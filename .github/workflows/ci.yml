@@ -73,10 +73,11 @@ jobs:
         run: |
           npm install
           npm run api:generate
-      - name: Web lint, types and build
+      - name: Web lint, types, offline tests and build
         run: |
           npm run web:lint
           npm run web:typecheck
+          npm run web:test
           npm run web:build
       - name: Build deployment images
         run: |
