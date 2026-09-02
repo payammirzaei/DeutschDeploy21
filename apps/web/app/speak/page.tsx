@@ -168,10 +168,13 @@ export default function SpeakPage() {
     };
   }, [router]);
 
+  const pendingAttemptId =
+    attempt && PENDING_STATES.has(attempt.status) ? attempt.id : null;
+
   useEffect(() => {
-    if (!attempt || !PENDING_STATES.has(attempt.status)) return;
+    if (!pendingAttemptId) return;
     let cancelled = false;
-    const id = attempt.id;
+    const id = pendingAttemptId;
     const timer = window.setInterval(async () => {
       const { data, response } = await api.GET("/api/v1/speech/attempts/{attempt_id}", {
         params: { path: { attempt_id: id } },
@@ -188,7 +191,7 @@ export default function SpeakPage() {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [attempt?.id, attempt?.status, applyAttempt, loadRecent]);
+  }, [pendingAttemptId, applyAttempt, loadRecent]);
 
   useEffect(() => {
     return () => {
