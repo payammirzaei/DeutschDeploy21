@@ -55,7 +55,8 @@ docs/                   product, architecture, ADRs, delivery notes
 **Phase 5B — Exercise explosion: merged and CI verified.**  
 **Phase 5C — Interview drills: merged and CI verified.**  
 **Phase 5D — Full 21-day curriculum: merged and CI verified.**  
-**Phase 6 — Durable speech pipeline: implemented and CI verified; production Railway provisioning remains an environment step.**
+**Phase 6 — Durable speech pipeline: merged and CI verified; production Railway provisioning remains an environment step.**  
+**Phase 7 — Mock interview and readiness: implementation / final CI verification.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
@@ -71,11 +72,13 @@ Every submitted learning, practice, interview-drill, or review attempt produces 
 
 `/drills` is the Interview Lab. It provides 18 curated deterministic drills across six interview skills: best-answer quality, HR structure, STAR behavioral structure, technical explanation, architecture sequencing, and recovery-phrase recall under visible time pressure. The same drills can also appear as required late-course activities without optional Interview Lab sessions satisfying course progress.
 
-`/speak` is the first durable Speak Mode. Recording is consent-gated and optional. A speech attempt and frozen prompt are persisted before provider analysis; private audio is uploaded with size/type/duration bounds, transcription runs through the durable worker queue, the raw provider transcript remains immutable, learner corrections are append-only, and text-level feedback is versioned. Failed transcription can be retried without losing the attempt, manual text fallback keeps the mode usable without microphone access, and raw audio can be deleted while derived transcript/feedback remain. Pronunciation and accent are intentionally not scored without credible assessment evidence.
+`/speak` is the durable Speak Mode. Recording is consent-gated and optional. A speech attempt and frozen prompt are persisted before provider analysis; private audio is uploaded with size/type/duration bounds, transcription runs through the durable worker queue, the raw provider transcript remains immutable, learner corrections are append-only, and text-level feedback is versioned. Failed transcription can be retried without losing the attempt, manual text fallback keeps the mode usable without microphone access, and raw audio can be deleted while derived transcript/feedback remain. Pronunciation and accent are intentionally not scored without credible assessment evidence.
+
+`/mock` is the interview-transfer layer. Guided, Practice and Realistic sessions pin a version-controlled interview blueprint and materialize durable turns. Weak answers can create one deterministic contextual follow-up, text submissions are idempotent, voice answers reuse the exact Phase 6 `SpeechAttempt` pipeline, and completion creates a readiness report separate from vocabulary mastery. Baseline and final reports can be compared only under compatible blueprint/rubric boundaries.
 
 ReleaseActivity can reference either an exact content version or a version-controlled interview drill source. The runtime keeps source identity, course placement, immutable learner-facing instances and mastery targets separate.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md), [`docs/23-phase-5c-interview-drills.md`](docs/23-phase-5c-interview-drills.md), [`docs/24-phase-5d-full-curriculum.md`](docs/24-phase-5d-full-curriculum.md), and [`docs/25-phase-6-speech-pipeline.md`](docs/25-phase-6-speech-pipeline.md).
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md), [`docs/23-phase-5c-interview-drills.md`](docs/23-phase-5c-interview-drills.md), [`docs/24-phase-5d-full-curriculum.md`](docs/24-phase-5d-full-curriculum.md), [`docs/25-phase-6-speech-pipeline.md`](docs/25-phase-6-speech-pipeline.md), and [`docs/26-phase-7-mock-interview-readiness.md`](docs/26-phase-7-mock-interview-readiness.md).
 
 ## Local development
 
@@ -114,6 +117,7 @@ After signing in:
 - open `/practice` for unlimited ten-mode Silent Practice;
 - open `/drills` for silent-first interview-transfer drills;
 - open `/speak` for consent-gated recording, transcription, correction and speaking feedback;
+- open `/mock` for guided, practice or realistic interview sessions and readiness reports;
 - open `/review` for due spaced-review work and the combined mastery map.
 
 ## End-to-end proof paths
@@ -172,6 +176,14 @@ Speech:
 Browser MediaRecorder → private media adapter → durable SpeechAttempt + PlatformJob
 → Redis signal → worker → provider-neutral transcription → immutable raw transcript
 → learner correction → versioned text-level feedback → retry/new rep
+```
+
+Mock interview:
+
+```text
+Versioned interview blueprint → frozen session plan → durable turn
+→ text or linked SpeechAttempt → deterministic rubric → contextual follow-up
+→ completed readiness report → compatible baseline/final comparison
 ```
 
 Mastery and review:
