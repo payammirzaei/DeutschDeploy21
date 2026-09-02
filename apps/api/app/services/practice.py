@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.learning import ActivityInstance, Attempt, CourseDay, ReleaseActivity
 from app.models.user import User
 from app.schemas.practice import PracticeActivityView, PracticeNextResponse
-from app.services.exercises import (
-    SILENT_EXERCISE_TYPES,
+from app.services.exercise_registry import (
+    ALL_SILENT_EXERCISE_TYPES,
     UnsupportedExerciseError,
-    materialize_exercise,
+    materialize_registered_exercise,
 )
 from app.services.learning import ensure_starter_learning, get_active_enrollment
 
@@ -53,10 +53,10 @@ async def get_next_silent_practice(
         for instance, attempt_count in instance_rows
     }
     total_attempts = sum(counts.values())
-    start_index = total_attempts % len(SILENT_EXERCISE_TYPES)
+    start_index = total_attempts % len(ALL_SILENT_EXERCISE_TYPES)
     type_order = (
-        SILENT_EXERCISE_TYPES[start_index:]
-        + SILENT_EXERCISE_TYPES[:start_index]
+        ALL_SILENT_EXERCISE_TYPES[start_index:]
+        + ALL_SILENT_EXERCISE_TYPES[:start_index]
     )
 
     for exercise_type in type_order:
@@ -70,7 +70,7 @@ async def get_next_silent_practice(
         for activity in ordered_activities:
             attempt_count = counts.get((activity.id, exercise_type), 0)
             try:
-                instance = await materialize_exercise(
+                instance = await materialize_registered_exercise(
                     session,
                     enrollment,
                     activity,
@@ -89,7 +89,7 @@ async def get_next_silent_practice(
                     prompt=instance.prompt,
                     attempt_count=attempt_count,
                 ),
-                available_types=list(SILENT_EXERCISE_TYPES),
+                available_types=list(ALL_SILENT_EXERCISE_TYPES),
             )
 
     raise RuntimeError("No compatible silent exercise could be materialized")
