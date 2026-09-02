@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@/src/lib/api";
 
 type User = { id: string; email: string };
@@ -21,23 +21,29 @@ export default function DashboardPage() {
   const [running, setRunning] = useState(false);
   const [system, setSystem] = useState<"checking" | "ready" | "degraded">("checking");
 
-  const load = useCallback(async () => {
-    const [{ data: me, response: meResponse }, { data: health }] = await Promise.all([
-      api.GET("/api/v1/auth/me"),
-      api.GET("/api/v1/health/ready"),
-    ]);
-
-    if (meResponse.status === 401) {
-      router.replace("/login");
-      return;
-    }
-    if (me) setUser(me as User);
-    setSystem(health?.status === "ok" ? "ready" : "degraded");
-  }, [router]);
-
   useEffect(() => {
-    void load();
-  }, [load]);
+    let cancelled = false;
+
+    Promise.all([api.GET("/api/v1/auth/me"), api.GET("/api/v1/health/ready")])
+      .then(([{ data: me, response: meResponse }, { data: health }]) => {
+        if (cancelled) return;
+
+        if (meResponse.status === 401) {
+          router.replace("/login");
+          return;
+        }
+
+        if (me) setUser(me as User);
+        setSystem(health?.status === "ok" ? "ready" : "degraded");
+      })
+      .catch(() => {
+        if (!cancelled) setSystem("degraded");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
 
   useEffect(() => {
     if (!job || !["queued", "running"].includes(job.status)) return;
