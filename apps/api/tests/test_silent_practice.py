@@ -17,6 +17,11 @@ EXPECTED_TYPES = {
     "perfect_participle_choice",
     "auxiliary_choice",
     "sentence_order",
+    "meaning_matching",
+    "example_cloze",
+    "usage_error_spotting",
+    "perfect_form_typing",
+    "phrase_builder",
 }
 EXPECTED_DIMENSIONS = {
     "meaning_recognition",
@@ -24,6 +29,11 @@ EXPECTED_DIMENSIONS = {
     "perfect_participle",
     "perfect_auxiliary",
     "sentence_structure",
+    "meaning_association",
+    "contextual_recall",
+    "usage_discrimination",
+    "perfect_form",
+    "phrase_fluency",
 }
 
 
@@ -45,13 +55,26 @@ def _answer_for(activity: dict) -> dict:
         "meaning_multiple_choice",
         "perfect_participle_choice",
         "auxiliary_choice",
+        "usage_error_spotting",
     }:
         return {"choice_id": prompt["choices"][0]["id"], "duration_ms": 1200}
-    if exercise_type == "reverse_typing":
+    if exercise_type in {"reverse_typing", "example_cloze", "perfect_form_typing"}:
         return {"text": "probe", "duration_ms": 1200}
-    if exercise_type == "sentence_order":
+    if exercise_type in {"sentence_order", "phrase_builder"}:
         return {
             "token_ids": [token["id"] for token in prompt["tokens"]],
+            "duration_ms": 1200,
+        }
+    if exercise_type == "meaning_matching":
+        return {
+            "pair_ids": [
+                f"{left['id']}:{right['id']}"
+                for left, right in zip(
+                    prompt["left_items"],
+                    prompt["right_items"],
+                    strict=True,
+                )
+            ],
             "duration_ms": 1200,
         }
     raise AssertionError(f"Unhandled exercise type: {exercise_type}")
@@ -72,7 +95,7 @@ def test_silent_practice_rotates_types_without_completing_course_days() -> None:
         before_current_day = before["current_day"]
 
         seen_types: list[str] = []
-        for _ in range(5):
+        for _ in range(len(EXPECTED_TYPES)):
             next_response = client.post("/api/v1/practice/silent/next")
             assert next_response.status_code == 200
             body = next_response.json()
