@@ -48,7 +48,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: apps/api/Dockerfile
+      dockerfile: apps/api/Dockerfile.worker
     env_file: .env
     environment:
       DATABASE_URL: postgresql://deutschdeploy:deutschdeploy@postgres:5432/deutschdeploy
@@ -56,7 +56,6 @@ services:
       MEDIA_STORAGE_BACKEND: filesystem
       MEDIA_ROOT: /data/media
     volumes: ["speech_media:/data/media"]
-    command: ["uv", "run", "python", "-m", "app.worker.main"]
     depends_on:
       api: {condition: service_healthy}
 

@@ -81,6 +81,7 @@ jobs:
       - name: Build deployment images
         run: |
           docker build -f apps/api/Dockerfile -t deutschdeploy21-api:ci .
+          docker build -f apps/api/Dockerfile.worker -t deutschdeploy21-worker:ci .
           docker build -f apps/web/Dockerfile -t deutschdeploy21-web:ci .
       - name: Smoke packaged API import
         run: |
@@ -92,3 +93,32 @@ jobs:
             -e WEB_ORIGIN=http://localhost:3000 \
             deutschdeploy21-api:ci \
             python -c "import app.main; print('packaged api import ok')"
+      - name: Smoke packaged worker startup
+        run: |
+          cleanup() {
+            docker rm -f dd21-worker-smoke >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          docker run -d --name dd21-worker-smoke --network host \
+            -e APP_ENV=test \
+            -e APP_SECRET_KEY=test-secret-key-that-is-longer-than-thirty-two-characters \
+            -e DATABASE_URL=postgresql://deutschdeploy:deutschdeploy@localhost:5432/deutschdeploy \
+            -e REDIS_URL=redis://localhost:6379/15 \
+            -e WEB_ORIGIN=http://localhost:3000 \
+            deutschdeploy21-worker:ci
+          for attempt in $(seq 1 20); do
+            output=$(docker logs dd21-worker-smoke 2>&1 || true)
+            if printf '%s\n' "$output" | grep -q "worker_started"; then
+              printf '%s\n' "$output"
+              exit 0
+            fi
+            if ! docker inspect -f '{{.State.Running}}' dd21-worker-smoke 2>/dev/null | grep -q true; then
+              printf '%s\n' "$output"
+              echo "worker container exited before startup" >&2
+              exit 1
+            fi
+            sleep 0.5
+          done
+          docker logs dd21-worker-smoke 2>&1 || true
+          echo "worker_started log was not observed" >&2
+          exit 1
