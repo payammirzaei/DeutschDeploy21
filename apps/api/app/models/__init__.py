@@ -19,7 +19,7 @@ from app.models.learning import (
     Evaluation,
     ReleaseActivity,
 )
-from app.models.mastery import LearningTarget, LearnerMastery, MasteryEvent, ReviewQueueEntry
+from app.models.mastery import LearnerMastery, LearningTarget, MasteryEvent, ReviewQueueEntry
 from app.models.platform_job import PlatformJob
 from app.models.user import User
 
