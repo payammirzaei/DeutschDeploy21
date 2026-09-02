@@ -10,6 +10,12 @@ import {
   ExercisePrompt,
 } from "@/src/components/exercise-player";
 import { api } from "@/src/lib/api";
+import {
+  ATTEMPT_SYNCED_EVENT,
+  AttemptSyncDetail,
+  learningAttemptUrl,
+  submitLearningAttemptSafely,
+} from "@/src/lib/offline-attempts";
 
 import styles from "./practice.module.css";
 
@@ -55,6 +61,7 @@ export default function PracticePage() {
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [queued, setQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionCount, setSessionCount] = useState(0);
   const startedAt = useRef(0);
@@ -62,6 +69,7 @@ export default function PracticePage() {
   const loadNext = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setQueued(false);
     const { data, response } = await api.POST("/api/v1/practice/silent/next");
     if (response.status === 401) {
       router.replace("/login");
@@ -87,29 +95,44 @@ export default function PracticePage() {
     return () => window.clearTimeout(timer);
   }, [loadNext]);
 
+  useEffect(() => {
+    if (!activity) return;
+    const expectedUrl = learningAttemptUrl(activity.id);
+    const onSynced = (event: Event) => {
+      const detail = (event as CustomEvent<AttemptSyncDetail<AttemptResult>>).detail;
+      if (detail.url !== expectedUrl) return;
+      setResult(detail.data);
+      setQueued(false);
+      setSubmitting(false);
+      setError(null);
+      setSessionCount((count) => count + 1);
+    };
+    window.addEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
+    return () => window.removeEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
+  }, [activity]);
+
   async function submit(answer: ExerciseAnswer) {
-    if (!activity || submitting) return;
+    if (!activity || submitting || queued) return;
     setSubmitting(true);
     setError(null);
     const durationMs = startedAt.current
       ? Math.max(0, Date.now() - startedAt.current)
       : null;
-    const { data, response } = await api.POST(
-      "/api/v1/learning/instances/{instance_id}/attempts",
-      {
-        params: {
-          path: { instance_id: activity.id },
-          header: { "Idempotency-Key": crypto.randomUUID() },
-        },
-        body: { ...answer, duration_ms: durationMs },
-      },
-    );
-    if (!response.ok || !data) {
+    const submission = await submitLearningAttemptSafely<AttemptResult>(activity.id, {
+      ...answer,
+      duration_ms: durationMs,
+    });
+    if (submission.status === "queued") {
+      setQueued(true);
+      setSubmitting(false);
+      return;
+    }
+    if (submission.status === "error") {
       setError("Your answer was not saved. Try once more.");
       setSubmitting(false);
       return;
     }
-    setResult(data as AttemptResult);
+    setResult(submission.data);
     setSessionCount((count) => count + 1);
     setSubmitting(false);
   }
@@ -205,7 +228,7 @@ export default function PracticePage() {
                 key={activity.id}
                 exerciseType={activity.exercise_type}
                 prompt={activity.prompt}
-                submitting={submitting}
+                submitting={submitting || queued}
                 onSubmit={submit}
               />
             </article>
