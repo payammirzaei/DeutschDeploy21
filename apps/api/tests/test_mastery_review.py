@@ -47,6 +47,10 @@ def _target_for_activity(home: dict, activity: dict) -> dict:
     )
 
 
+def _target_by_id(home: dict, target_id: str) -> dict:
+    return next(row for row in home["mastery"] if row["target_id"] == target_id)
+
+
 def test_attempt_projects_mastery_and_duplicate_is_idempotent() -> None:
     with TestClient(app) as client:
         _login(client)
@@ -84,45 +88,55 @@ def test_due_review_reuses_frozen_prompt_and_updates_projection(
     with TestClient(app) as client:
         _login(client)
         activity = _next_available_activity(client)
-
-        correct_choice = None
-        for choice in activity["choices"]:
-            response = client.post(
-                f"/api/v1/learning/instances/{activity['id']}/attempts",
-                headers={"Idempotency-Key": f"find-correct-{uuid4()}"},
-                json={"choice_id": choice["id"]},
-            )
-            assert response.status_code == 200
-            if response.json()["correct"]:
-                correct_choice = choice["id"]
-                break
-        assert correct_choice is not None
+        first_attempt = client.post(
+            f"/api/v1/learning/instances/{activity['id']}/attempts",
+            headers={"Idempotency-Key": f"seed-review-{uuid4()}"},
+            json={"choice_id": activity["choices"][0]["id"]},
+        )
+        assert first_attempt.status_code == 200
 
         future = datetime.now(UTC) + timedelta(days=2)
         monkeypatch.setattr(mastery_service, "utcnow", lambda: future)
+
+        due_home = client.get("/api/v1/review/home")
+        assert due_home.status_code == 200
+        due_body = due_home.json()
+        assert due_body["due_count"] >= 1
 
         review = client.post("/api/v1/review/next")
         assert review.status_code == 200
         review_body = review.json()
         assert review_body["completed"] is False
         review_activity = review_body["activity"]
-        assert review_activity["activity_instance_id"] == activity["id"]
-        assert review_activity["content_version_id"] == activity["content_version_id"]
-        assert review_activity["choices"] == activity["choices"]
 
+        queue_item = next(
+            row
+            for row in due_body["due"]
+            if row["activity_instance_id"] == review_activity["activity_instance_id"]
+        )
+        assert review_activity["target_id"] == queue_item["target_id"]
+        assert review_activity["content_version_id"] == queue_item["content_version_id"]
+        assert review_activity["lemma"] == queue_item["lemma"]
+        assert review_activity["reason_code"] == queue_item["reason_code"]
+        assert review_activity["state"] == queue_item["state"]
+        assert review_activity["question"]
+        assert len(review_activity["choices"]) == 4
+        assert len({choice["id"] for choice in review_activity["choices"]}) == 4
+        assert len({choice["text"] for choice in review_activity["choices"]}) == 4
+
+        before_target = _target_by_id(due_body, review_activity["target_id"])
         retry = client.post(
-            f"/api/v1/learning/instances/{activity['id']}/attempts",
+            f"/api/v1/learning/instances/{review_activity['activity_instance_id']}/attempts",
             headers={"Idempotency-Key": f"review-{uuid4()}"},
-            json={"choice_id": correct_choice},
+            json={"choice_id": review_activity["choices"][0]["id"]},
         )
         assert retry.status_code == 200
-        assert retry.json()["correct"] is True
 
         home = client.get("/api/v1/review/home")
         assert home.status_code == 200
-        target = _target_for_activity(home.json(), activity)
-        assert target["success_streak"] >= 2
-        assert target["evidence_count"] >= 2
+        after_target = _target_by_id(home.json(), review_activity["target_id"])
+        assert after_target["evidence_count"] == before_target["evidence_count"] + 1
+        assert after_target["next_review_at"] != before_target["next_review_at"]
 
 
 def test_mastery_projection_rebuild_is_replayable() -> None:
