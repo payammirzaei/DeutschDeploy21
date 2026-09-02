@@ -11,7 +11,9 @@ class ChoiceView(BaseModel):
 class ActivitySummary(BaseModel):
     activity_id: UUID
     position: int
-    content_version_id: UUID
+    source_kind: str
+    source_key: str
+    content_version_id: UUID | None = None
     exercise_type: str
     submitted: bool
 
@@ -31,8 +33,11 @@ class LearningHome(BaseModel):
     enrollment_id: UUID | None = None
     course_title: str | None = None
     release_version: int | None = None
+    latest_release_version: int = 2
+    upgrade_available: bool = False
     current_day: int = 1
-    available_through_day: int = 3
+    available_through_day: int = 21
+    course_complete: bool = False
     days: list[DayView] = Field(default_factory=list)
 
 
@@ -40,7 +45,9 @@ class ActivityInstanceView(BaseModel):
     id: UUID
     day_number: int
     position: int
-    content_version_id: UUID
+    source_kind: str
+    source_key: str
+    content_version_id: UUID | None = None
     exercise_type: str
     contract_version: int
     prompt_checksum: str
@@ -56,11 +63,19 @@ class NextActivityResponse(BaseModel):
 
 
 class AttemptIn(BaseModel):
-    choice_id: str | None = Field(default=None, min_length=1, max_length=120)
+    choice_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=120,
+    )
     text: str | None = Field(default=None, max_length=600)
     token_ids: list[str] | None = Field(default=None, max_length=40)
     pair_ids: list[str] | None = Field(default=None, max_length=20)
-    duration_ms: int | None = Field(default=None, ge=0, le=3_600_000)
+    duration_ms: int | None = Field(
+        default=None,
+        ge=0,
+        le=3_600_000,
+    )
 
     @model_validator(mode="after")
     def require_answer(self) -> "AttemptIn":
@@ -87,5 +102,16 @@ class AttemptResult(BaseModel):
 class StartLearningResult(BaseModel):
     enrollment_id: UUID
     course_release_id: UUID
+    release_version: int
     created_enrollment: bool
+    pinned_activity_count: int
+
+
+class UpgradeLearningResult(BaseModel):
+    enrollment_id: UUID
+    from_release_version: int | None = None
+    to_release_version: int
+    created_enrollment: bool
+    carried_completed_days: int
+    current_day: int
     pinned_activity_count: int
