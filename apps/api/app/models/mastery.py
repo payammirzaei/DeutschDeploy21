@@ -15,6 +15,7 @@ def utcnow() -> datetime:
 class LearningTarget(Base):
     __tablename__ = "learning_targets"
     __table_args__ = (
+        UniqueConstraint("target_key", name="uq_learning_target_key"),
         UniqueConstraint(
             "content_version_id",
             "skill_dimension",
@@ -24,8 +25,14 @@ class LearningTarget(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    content_version_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("content_versions.id", ondelete="RESTRICT"), index=True
+    target_key: Mapped[str] = mapped_column(String(220), unique=True)
+    target_label: Mapped[str | None] = mapped_column(String(240), nullable=True)
+    target_kind: Mapped[str] = mapped_column(String(40), default="content")
+    content_version_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("content_versions.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
     )
     skill_dimension: Mapped[str] = mapped_column(String(80))
     production_mode: Mapped[str] = mapped_column(String(40))

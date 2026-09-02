@@ -92,9 +92,10 @@ class ActivityInstance(Base):
     __table_args__ = (
         UniqueConstraint(
             "enrollment_id",
-            "release_activity_id",
+            "source_kind",
+            "source_key",
             "instance_key",
-            name="uq_enrollment_activity_instance_key",
+            name="uq_enrollment_source_instance",
         ),
     )
 
@@ -102,12 +103,20 @@ class ActivityInstance(Base):
     enrollment_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("enrollments.id", ondelete="CASCADE"), index=True
     )
-    release_activity_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("release_activities.id", ondelete="RESTRICT"), index=True
+    release_activity_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("release_activities.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
     )
+    source_kind: Mapped[str] = mapped_column(String(40), default="release_activity")
+    source_key: Mapped[str] = mapped_column(String(180))
     instance_key: Mapped[str] = mapped_column(String(120), default="course")
-    content_version_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("content_versions.id", ondelete="RESTRICT"), index=True
+    content_version_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("content_versions.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
     )
     exercise_type: Mapped[str] = mapped_column(String(80))
     contract_version: Mapped[int] = mapped_column(Integer)
