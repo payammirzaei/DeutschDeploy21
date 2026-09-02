@@ -321,7 +321,7 @@ export default function MockInterviewPage() {
     ) ?? "";
   }
 
-  async function startVoiceAnswer() {
+  async function startVoiceAnswer(event: { timeStamp: number }) {
     if (!session || !activeTurn) return;
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
       setError("This browser cannot record audio here. Text answer remains available.");
@@ -348,8 +348,8 @@ export default function MockInterviewPage() {
         ? new MediaRecorder(stream, { mimeType })
         : new MediaRecorder(stream);
       recorderRef.current = recorder;
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) chunksRef.current.push(event.data);
+      recorder.ondataavailable = (mediaEvent) => {
+        if (mediaEvent.data.size > 0) chunksRef.current.push(mediaEvent.data);
       };
       recorder.onstop = async () => {
         const duration = startedAtRef.current
@@ -367,7 +367,7 @@ export default function MockInterviewPage() {
         setRecording(false);
         await uploadVoice(linked!.id, blob, duration);
       };
-      startedAtRef.current = Date.now();
+      startedAtRef.current = performance.timeOrigin + event.timeStamp;
       setRecordingSeconds(0);
       recorder.start(250);
       setRecording(true);
