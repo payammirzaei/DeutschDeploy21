@@ -1,6 +1,6 @@
 # Phase 7 — Mock interview and readiness
 
-**Status:** Implemented; final CI verification pending.
+**Status:** Implemented and CI verified on PR #10; merge pending.
 
 ## 1. User outcome
 
@@ -251,7 +251,9 @@ Text submission uses `Idempotency-Key`.
 9. mock speech turn creates a real Phase 6 `SpeechAttempt`;
 10. Phase 6 manual transcript/feedback can be synced back into the mock turn.
 
-The repository suite must also keep all previous platform, content, curriculum, practice, mastery, review and speech tests green.
+CI run #104 (`33633258951`) verified migrations `0001–0009`, Ruff, all 18 backend tests, OpenAPI export, generated TypeScript, frontend lint/typecheck, and the production Next.js build including `/mock`.
+
+The repository suite also keeps all previous platform, content, curriculum, practice, mastery, review and speech tests green. Speech consent tests were made order-independent after the new mock-speech integration exposed a pre-existing test-isolation assumption.
 
 ## 14. AI boundary
 
