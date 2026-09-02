@@ -48,13 +48,16 @@ docs/                   product, architecture, ADRs, delivery notes
 ## Current status
 
 **Phase 1 — Platform skeleton: merged and CI verified.**  
-**Phase 2 — Content and publishing: implementation in progress.**
+**Phase 2 — Content and publishing: merged and CI verified.**  
+**Phase 3 — Deterministic learning loop: implemented and CI verified.**
 
-The executable platform now includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
+The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
-Phase 2 adds relational content drafts, immutable published versions, typed verb grammar, localizations, examples, dry-run/idempotent imports, publication history, and an initial 100-verb software-interview catalog that can be installed and browsed without changing application code.
+The content layer adds relational drafts, immutable published versions, typed verb grammar, localizations, examples, dry-run/idempotent imports, publication history, and a controlled 100-verb software-interview catalog.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md) and [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md).
+The first learner-facing loop is available at `/learn`. It creates a version-pinned course release for Days 1–3, materializes 21 deterministic multiple-choice activities, persists append-only attempts and evaluations, gives immediate feedback, advances after submissions rather than retry-until-correct gating, and resumes from durable learner state.
+
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), and [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md).
 
 ## Local development
 
@@ -87,6 +90,8 @@ cd apps/api
 uv run python -m app.scripts.seed_content
 ```
 
+After signing in, open `/learn` to initialize the first pinned course release and begin Days 1–3.
+
 ## End-to-end proof paths
 
 Platform:
@@ -99,6 +104,13 @@ Content:
 
 ```text
 CSV/JSON → validate → dry-run → draft → publish → immutable version → API → catalog
+```
+
+Learning:
+
+```text
+Published content version → course release → enrollment → activity instance
+→ idempotent attempt → deterministic evaluation → progress/resume
 ```
 
 ## Non-negotiable principles
