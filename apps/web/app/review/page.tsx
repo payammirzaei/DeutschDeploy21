@@ -73,7 +73,7 @@ export default function ReviewPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const startedAt = useRef<number>(Date.now());
+  const startedAt = useRef<number | null>(null);
 
   const loadHome = useCallback(async () => {
     const { data, response } = await api.GET("/api/v1/review/home");
@@ -136,7 +136,9 @@ export default function ReviewPage() {
     if (!activity || !selected || submitting) return;
     setSubmitting(true);
     setError(null);
-    const duration = Math.max(0, Date.now() - startedAt.current);
+    const duration = startedAt.current === null
+      ? 0
+      : Math.max(0, Date.now() - startedAt.current);
     const { data, response } = await api.POST(
       "/api/v1/learning/instances/{instance_id}/attempts",
       {
