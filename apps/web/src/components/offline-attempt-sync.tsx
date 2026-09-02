@@ -8,6 +8,8 @@ import {
   OUTBOX_CHANGED_EVENT,
 } from "@/src/lib/offline-attempts";
 
+import styles from "./offline-attempt-sync.module.css";
+
 export function OfflineAttemptSync() {
   const [pending, setPending] = useState(0);
   const [syncing, setSyncing] = useState(false);
@@ -46,7 +48,7 @@ export function OfflineAttemptSync() {
   if (!pending) return null;
 
   return (
-    <div className="offline-sync-banner" role="status" aria-live="polite">
+    <div className={styles.banner} role="status" aria-live="polite">
       <strong>{syncing ? "Syncing saved answer…" : "Answer saved offline"}</strong>
       <span>
         {pending} {pending === 1 ? "attempt is" : "attempts are"} safe on this device and will sync
