@@ -1,6 +1,6 @@
 # Phase 5A — Silent multi-exercise engine
 
-**Status:** Implementation / CI verification
+**Status:** Implemented / CI verified
 
 ## Outcome
 
@@ -200,17 +200,19 @@ Dashboard makes Silent Mode a primary product action rather than hiding it insid
 - removes the server default after backfill;
 - downgrade removes non-course practice variants before restoring the Phase 3 uniqueness constraint.
 
-## Verification target
+## Verification
 
-The Phase 5A integration test must prove:
+CI verifies:
 
-- the five initial exercise types can all materialize;
-- all answer shapes pass through the same attempt endpoint;
-- silent attempts create mastery evidence in distinct skill dimensions;
-- Silent Mode does not alter course day submitted counts;
-- Silent Mode does not advance `current_day`;
-- OpenAPI and generated TypeScript expose the generic contracts;
-- `/practice` and `/review` pass lint, strict typecheck and production build.
+- PostgreSQL migrations 0001–0005;
+- Ruff;
+- 10/10 backend tests;
+- all five initial silent exercise types materialize and submit through one attempt endpoint;
+- Silent Mode leaves course submitted counts and `current_day` unchanged;
+- silent attempts create five distinct mastery dimensions;
+- OpenAPI export and generated TypeScript contracts;
+- frontend ESLint and strict TypeScript;
+- Next.js production build for `/practice`, `/review` and the shared exercise player.
 
 ## Deliberately deferred
 
