@@ -1,6 +1,6 @@
 # Phase 5C — Interview drills
 
-**Status:** Implementation / CI verification
+**Status:** Implemented and CI verified
 
 ## Outcome
 
@@ -326,18 +326,20 @@ It provides:
 
 Dashboard promotes Interview Lab as a primary action alongside Silent Practice, Review and the structured course.
 
-## Verification target
+## Verification
 
-Before merge, CI must prove:
+CI proves:
 
 - migrations `0001` through `0006` apply on PostgreSQL;
 - Ruff passes;
+- 11/11 backend integration tests pass;
 - the existing ten-family Silent Mode integration test passes through the real registry dispatcher;
 - 18 interview drills rotate through all six families;
 - all 18 submit through the existing attempt endpoint;
 - six distinct `interview_skill` mastery dimensions are projected;
 - interview drills do not alter `current_day`;
 - interview drills do not alter required day submitted counts;
+- review replay is exercise-generic rather than MCQ-specific;
 - OpenAPI exports the generalized contracts;
 - generated TypeScript succeeds;
 - `/drills`, `/practice` and `/review` pass ESLint, strict typecheck and Next.js production build.
