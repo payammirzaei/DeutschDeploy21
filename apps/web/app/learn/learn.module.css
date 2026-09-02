@@ -95,9 +95,10 @@
   background: rgba(159, 45, 32, .05);
 }
 
-.onboarding {
+.onboarding,
+.upgradeCard {
   max-width: 1180px;
-  margin: 64px auto 0;
+  margin: 52px auto 0;
   border: 1px solid var(--ink);
   background: #faf7f0;
   padding: clamp(26px, 5vw, 48px);
@@ -107,16 +108,26 @@
   align-items: end;
 }
 
-.onboarding h2 {
+.upgradeCard {
+  max-width: 1440px;
+  margin-top: 24px;
+  border-top: 6px solid var(--ink);
+  background: rgba(216, 255, 99, .18);
+}
+
+.onboarding h2,
+.upgradeCard h2 {
   margin: 10px 0 12px;
-  max-width: 720px;
-  font-size: clamp(32px, 5vw, 54px);
+  max-width: 760px;
+  font-size: clamp(30px, 5vw, 54px);
   line-height: .98;
   letter-spacing: -.045em;
 }
 
-.onboarding p {
-  max-width: 700px;
+.onboarding p,
+.upgradeCard p {
+  max-width: 760px;
+  margin-bottom: 0;
   color: var(--muted);
   line-height: 1.55;
 }
@@ -131,15 +142,25 @@
 }
 
 .dayRail {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  max-height: calc(100dvh - 36px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 24px 26px 0 0;
   border-right: 1px solid var(--line);
 }
 
 .courseMeta {
-  padding-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 4px 0 20px;
   display: grid;
   gap: 5px;
   border-bottom: 1px solid var(--line);
+  background: var(--paper);
 }
 
 .courseMeta span {
@@ -158,7 +179,7 @@
   border-bottom: 1px solid var(--line);
   background: transparent;
   color: var(--muted);
-  padding: 20px 0;
+  padding: 17px 0;
   display: grid;
   grid-template-columns: 34px 1fr 20px;
   gap: 10px;
@@ -258,7 +279,15 @@
   font-size: 13px !important;
 }
 
+.nextActions {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .exerciseTop {
+  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -269,73 +298,24 @@
 }
 
 .exerciseTop code {
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background: var(--ink);
   color: var(--acid);
   padding: 6px 8px;
   letter-spacing: 0;
 }
 
-.exercise h2 {
-  margin: 26px 0 32px;
-  max-width: 820px;
-  font-size: clamp(34px, 5vw, 60px);
-  line-height: 1.04;
-  letter-spacing: -.045em;
-}
-
-.choices {
-  display: grid;
-  gap: 10px;
-}
-
-.choice {
-  width: 100%;
-  border: 1px solid var(--line);
-  background: #faf7f0;
-  color: var(--ink);
-  padding: 17px;
-  display: grid;
-  grid-template-columns: 38px 1fr;
-  gap: 12px;
-  align-items: center;
-  text-align: left;
-  cursor: pointer;
-  transition: transform .12s ease, border-color .12s ease, background .12s ease;
-}
-
-.choice:hover {
-  transform: translateX(3px);
-  border-color: var(--ink);
-}
-
-.choice.selected {
-  border-color: var(--ink);
-  background: var(--acid);
-}
-
-.choice span {
-  width: 28px;
-  height: 28px;
-  border: 1px solid currentColor;
-  display: grid;
-  place-items: center;
-  font: 700 11px/1 monospace;
-}
-
-.choice strong {
-  font-size: 17px;
-}
-
 .exerciseFooter {
   margin-top: 26px;
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: center;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
 }
 
 .exerciseFooter > span {
-  max-width: 520px;
+  max-width: 620px;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.45;
@@ -393,6 +373,9 @@
   }
 
   .dayRail {
+    position: static;
+    max-height: none;
+    overflow: visible;
     border-right: 0;
     padding: 18px 0;
     display: grid;
@@ -401,6 +384,7 @@
   }
 
   .courseMeta {
+    position: static;
     grid-column: 1 / -1;
   }
 
@@ -432,13 +416,15 @@
 
   .nav {
     gap: 12px;
+    font-size: 12px;
   }
 
   .hero h1 {
     font-size: clamp(54px, 18vw, 76px);
   }
 
-  .onboarding {
+  .onboarding,
+  .upgradeCard {
     grid-template-columns: 1fr;
   }
 
@@ -462,15 +448,6 @@
     font-size: 21px;
   }
 
-  .exerciseFooter {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .exerciseFooter button {
-    width: 100%;
-  }
-
   .scoreRow {
     align-items: flex-start;
     flex-wrap: wrap;
@@ -480,10 +457,14 @@
     width: 100%;
     margin-left: 0;
   }
+
+  .nextActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .choice,
   .progressTrack div {
     transition: none;
   }
