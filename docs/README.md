@@ -32,7 +32,8 @@ This directory is the authoritative design baseline for the product. It explains
 26. [Phase 7 mock interview and readiness](26-phase-7-mock-interview-readiness.md)
 27. [Phase 8A motivation, mobile polish and accessibility foundation](27-phase-8a-motivation-mobile-accessibility.md)
 28. [Phase 8B offline-safe attempts and operational visibility](28-phase-8b-offline-operations.md)
-29. [Architecture Decision Records](adr/README.md)
+29. [Phase 8C release hardening](29-phase-8c-release-hardening.md)
+30. [Architecture Decision Records](adr/README.md)
 
 ## Document authority
 
