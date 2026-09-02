@@ -147,7 +147,11 @@ def upgrade() -> None:
         "activity_instances",
         ["content_version_id"],
     )
-    op.create_index("ix_activity_instances_prompt_checksum", "activity_instances", ["prompt_checksum"])
+    op.create_index(
+        "ix_activity_instances_prompt_checksum",
+        "activity_instances",
+        ["prompt_checksum"],
+    )
 
     op.create_table(
         "attempts",
