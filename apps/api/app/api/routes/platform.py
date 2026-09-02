@@ -1,10 +1,10 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Header, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import CurrentUser, DbSession
+from app.api.deps import CurrentUser, DbSession, IdempotencyKey
 from app.models.platform_job import PlatformJob
 from app.services.jobs import enqueue_job_signal, get_job, get_job_by_idempotency_key
 
@@ -40,7 +40,7 @@ async def create_job(
     payload: CreateJobRequest,
     session: DbSession,
     _user: CurrentUser,
-    idempotency_key: str = Header(alias="Idempotency-Key", min_length=8, max_length=160),
+    idempotency_key: IdempotencyKey,
 ) -> JobResponse:
     existing = await get_job_by_idempotency_key(session, idempotency_key)
     if existing:

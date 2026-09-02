@@ -27,7 +27,9 @@ class Settings(BaseSettings):
             if not self.app_bootstrap_email or not self.app_bootstrap_password:
                 raise ValueError("bootstrap credentials are required outside development/test")
             if "dev-only" in self.app_bootstrap_password.lower():
-                raise ValueError("development bootstrap password cannot be used outside development/test")
+                raise ValueError(
+                    "development bootstrap password cannot be used outside development/test"
+                )
         return self
 
     @property
