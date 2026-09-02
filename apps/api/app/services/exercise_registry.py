@@ -17,6 +17,7 @@ from app.services.advanced_exercises import (
 from app.services.exercises import (
     CONTRACT_VERSION,
     SILENT_EXERCISE_TYPES,
+    TARGET_BY_EXERCISE,
     UnsupportedExerciseError,
     evaluate_exercise,
     learning_target_for,
@@ -24,6 +25,7 @@ from app.services.exercises import (
 )
 
 ALL_SILENT_EXERCISE_TYPES = (*SILENT_EXERCISE_TYPES, *ADVANCED_EXERCISE_TYPES)
+TARGET_BY_EXERCISE.update(ADVANCED_TARGETS)
 
 
 async def materialize_registered_exercise(
