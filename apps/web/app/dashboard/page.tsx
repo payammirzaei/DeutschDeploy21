@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 import { api } from "@/src/lib/api";
 
 type User = { id: string; email: string };
@@ -27,12 +29,10 @@ export default function DashboardPage() {
     Promise.all([api.GET("/api/v1/auth/me"), api.GET("/api/v1/health/ready")])
       .then(([{ data: me, response: meResponse }, { data: health }]) => {
         if (cancelled) return;
-
         if (meResponse.status === 401) {
           router.replace("/login");
           return;
         }
-
         if (me) setUser(me as User);
         setSystem(health?.status === "ok" ? "ready" : "degraded");
       })
@@ -95,22 +95,37 @@ export default function DashboardPage() {
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 1 · PLATFORM SKELETON</div>
+          <div className="eyebrow">PHASE 2 · CONTENT & PUBLISHING</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            The learning engine comes next. First, prove the foundation can carry it.
+            The platform foundation is proven. Now the German learning material is becoming
+            versioned data that can evolve without changing application code.
           </p>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">END-TO-END CHECK</span>
-              <h2>Run one durable background job.</h2>
+              <span className="card-kicker">CONTENT CATALOG</span>
+              <h2>Install and browse the first 100 interview verbs.</h2>
               <p>
-                This creates an authenticated API write, persists it in PostgreSQL, signals Redis,
-                executes in the worker, then reads the durable result back.
+                Imports are validated and idempotent. Drafts remain editable; publishing creates
+                immutable versions that future curriculum and progress can safely reference.
               </p>
             </div>
-            <button className="button button-accent" onClick={runWorkerCheck} disabled={running}>
+            <Link className="button button-accent" href="/catalog">
+              Open catalog
+            </Link>
+          </article>
+
+          <article className="check-card">
+            <div>
+              <span className="card-kicker">PHASE 1 PROOF</span>
+              <h2>The durable worker path stays testable.</h2>
+              <p>
+                Browser → API → PostgreSQL → Redis → worker → PostgreSQL remains available as an
+                operational smoke test while the learning product grows.
+              </p>
+            </div>
+            <button className="button" onClick={runWorkerCheck} disabled={running}>
               {running ? "Running…" : "Run platform check"}
             </button>
           </article>
@@ -135,15 +150,15 @@ export default function DashboardPage() {
         </div>
 
         <aside className="phase-card">
-          <span className="card-kicker">FOUNDATION</span>
+          <span className="card-kicker">DELIVERY</span>
           <ol className="phase-list">
             <li className="done">
               <span>01</span> Product architecture
             </li>
-            <li className="active">
+            <li className="done">
               <span>02</span> Platform skeleton
             </li>
-            <li>
+            <li className="active">
               <span>03</span> Content & publishing
             </li>
             <li>

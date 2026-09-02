@@ -21,7 +21,8 @@ This directory is the authoritative design baseline for the product. It explains
 15. [Glossary](15-glossary.md)
 16. [UX and information architecture](16-ux-information-architecture.md)
 17. [Phase 1 platform skeleton](17-phase-1-platform-skeleton.md)
-18. [Architecture Decision Records](adr/README.md)
+18. [Phase 2 content and publishing](18-phase-2-content-publishing.md)
+19. [Architecture Decision Records](adr/README.md)
 
 ## Document authority
 

@@ -1,0 +1,101 @@
+external_id,lemma,translation_en,translation_fa,perfect_auxiliary,participle_ii,separable,separable_prefix,cefr,example_de
+verb.arbeiten,arbeiten,to work,کار کردن,haben,gearbeitet,false,,A2,Ich kann selbstständig und im Team arbeiten.
+verb.entwickeln,entwickeln,to develop,توسعه دادن,haben,entwickelt,false,,A2,Ich kann REST-APIs entwickeln.
+verb.programmieren,programmieren,to program,برنامه‌نویسی کردن,haben,programmiert,false,,A2,Ich kann Backend-Services in Python programmieren.
+verb.implementieren,implementieren,to implement,پیاده‌سازی کردن,haben,implementiert,false,,B1,Ich kann neue Funktionen sauber implementieren.
+verb.testen,testen,to test,تست کردن,haben,getestet,false,,A2,Ich kann APIs automatisiert testen.
+verb.pruefen,prüfen,to check,بررسی کردن,haben,geprüft,false,,A2,Ich kann Eingabedaten vor der Verarbeitung prüfen.
+verb.analysieren,analysieren,to analyze,تحلیل کردن,haben,analysiert,false,,B1,Ich kann Fehler und Logs systematisch analysieren.
+verb.planen,planen,to plan,برنامه‌ریزی کردن,haben,geplant,false,,A2,Ich kann technische Aufgaben realistisch planen.
+verb.entwerfen,entwerfen,to design,طراحی کردن,haben,entworfen,false,,B1,Ich kann eine einfache Systemarchitektur entwerfen.
+verb.gestalten,gestalten,to design / shape,طراحی و شکل‌دهی کردن,haben,gestaltet,false,,B1,Ich kann Benutzeroberflächen klar gestalten.
+verb.verbessern,verbessern,to improve,بهبود دادن,haben,verbessert,false,,A2,Ich kann bestehende Lösungen schrittweise verbessern.
+verb.optimieren,optimieren,to optimize,بهینه‌سازی کردن,haben,optimiert,false,,B1,Ich kann langsame Datenbankabfragen optimieren.
+verb.loesen,lösen,to solve,حل کردن,haben,gelöst,false,,A2,Ich kann technische Probleme strukturiert lösen.
+verb.finden,finden,to find,پیدا کردن,haben,gefunden,false,,A2,Ich kann die Ursache eines Fehlers finden.
+verb.beheben,beheben,to fix,برطرف کردن,haben,behoben,false,,B1,Ich kann Produktionsfehler sicher beheben.
+verb.integrieren,integrieren,to integrate,یکپارچه کردن,haben,integriert,false,,B1,Ich kann externe APIs in ein System integrieren.
+verb.verbinden,verbinden,to connect,متصل کردن,haben,verbunden,false,,A2,Ich kann Frontend und Backend über APIs verbinden.
+verb.kommunizieren,kommunizieren,to communicate,ارتباط برقرار کردن,haben,kommuniziert,false,,A2,Ich kann technische Entscheidungen klar kommunizieren.
+verb.dokumentieren,dokumentieren,to document,مستندسازی کردن,haben,dokumentiert,false,,B1,Ich kann APIs und Architekturentscheidungen dokumentieren.
+verb.erklaeren,erklären,to explain,توضیح دادن,haben,erklärt,false,,A2,Ich kann meinen Lösungsweg verständlich erklären.
+verb.beschreiben,beschreiben,to describe,توصیف کردن,haben,beschrieben,false,,A2,Ich kann meine Aufgaben im Projekt beschreiben.
+verb.vorstellen,vorstellen,to introduce / present,معرفی کردن,haben,vorgestellt,true,vor,A2,Ich kann mich und mein Projekt kurz vorstellen.
+verb.praesentieren,präsentieren,to present,ارائه کردن,haben,präsentiert,false,,B1,Ich kann technische Ergebnisse kompakt präsentieren.
+verb.entscheiden,entscheiden,to decide,تصمیم گرفتن,haben,entschieden,false,,A2,Ich kann anhand klarer Kriterien entscheiden.
+verb.auswaehlen,auswählen,to select,انتخاب کردن,haben,ausgewählt,true,aus,A2,Ich kann passende Technologien auswählen.
+verb.verwenden,verwenden,to use,استفاده کردن,haben,verwendet,false,,A2,Ich kann Docker für reproduzierbare Umgebungen verwenden.
+verb.nutzen,nutzen,to use,به‌کار بردن,haben,genutzt,false,,A2,Ich kann vorhandene Komponenten sinnvoll nutzen.
+verb.erstellen,erstellen,to create,ایجاد کردن,haben,erstellt,false,,A2,Ich kann technische Dokumentation erstellen.
+verb.bauen,bauen,to build,ساختن,haben,gebaut,false,,A2,Ich kann robuste Webanwendungen bauen.
+verb.konfigurieren,konfigurieren,to configure,پیکربندی کردن,haben,konfiguriert,false,,B1,Ich kann Services für verschiedene Umgebungen konfigurieren.
+verb.installieren,installieren,to install,نصب کردن,haben,installiert,false,,A2,Ich kann benötigte Entwicklungswerkzeuge installieren.
+verb.aktualisieren,aktualisieren,to update,به‌روزرسانی کردن,haben,aktualisiert,false,,B1,Ich kann Abhängigkeiten kontrolliert aktualisieren.
+verb.migrieren,migrieren,to migrate,مهاجرت دادن,haben,migriert,false,,B1,Ich kann Datenbanken ohne unnötige Ausfallzeit migrieren.
+verb.automatisieren,automatisieren,to automate,خودکار کردن,haben,automatisiert,false,,B1,Ich kann wiederkehrende Deployment-Schritte automatisieren.
+verb.ueberwachen,überwachen,to monitor,پایش کردن,haben,überwacht,false,,B1,Ich kann Services mit Logs und Metriken überwachen.
+verb.messen,messen,to measure,اندازه‌گیری کردن,haben,gemessen,false,,B1,Ich kann Laufzeit und Fehlerraten messen.
+verb.speichern,speichern,to store,ذخیره کردن,haben,gespeichert,false,,A2,Ich kann Daten sicher in PostgreSQL speichern.
+verb.laden,laden,to load,بارگذاری کردن,haben,geladen,false,,A2,Ich kann Daten asynchron laden.
+verb.senden,senden,to send,ارسال کردن,haben,gesendet,false,,A2,Ich kann strukturierte Daten über eine API senden.
+verb.empfangen,empfangen,to receive,دریافت کردن,haben,empfangen,false,,A2,Ich kann Ereignisse aus einer Queue empfangen.
+verb.verarbeiten,verarbeiten,to process,پردازش کردن,haben,verarbeitet,false,,B1,Ich kann große Datenmengen schrittweise verarbeiten.
+verb.validieren,validieren,to validate,اعتبارسنجی کردن,haben,validiert,false,,B1,Ich kann Nutzereingaben am Systemrand validieren.
+verb.authentifizieren,authentifizieren,to authenticate,احراز هویت کردن,haben,authentifiziert,false,,B2,Ich kann Benutzer sicher authentifizieren.
+verb.autorisieren,autorisieren,to authorize,مجوزدهی کردن,haben,autorisiert,false,,B2,Ich kann Zugriffe auf Ressourcen autorisieren.
+verb.verschluesseln,verschlüsseln,to encrypt,رمزگذاری کردن,haben,verschlüsselt,false,,B1,Ich kann sensible Daten bei der Übertragung verschlüsseln.
+verb.sichern,sichern,to secure / back up,ایمن‌سازی یا پشتیبان‌گیری کردن,haben,gesichert,false,,B1,Ich kann wichtige Daten regelmäßig sichern.
+verb.schuetzen,schützen,to protect,محافظت کردن,haben,geschützt,false,,B1,Ich kann interne Endpunkte vor unberechtigtem Zugriff schützen.
+verb.skalieren,skalieren,to scale,مقیاس‌پذیر کردن,haben,skaliert,false,,B1,Ich kann zustandslose Services horizontal skalieren.
+verb.starten,starten,to start,شروع کردن,haben,gestartet,false,,A2,Ich kann lokale Services mit Docker starten.
+verb.stoppen,stoppen,to stop,متوقف کردن,haben,gestoppt,false,,A2,Ich kann fehlerhafte Jobs kontrolliert stoppen.
+verb.ausfuehren,ausführen,to execute,اجرا کردن,haben,ausgeführt,true,aus,A2,Ich kann Migrationen kontrolliert ausführen.
+verb.aufrufen,aufrufen,to call,فراخوانی کردن,haben,aufgerufen,true,auf,A2,Ich kann einen API-Endpunkt aus dem Frontend aufrufen.
+verb.zurueckgeben,zurückgeben,to return,برگرداندن,haben,zurückgegeben,true,zurück,B1,Ich kann klare Fehlercodes an den Client zurückgeben.
+verb.uebergeben,übergeben,to pass / hand over,تحویل یا پاس دادن,haben,übergeben,false,,B1,Ich kann Daten typisiert an eine Funktion übergeben.
+verb.lesen,lesen,to read,خواندن,haben,gelesen,false,,A2,Ich kann Konfiguration aus Umgebungsvariablen lesen.
+verb.schreiben,schreiben,to write,نوشتن,haben,geschrieben,false,,A2,Ich kann sauberen und wartbaren Code schreiben.
+verb.aendern,ändern,to change,تغییر دادن,haben,geändert,false,,A2,Ich kann bestehende Funktionen sicher ändern.
+verb.hinzufuegen,hinzufügen,to add,اضافه کردن,haben,hinzugefügt,true,hinzu,A2,Ich kann neue Felder ohne Breaking Change hinzufügen.
+verb.entfernen,entfernen,to remove,حذف کردن,haben,entfernt,false,,A2,Ich kann veralteten Code kontrolliert entfernen.
+verb.loeschen,löschen,to delete,پاک کردن,haben,gelöscht,false,,A2,Ich kann personenbezogene Daten gezielt löschen.
+verb.suchen,suchen,to search,جستجو کردن,haben,gesucht,false,,A2,Ich kann Inhalte nach Stichwörtern suchen.
+verb.filtern,filtern,to filter,فیلتر کردن,haben,gefiltert,false,,A2,Ich kann Ergebnisse nach Status filtern.
+verb.sortieren,sortieren,to sort,مرتب کردن,haben,sortiert,false,,A2,Ich kann Datensätze nach Datum sortieren.
+verb.vergleichen,vergleichen,to compare,مقایسه کردن,haben,verglichen,false,,A2,Ich kann zwei technische Optionen objektiv vergleichen.
+verb.unterscheiden,unterscheiden,to distinguish,تمایز قائل شدن,haben,unterschieden,false,,B1,Ich kann funktionale und nichtfunktionale Anforderungen unterscheiden.
+verb.verstehen,verstehen,to understand,فهمیدن,haben,verstanden,false,,A2,Ich kann neue Anforderungen schnell verstehen.
+verb.lernen,lernen,to learn,یاد گرفتن,haben,gelernt,false,,A2,Ich kann mich schnell in neue Technologien einarbeiten und lernen.
+verb.ueben,üben,to practice,تمرین کردن,haben,geübt,false,,A2,Ich kann technische Antworten auf Deutsch üben.
+verb.wiederholen,wiederholen,to repeat,تکرار کردن,haben,wiederholt,false,,A2,Ich kann wichtige Fachbegriffe regelmäßig wiederholen.
+verb.beantworten,beantworten,to answer,پاسخ دادن,haben,beantwortet,false,,A2,Ich kann typische Interviewfragen strukturiert beantworten.
+verb.fragen,fragen,to ask,پرسیدن,haben,gefragt,false,,A2,Ich kann nachfragen, wenn eine Anforderung unklar ist.
+verb.zuhoeren,zuhören,to listen,گوش دادن,haben,zugehört,true,zu,A2,Ich kann aufmerksam zuhören und Rückfragen stellen.
+verb.sprechen,sprechen,to speak,صحبت کردن,haben,gesprochen,false,,A2,Ich kann über meine Projekte auf Deutsch sprechen.
+verb.zusammenarbeiten,zusammenarbeiten,to collaborate,همکاری کردن,haben,zusammengearbeitet,true,zusammen,A2,Ich kann gut mit Entwicklern und Fachbereichen zusammenarbeiten.
+verb.unterstuetzen,unterstützen,to support,پشتیبانی کردن,haben,unterstützt,false,,A2,Ich kann Teammitglieder bei technischen Problemen unterstützen.
+verb.uebernehmen,übernehmen,to take over,بر عهده گرفتن,haben,übernommen,false,,B1,Ich kann Verantwortung für ein Feature übernehmen.
+verb.verantworten,verantworten,to be responsible for,مسئول بودن,haben,verantwortet,false,,B1,Ich kann technische Entscheidungen fachlich verantworten.
+verb.leiten,leiten,to lead,هدایت کردن,haben,geleitet,false,,B1,Ich kann ein kleines technisches Arbeitspaket leiten.
+verb.organisieren,organisieren,to organize,سازمان‌دهی کردن,haben,organisiert,false,,A2,Ich kann meine Aufgaben selbstständig organisieren.
+verb.priorisieren,priorisieren,to prioritize,اولویت‌بندی کردن,haben,priorisiert,false,,B1,Ich kann Aufgaben nach Risiko und Nutzen priorisieren.
+verb.schaetzen,schätzen,to estimate,برآورد کردن,haben,geschätzt,false,,B1,Ich kann den Aufwand einer Aufgabe grob schätzen.
+verb.liefern,liefern,to deliver,تحویل دادن,haben,geliefert,false,,A2,Ich kann kleine Änderungen zuverlässig liefern.
+verb.erreichen,erreichen,to achieve,دستیابی پیدا کردن,haben,erreicht,false,,A2,Ich kann vereinbarte technische Ziele erreichen.
+verb.vermeiden,vermeiden,to avoid,اجتناب کردن,haben,vermieden,false,,B1,Ich kann unnötige Abhängigkeiten vermeiden.
+verb.reduzieren,reduzieren,to reduce,کاهش دادن,haben,reduziert,false,,B1,Ich kann Antwortzeiten durch Caching reduzieren.
+verb.erhoehen,erhöhen,to increase,افزایش دادن,haben,erhöht,false,,B1,Ich kann die Zuverlässigkeit durch Tests erhöhen.
+verb.teilen,teilen,to share,به اشتراک گذاشتن,haben,geteilt,false,,A2,Ich kann Wissen und Dokumentation im Team teilen.
+verb.abstimmen,abstimmen,to coordinate,هماهنگ کردن,haben,abgestimmt,true,ab,B1,Ich kann technische Schnittstellen mit anderen Teams abstimmen.
+verb.teilnehmen,teilnehmen,to participate,شرکت کردن,haben,teilgenommen,true,teil,A2,Ich kann aktiv an technischen Meetings teilnehmen.
+verb.vereinbaren,vereinbaren,to agree,توافق کردن,haben,vereinbart,false,,A2,Ich kann klare nächste Schritte mit dem Team vereinbaren.
+verb.besprechen,besprechen,to discuss,بررسی و گفتگو کردن,haben,besprochen,false,,A2,Ich kann offene Punkte direkt mit Stakeholdern besprechen.
+verb.diskutieren,diskutieren,to discuss,بحث کردن,haben,diskutiert,false,,A2,Ich kann Vor- und Nachteile einer Lösung sachlich diskutieren.
+verb.vorschlagen,vorschlagen,to suggest,پیشنهاد دادن,haben,vorgeschlagen,true,vor,B1,Ich kann eine einfachere technische Lösung vorschlagen.
+verb.begruenden,begründen,to justify,دلیل آوردن,haben,begründet,false,,B1,Ich kann Architekturentscheidungen nachvollziehbar begründen.
+verb.bewerten,bewerten,to evaluate,ارزیابی کردن,haben,bewertet,false,,B1,Ich kann Risiken vor einer Änderung bewerten.
+verb.beobachten,beobachten,to observe,مشاهده کردن,haben,beobachtet,false,,A2,Ich kann das Verhalten eines Systems unter Last beobachten.
+verb.erkennen,erkennen,to recognize,تشخیص دادن,haben,erkannt,false,,B1,Ich kann wiederkehrende Fehlermuster früh erkennen.
+verb.reagieren,reagieren,to react,واکنش نشان دادن,haben,reagiert,false,,A2,Ich kann ruhig auf Produktionsprobleme reagieren.
+verb.anpassen,anpassen,to adapt,تطبیق دادن,haben,angepasst,true,an,A2,Ich kann eine Lösung an neue Anforderungen anpassen.
+verb.bereitstellen,bereitstellen,to provide / deploy,فراهم یا مستقر کردن,haben,bereitgestellt,true,bereit,B1,Ich kann eine Anwendung reproduzierbar bereitstellen.

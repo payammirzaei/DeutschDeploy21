@@ -38,6 +38,7 @@ The implementation is a modular monolith with separate web, API, and worker proc
 apps/
   api/                 FastAPI application, migrations, worker
   web/                 Next.js mobile-first PWA
+content/                version-controlled source content for controlled imports
 packages/
   api-contract/        generated OpenAPI contract
 docs/                   product, architecture, ADRs, delivery notes
@@ -46,11 +47,14 @@ docs/                   product, architecture, ADRs, delivery notes
 
 ## Current status
 
-**Phase 1 — Platform skeleton: implementation complete on feature branch, staging verification pending.**
+**Phase 1 — Platform skeleton: merged and CI verified.**  
+**Phase 2 — Content and publishing: implementation in progress.**
 
-The first executable vertical slice includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
+The executable platform now includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md) for the implementation proof and remaining exit checks.
+Phase 2 adds relational content drafts, immutable published versions, typed verb grammar, localizations, examples, dry-run/idempotent imports, publication history, and an initial 100-verb software-interview catalog that can be installed and browsed without changing application code.
+
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md) and [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md).
 
 ## Local development
 
@@ -76,15 +80,26 @@ make api-client
 make check
 ```
 
-## End-to-end platform check
+Install the starter learning catalog after migration with either the private `/catalog` screen or:
 
-After login, the dashboard can execute:
+```bash
+cd apps/api
+uv run python -m app.scripts.seed_content
+```
+
+## End-to-end proof paths
+
+Platform:
 
 ```text
 Browser → Next.js → FastAPI → PostgreSQL → Redis → worker → PostgreSQL → Browser
 ```
 
-The job is durable and idempotency-keyed in PostgreSQL; Redis is transport, not the source of truth.
+Content:
+
+```text
+CSV/JSON → validate → dry-run → draft → publish → immutable version → API → catalog
+```
 
 ## Non-negotiable principles
 
