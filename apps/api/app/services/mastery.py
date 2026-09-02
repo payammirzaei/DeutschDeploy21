@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from uuid import UUID
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,7 +16,7 @@ from app.schemas.mastery import (
     ReviewNextResponse,
     ReviewQueueItem,
 )
-from app.services.exercises import learning_target_for
+from app.services.exercise_registry import learning_target_descriptor
 
 SCHEDULER_VERSION = 1
 
@@ -59,19 +60,24 @@ async def record_attempt_evidence(
     if existing is not None:
         return
 
-    skill_dimension, production_mode = learning_target_for(instance.exercise_type)
+    descriptor = learning_target_descriptor(instance)
     target = await session.scalar(
         select(LearningTarget).where(
-            LearningTarget.content_version_id == instance.content_version_id,
-            LearningTarget.skill_dimension == skill_dimension,
-            LearningTarget.production_mode == production_mode,
+            LearningTarget.target_key == descriptor["target_key"]
         )
     )
     if target is None:
+        content_version_value = descriptor["content_version_id"]
+        content_version_id = (
+            UUID(str(content_version_value)) if content_version_value is not None else None
+        )
         target = LearningTarget(
-            content_version_id=instance.content_version_id,
-            skill_dimension=skill_dimension,
-            production_mode=production_mode,
+            target_key=str(descriptor["target_key"]),
+            target_label=descriptor["target_label"],
+            target_kind=str(descriptor["target_kind"]),
+            content_version_id=content_version_id,
+            skill_dimension=str(descriptor["skill_dimension"]),
+            production_mode=str(descriptor["production_mode"]),
             policy_version=SCHEDULER_VERSION,
         )
         session.add(target)
@@ -174,7 +180,7 @@ async def get_review_home(session: AsyncSession, user: User) -> ReviewHome:
                 (LearnerMastery.target_id == LearningTarget.id)
                 & (LearnerMastery.user_id == ReviewQueueEntry.user_id),
             )
-            .join(VerbVersion, VerbVersion.version_id == LearningTarget.content_version_id)
+            .outerjoin(VerbVersion, VerbVersion.version_id == LearningTarget.content_version_id)
             .where(ReviewQueueEntry.user_id == user.id)
             .order_by(ReviewQueueEntry.due_at, ReviewQueueEntry.priority.desc())
         )
@@ -184,6 +190,7 @@ async def get_review_home(session: AsyncSession, user: User) -> ReviewHome:
     weak_count = 0
     mastered_count = 0
     for queue, target, mastery, verb in rows:
+        label = _target_label(target, verb)
         if mastery.state in {"review", "learning"}:
             weak_count += 1
         if mastery.state == "mastered":
@@ -191,8 +198,10 @@ async def get_review_home(session: AsyncSession, user: User) -> ReviewHome:
         mastery_views.append(
             MasteryTargetView(
                 target_id=target.id,
+                target_kind=target.target_kind,
+                target_label=label,
                 content_version_id=target.content_version_id,
-                lemma=verb.infinitive,
+                lemma=label,
                 skill_dimension=target.skill_dimension,
                 state=mastery.state,
                 stability=mastery.stability,
@@ -209,9 +218,10 @@ async def get_review_home(session: AsyncSession, user: User) -> ReviewHome:
             due.append(
                 ReviewQueueItem(
                     target_id=target.id,
+                    target_kind=target.target_kind,
                     activity_instance_id=queue.activity_instance_id,
                     content_version_id=target.content_version_id,
-                    lemma=verb.infinitive,
+                    lemma=label,
                     due_at=queue.due_at,
                     overdue=queue.due_at < now,
                     priority=queue.priority,
@@ -249,7 +259,7 @@ async def get_next_review(session: AsyncSession, user: User) -> ReviewNextRespon
                 & (LearnerMastery.user_id == ReviewQueueEntry.user_id),
             )
             .join(ActivityInstance, ActivityInstance.id == ReviewQueueEntry.activity_instance_id)
-            .join(VerbVersion, VerbVersion.version_id == LearningTarget.content_version_id)
+            .outerjoin(VerbVersion, VerbVersion.version_id == LearningTarget.content_version_id)
             .where(
                 ReviewQueueEntry.user_id == user.id,
                 ReviewQueueEntry.due_at <= now,
@@ -261,17 +271,19 @@ async def get_next_review(session: AsyncSession, user: User) -> ReviewNextRespon
     if row is None:
         return ReviewNextResponse(completed=True)
     queue, target, mastery, instance, verb = row
+    label = _target_label(target, verb)
     return ReviewNextResponse(
         completed=False,
         activity=ReviewActivityView(
             target_id=target.id,
+            target_kind=target.target_kind,
             activity_instance_id=instance.id,
             content_version_id=target.content_version_id,
             exercise_type=instance.exercise_type,
             contract_version=instance.contract_version,
             prompt_checksum=instance.prompt_checksum,
             prompt=instance.prompt,
-            lemma=verb.infinitive,
+            lemma=label,
             question=str(instance.prompt["question"]),
             choices=list(instance.prompt.get("choices", [])),
             reason_code=queue.reason_code,
@@ -316,3 +328,11 @@ async def rebuild_mastery(session: AsyncSession, user: User) -> RebuildMasteryRe
         target_count=target_count,
         queue_count=queue_count,
     )
+
+
+def _target_label(target: LearningTarget, verb: VerbVersion | None) -> str:
+    if target.target_label:
+        return target.target_label
+    if verb is not None:
+        return verb.infinitive
+    return target.target_key

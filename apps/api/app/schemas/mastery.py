@@ -6,7 +6,9 @@ from pydantic import BaseModel, Field
 
 class MasteryTargetView(BaseModel):
     target_id: UUID
-    content_version_id: UUID
+    target_kind: str
+    target_label: str
+    content_version_id: UUID | None = None
     lemma: str
     skill_dimension: str
     state: str
@@ -22,8 +24,9 @@ class MasteryTargetView(BaseModel):
 
 class ReviewQueueItem(BaseModel):
     target_id: UUID
+    target_kind: str
     activity_instance_id: UUID
-    content_version_id: UUID
+    content_version_id: UUID | None = None
     lemma: str
     due_at: datetime
     overdue: bool
@@ -44,8 +47,9 @@ class ReviewHome(BaseModel):
 
 class ReviewActivityView(BaseModel):
     target_id: UUID
+    target_kind: str
     activity_instance_id: UUID
-    content_version_id: UUID
+    content_version_id: UUID | None = None
     exercise_type: str
     contract_version: int
     prompt_checksum: str

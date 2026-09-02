@@ -27,7 +27,8 @@ from app.schemas.learning import (
     StartLearningResult,
 )
 from app.services.content import apply_verb_import, dry_run_verbs, load_starter_verbs, publish_item
-from app.services.exercises import evaluate_exercise, materialize_exercise
+from app.services.exercise_registry import evaluate_registered_exercise
+from app.services.exercises import materialize_exercise
 
 COURSE_SLUG = "software-interview-21d"
 STARTER_DAYS = [
@@ -242,11 +243,14 @@ async def submit_attempt(
     if enrollment is None or enrollment.user_id != user.id:
         raise PermissionError("Activity instance does not belong to this user")
 
-    raw_answer, normalized_answer, correct, score, feedback_code = evaluate_exercise(
-        instance,
-        choice_id=payload.choice_id,
-        text=payload.text,
-        token_ids=payload.token_ids,
+    raw_answer, normalized_answer, correct, score, feedback_code = (
+        evaluate_registered_exercise(
+            instance,
+            choice_id=payload.choice_id,
+            text=payload.text,
+            token_ids=payload.token_ids,
+            pair_ids=payload.pair_ids,
+        )
     )
     attempt = Attempt(
         user_id=user.id,
@@ -461,6 +465,8 @@ async def _progress_after_attempt(
 ) -> tuple[bool, int]:
     if instance.instance_key != "course":
         return False, enrollment.current_day
+    if instance.release_activity_id is None:
+        raise RuntimeError("Course instance is missing its release activity")
 
     activity = await session.get(ReleaseActivity, instance.release_activity_id)
     if activity is None:
@@ -510,6 +516,8 @@ def _instance_view(
     instance: ActivityInstance,
 ) -> ActivityInstanceView:
     choices = instance.prompt.get("choices", [])
+    if instance.content_version_id is None:
+        raise RuntimeError("Course instance is missing its pinned content version")
     return ActivityInstanceView(
         id=instance.id,
         day_number=day_number,
