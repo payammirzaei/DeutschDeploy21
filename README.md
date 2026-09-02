@@ -49,15 +49,18 @@ docs/                   product, architecture, ADRs, delivery notes
 
 **Phase 1 — Platform skeleton: merged and CI verified.**  
 **Phase 2 — Content and publishing: merged and CI verified.**  
-**Phase 3 — Deterministic learning loop: implemented and CI verified.**
+**Phase 3 — Deterministic learning loop: merged and CI verified.**  
+**Phase 4 — Mastery and spaced review: implemented and CI verified.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
 The content layer adds relational drafts, immutable published versions, typed verb grammar, localizations, examples, dry-run/idempotent imports, publication history, and a controlled 100-verb software-interview catalog.
 
-The first learner-facing loop is available at `/learn`. It creates a version-pinned course release for Days 1–3, materializes 21 deterministic multiple-choice activities, persists append-only attempts and evaluations, gives immediate feedback, advances after submissions rather than retry-until-correct gating, and resumes from durable learner state.
+The learner-facing loop at `/learn` creates a version-pinned course release for Days 1–3, materializes 21 deterministic multiple-choice activities, persists append-only attempts and evaluations, gives immediate feedback, advances after submissions rather than retry-until-correct gating, and resumes from durable learner state.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), and [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md).
+Every submitted learning or review attempt now also produces idempotent mastery evidence. `learning_targets`, append-only `mastery_events`, rebuildable `learner_mastery`, and `review_queue_entries` keep completion separate from memory reliability. The `/review` workspace surfaces due items, explains why they are scheduled, reuses the exact frozen activity/content version originally shown, and reschedules from new evidence.
+
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), and [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md).
 
 ## Local development
 
@@ -90,7 +93,7 @@ cd apps/api
 uv run python -m app.scripts.seed_content
 ```
 
-After signing in, open `/learn` to initialize the first pinned course release and begin Days 1–3.
+After signing in, open `/learn` to initialize the first pinned course release and begin Days 1–3. Open `/review` to inspect mastery and complete reviews when targets become due.
 
 ## End-to-end proof paths
 
@@ -111,6 +114,13 @@ Learning:
 ```text
 Published content version → course release → enrollment → activity instance
 → idempotent attempt → deterministic evaluation → progress/resume
+```
+
+Mastery and review:
+
+```text
+Attempt → evaluation → learning target → mastery event → rebuildable projection
+→ explainable review queue → frozen activity review → new evidence → reschedule
 ```
 
 ## Non-negotiable principles

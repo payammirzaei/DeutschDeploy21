@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Header, HTTPException, status
 
 from app.api.deps import CurrentUser, DbSession
+from app.models.learning import ActivityInstance, Attempt, Evaluation
 from app.schemas.learning import (
     AttemptIn,
     AttemptResult,
@@ -18,6 +19,7 @@ from app.services.learning import (
     get_next_activity,
     submit_attempt,
 )
+from app.services.mastery import record_attempt_evidence
 
 router = APIRouter(prefix="/learning", tags=["learning"])
 
@@ -91,6 +93,12 @@ async def create_attempt(
             payload.choice_id,
             payload.duration_ms,
         )
+        attempt = await session.get(Attempt, result.attempt_id)
+        evaluation = await session.get(Evaluation, result.evaluation_id)
+        instance = await session.get(ActivityInstance, instance_id)
+        if attempt is None or evaluation is None or instance is None:
+            raise RuntimeError("Submitted attempt could not be projected into mastery")
+        await record_attempt_evidence(session, user, attempt, evaluation, instance)
         await session.commit()
         return result
     except LookupError as exc:
@@ -99,7 +107,7 @@ async def create_attempt(
     except PermissionError as exc:
         await session.rollback()
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
-    except ValueError as exc:
+    except (RuntimeError, ValueError) as exc:
         await session.rollback()
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
