@@ -4,7 +4,12 @@ from app.core.config import get_settings
 from app.db.session import SessionFactory
 from app.repositories.users import get_user_by_email
 from app.services.bootstrap import ensure_bootstrap_user
-from app.services.content import apply_verb_import, list_draft_verbs, load_starter_verbs, publish_item
+from app.services.content import (
+    apply_verb_import,
+    list_draft_verbs,
+    load_starter_verbs,
+    publish_item,
+)
 
 
 async def seed() -> None:

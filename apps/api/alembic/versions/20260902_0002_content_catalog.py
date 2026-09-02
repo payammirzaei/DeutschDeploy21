@@ -83,9 +83,19 @@ def upgrade() -> None:
         sa.Column("value", sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(["item_id"], ["content_items.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("item_id", "locale", "field", "position", name="uq_draft_localization"),
+        sa.UniqueConstraint(
+            "item_id",
+            "locale",
+            "field",
+            "position",
+            name="uq_draft_localization",
+        ),
     )
-    op.create_index("ix_content_draft_localizations_item_id", "content_draft_localizations", ["item_id"])
+    op.create_index(
+        "ix_content_draft_localizations_item_id",
+        "content_draft_localizations",
+        ["item_id"],
+    )
 
     op.create_table(
         "content_draft_examples",
@@ -155,9 +165,19 @@ def upgrade() -> None:
         sa.Column("value", sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(["version_id"], ["content_versions.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("version_id", "locale", "field", "position", name="uq_version_localization"),
+        sa.UniqueConstraint(
+            "version_id",
+            "locale",
+            "field",
+            "position",
+            name="uq_version_localization",
+        ),
     )
-    op.create_index("ix_content_version_localizations_version_id", "content_version_localizations", ["version_id"])
+    op.create_index(
+        "ix_content_version_localizations_version_id",
+        "content_version_localizations",
+        ["version_id"],
+    )
 
     op.create_table(
         "content_version_examples",
@@ -173,13 +193,23 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("version_id", "external_id", name="uq_version_example_external"),
     )
-    op.create_index("ix_content_version_examples_version_id", "content_version_examples", ["version_id"])
+    op.create_index(
+        "ix_content_version_examples_version_id",
+        "content_version_examples",
+        ["version_id"],
+    )
 
 
 def downgrade() -> None:
-    op.drop_index("ix_content_version_examples_version_id", table_name="content_version_examples")
+    op.drop_index(
+        "ix_content_version_examples_version_id",
+        table_name="content_version_examples",
+    )
     op.drop_table("content_version_examples")
-    op.drop_index("ix_content_version_localizations_version_id", table_name="content_version_localizations")
+    op.drop_index(
+        "ix_content_version_localizations_version_id",
+        table_name="content_version_localizations",
+    )
     op.drop_table("content_version_localizations")
     op.drop_index("ix_content_verb_versions_lemma", table_name="content_verb_versions")
     op.drop_table("content_verb_versions")
@@ -189,7 +219,10 @@ def downgrade() -> None:
     op.drop_table("content_versions")
     op.drop_index("ix_content_draft_examples_item_id", table_name="content_draft_examples")
     op.drop_table("content_draft_examples")
-    op.drop_index("ix_content_draft_localizations_item_id", table_name="content_draft_localizations")
+    op.drop_index(
+        "ix_content_draft_localizations_item_id",
+        table_name="content_draft_localizations",
+    )
     op.drop_table("content_draft_localizations")
     op.drop_index("ix_content_verb_drafts_lemma", table_name="content_verb_drafts")
     op.drop_table("content_verb_drafts")

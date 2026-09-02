@@ -71,7 +71,13 @@ async def dry_run_verbs(session: AsyncSession, payloads: list[VerbImportIn]) -> 
         else:
             action = "update"
             updates += 1
-        rows.append(ImportRowResult(external_id=payload.external_id, action=action, checksum=checksum))
+        rows.append(
+            ImportRowResult(
+                external_id=payload.external_id,
+                action=action,
+                checksum=checksum,
+            )
+        )
 
     return VerbImportReport(
         total=len(rows),
@@ -395,7 +401,10 @@ def load_starter_verbs() -> list[VerbImportIn]:
                     "canonical_language": "de",
                     "lemma": row["lemma"],
                     "display_infinitive": row["lemma"],
-                    "translations": {"en": [row["translation_en"]], "fa": [row["translation_fa"]]},
+                    "translations": {
+                        "en": [row["translation_en"]],
+                        "fa": [row["translation_fa"]],
+                    },
                     "grammar": {
                         "perfect_auxiliary": row["perfect_auxiliary"],
                         "participle_ii": row["participle_ii"],
@@ -403,7 +412,11 @@ def load_starter_verbs() -> list[VerbImportIn]:
                         "separable": row["separable"].lower() == "true",
                         "separable_prefix": row["separable_prefix"] or None,
                         "reflexive": False,
-                        "regularity": "regular" if row["participle_ii"].endswith("t") else "irregular",
+                        "regularity": (
+                            "regular"
+                            if row["participle_ii"].endswith("t")
+                            else "irregular"
+                        ),
                         "governed_case": None,
                         "governed_preposition": None,
                     },
@@ -426,7 +439,10 @@ def load_starter_verbs() -> list[VerbImportIn]:
     return TypeAdapter(list[VerbImportIn]).validate_python(records)
 
 
-async def _version_translations(session: AsyncSession, version_id: UUID) -> dict[str, list[str]]:
+async def _version_translations(
+    session: AsyncSession,
+    version_id: UUID,
+) -> dict[str, list[str]]:
     rows = (
         await session.execute(
             select(VersionLocalization)
