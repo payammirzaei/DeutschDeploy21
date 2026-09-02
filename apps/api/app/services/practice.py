@@ -4,7 +4,12 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.learning import ActivityInstance, Attempt, CourseDay, ReleaseActivity
+from app.models.learning import (
+    ActivityInstance,
+    Attempt,
+    CourseDay,
+    ReleaseActivity,
+)
 from app.models.user import User
 from app.schemas.practice import PracticeActivityView, PracticeNextResponse
 from app.services.exercise_registry import (
@@ -12,7 +17,10 @@ from app.services.exercise_registry import (
     UnsupportedExerciseError,
     materialize_registered_exercise,
 )
-from app.services.learning import ensure_starter_learning, get_active_enrollment
+from app.services.learning import (
+    ensure_starter_learning,
+    get_active_enrollment,
+)
 
 
 async def get_next_silent_practice(
@@ -22,35 +30,56 @@ async def get_next_silent_practice(
     await ensure_starter_learning(session, user)
     enrollment = await get_active_enrollment(session, user.id)
     if enrollment is None:
-        raise RuntimeError("Silent practice requires an active learning enrollment")
+        raise RuntimeError(
+            "Silent practice requires an active learning enrollment"
+        )
 
     activities = list(
         (
             await session.execute(
                 select(ReleaseActivity)
                 .join(CourseDay, CourseDay.id == ReleaseActivity.day_id)
-                .where(CourseDay.release_id == enrollment.course_release_id)
-                .order_by(CourseDay.day_number, ReleaseActivity.position)
+                .where(
+                    CourseDay.release_id == enrollment.course_release_id,
+                    ReleaseActivity.source_kind == "content",
+                    ReleaseActivity.content_version_id.is_not(None),
+                )
+                .order_by(
+                    CourseDay.day_number,
+                    ReleaseActivity.position,
+                )
             )
         ).scalars()
     )
     if not activities:
-        raise RuntimeError("No published activities are available for silent practice")
+        raise RuntimeError(
+            "No published content activities are available for silent practice"
+        )
 
     instance_rows = (
         await session.execute(
-            select(ActivityInstance, func.count(Attempt.id))
-            .outerjoin(Attempt, Attempt.activity_instance_id == ActivityInstance.id)
+            select(
+                ActivityInstance,
+                func.count(Attempt.id),
+            )
+            .outerjoin(
+                Attempt,
+                Attempt.activity_instance_id == ActivityInstance.id,
+            )
             .where(
                 ActivityInstance.enrollment_id == enrollment.id,
                 ActivityInstance.instance_key.like("silent:%"),
+                ActivityInstance.release_activity_id.is_not(None),
             )
             .group_by(ActivityInstance.id)
         )
     ).all()
     counts: dict[tuple[UUID, str], int] = {
-        (instance.release_activity_id, instance.exercise_type): int(attempt_count or 0)
+        (instance.release_activity_id, instance.exercise_type): int(
+            attempt_count or 0
+        )
         for instance, attempt_count in instance_rows
+        if instance.release_activity_id is not None
     }
     total_attempts = sum(counts.values())
     start_index = total_attempts % len(ALL_SILENT_EXERCISE_TYPES)
@@ -64,11 +93,16 @@ async def get_next_silent_practice(
             activities,
             key=lambda activity: (
                 counts.get((activity.id, exercise_type), 0),
-                _digest(f"{user.id}:{exercise_type}:{activity.id}"),
+                _digest(
+                    f"{user.id}:{exercise_type}:{activity.id}"
+                ),
             ),
         )
         for activity in ordered_activities:
-            attempt_count = counts.get((activity.id, exercise_type), 0)
+            attempt_count = counts.get(
+                (activity.id, exercise_type),
+                0,
+            )
             try:
                 instance = await materialize_registered_exercise(
                     session,
@@ -79,6 +113,10 @@ async def get_next_silent_practice(
                 )
             except UnsupportedExerciseError:
                 continue
+            if instance.content_version_id is None:
+                raise RuntimeError(
+                    "Silent practice materialized without content identity"
+                )
             return PracticeNextResponse(
                 activity=PracticeActivityView(
                     id=instance.id,
@@ -92,7 +130,9 @@ async def get_next_silent_practice(
                 available_types=list(ALL_SILENT_EXERCISE_TYPES),
             )
 
-    raise RuntimeError("No compatible silent exercise could be materialized")
+    raise RuntimeError(
+        "No compatible silent exercise could be materialized"
+    )
 
 
 def _digest(value: str) -> str:
