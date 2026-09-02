@@ -1,0 +1,270 @@
+.shell {
+  min-height: 100dvh;
+  padding: 28px clamp(20px, 4vw, 64px) 70px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.intro {
+  max-width: 1440px;
+  margin: clamp(52px, 8vw, 110px) auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 40px;
+  align-items: end;
+}
+
+.intro h1 {
+  margin: 12px 0 18px;
+  font-size: clamp(58px, 8vw, 112px);
+  line-height: 0.9;
+  letter-spacing: -0.07em;
+}
+
+.intro p {
+  margin: 0;
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.stat {
+  min-width: 170px;
+  padding: 18px 0 8px 28px;
+  border-left: 1px solid var(--line);
+  display: grid;
+}
+
+.stat strong {
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+.stat span,
+.state,
+.resultCount {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.state {
+  max-width: 1440px;
+  margin: 50px auto 0;
+}
+
+.empty {
+  max-width: 900px;
+  margin: 60px auto 0;
+  padding: clamp(28px, 5vw, 50px);
+  border: 1px solid var(--ink);
+  background: #faf7f0;
+  box-shadow: 10px 10px 0 var(--ink);
+}
+
+.empty h2 {
+  margin: 10px 0;
+  font-size: clamp(30px, 4vw, 48px);
+  letter-spacing: -0.045em;
+}
+
+.empty p {
+  max-width: 680px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 28px;
+}
+
+.toolbar {
+  max-width: 1440px;
+  margin: 54px auto 24px;
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 150px auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.toolbar label {
+  display: grid;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.toolbar input,
+.toolbar select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #faf7f0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: normal;
+  outline: none;
+}
+
+.toolbar input:focus,
+.toolbar select:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2px rgba(23, 23, 20, 0.08);
+}
+
+.resultCount {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.grid {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+}
+
+.card {
+  min-height: 315px;
+  padding: 24px;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: #f8f3e9;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cefr,
+.version {
+  font-family: monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.cefr {
+  background: var(--acid);
+  padding: 5px 7px;
+  font-weight: 800;
+}
+
+.version {
+  color: var(--muted);
+}
+
+.card h2 {
+  margin: 24px 0 4px;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.persian {
+  margin: 4px 0 22px;
+  color: #5f5a50;
+  font-size: 17px;
+  text-align: left;
+}
+
+.card dl {
+  margin: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.card dl div {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.card dt {
+  color: var(--muted);
+}
+
+.card dd {
+  margin: 0;
+}
+
+.card blockquote {
+  margin: auto 0 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-family: Georgia, serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .intro {
+    grid-template-columns: 1fr;
+  }
+
+  .stat {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 18px 0 0;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr 110px;
+  }
+
+  .resultCount {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    min-height: auto;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .shell {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .intro h1 {
+    font-size: 60px;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .resultCount {
+    grid-column: auto;
+  }
+}
