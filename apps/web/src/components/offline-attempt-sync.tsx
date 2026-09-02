@@ -35,11 +35,15 @@ export function OfflineAttemptSync() {
 
     window.addEventListener("online", onOnline);
     window.addEventListener(OUTBOX_CHANGED_EVENT, onOutboxChanged);
-    void refresh().then(() => {
-      if (navigator.onLine) void sync();
-    });
+
+    const initialSync = window.setTimeout(() => {
+      void refresh().then(() => {
+        if (navigator.onLine) void sync();
+      });
+    }, 0);
 
     return () => {
+      window.clearTimeout(initialSync);
       window.removeEventListener("online", onOnline);
       window.removeEventListener(OUTBOX_CHANGED_EVENT, onOutboxChanged);
     };
