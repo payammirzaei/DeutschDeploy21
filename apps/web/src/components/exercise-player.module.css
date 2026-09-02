@@ -1,0 +1,189 @@
+.player {
+  display: grid;
+  gap: 1rem;
+}
+
+.heading {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.heading code {
+  width: fit-content;
+  border-radius: 999px;
+  background: var(--surface-strong, #171717);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+}
+
+.heading h2 {
+  margin: 0;
+  max-width: 24ch;
+  font-size: clamp(1.45rem, 5vw, 2.25rem);
+  line-height: 1.08;
+}
+
+.choices {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.choice {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 3.8rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 1rem;
+  background: transparent;
+  padding: 0.75rem 0.9rem;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.choice > span {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: var(--surface-strong, #171717);
+  font-size: 0.76rem;
+}
+
+.choice strong {
+  font-size: 1rem;
+}
+
+.choice:hover,
+.choice:focus-visible,
+.selected {
+  border-color: currentColor;
+  transform: translateY(-1px);
+}
+
+.clue {
+  min-height: 5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 1.25rem;
+  background: var(--surface-strong, #171717);
+  padding: 1rem;
+  font-size: clamp(1.4rem, 7vw, 2.4rem);
+  font-weight: 800;
+  text-align: center;
+}
+
+.inputLabel {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.inputLabel span {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.inputLabel input {
+  width: 100%;
+  min-height: 3.9rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.16));
+  border-radius: 1rem;
+  background: transparent;
+  padding: 0.9rem 1rem;
+  color: inherit;
+  font: inherit;
+  font-size: 1.1rem;
+}
+
+.inputLabel input:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.sentenceBoard {
+  display: flex;
+  min-height: 7rem;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0.55rem;
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.22));
+  border-radius: 1.2rem;
+  padding: 0.9rem;
+}
+
+.sentenceBoard > span {
+  opacity: 0.55;
+}
+
+.orderedToken,
+.tokenBank button {
+  min-height: 2.75rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 0.8rem;
+  background: var(--surface-strong, #171717);
+  padding: 0.55rem 0.75rem;
+  color: inherit;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.orderedToken {
+  border-style: solid;
+}
+
+.tokenBank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.tokenBank button:hover,
+.tokenBank button:focus-visible,
+.orderedToken:hover,
+.orderedToken:focus-visible {
+  transform: translateY(-1px);
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.puzzleFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.resetButton {
+  min-height: 2.8rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+  cursor: pointer;
+}
+
+.hint {
+  opacity: 0.6;
+}
+
+.unsupported {
+  border-radius: 1rem;
+  background: var(--surface-strong, #171717);
+  padding: 1rem;
+}
+
+@media (min-width: 720px) {
+  .choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
