@@ -21,12 +21,35 @@ type ReviewSummary = {
   weak_count: number;
   mastered_count: number;
 };
+type EngagementBadge = {
+  key: string;
+  title: string;
+  description: string;
+  earned: boolean;
+  progress_current: number;
+  progress_target: number;
+};
+type EngagementSummary = {
+  xp: number;
+  level: number;
+  level_progress_percent: number;
+  next_level_xp: number;
+  current_streak_days: number;
+  longest_streak_days: number;
+  total_reps: number;
+  correct_reps: number;
+  accuracy_percent: number;
+  mastered_targets: number;
+  timezone: string;
+  badges: EngagementBadge[];
+};
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [review, setReview] = useState<ReviewSummary | null>(null);
+  const [engagement, setEngagement] = useState<EngagementSummary | null>(null);
   const [running, setRunning] = useState(false);
   const [system, setSystem] = useState<"checking" | "ready" | "degraded">("checking");
 
@@ -36,17 +59,26 @@ export default function DashboardPage() {
       api.GET("/api/v1/auth/me"),
       api.GET("/api/v1/health/ready"),
       api.GET("/api/v1/review/home"),
+      api.GET("/api/v1/engagement/summary"),
     ])
-      .then(([{ data: me, response: meResponse }, { data: health }, { data: reviewData }]) => {
-        if (cancelled) return;
-        if (meResponse.status === 401) {
-          router.replace("/login");
-          return;
-        }
-        if (me) setUser(me as User);
-        if (reviewData) setReview(reviewData as ReviewSummary);
-        setSystem(health?.status === "ok" ? "ready" : "degraded");
-      })
+      .then(
+        ([
+          { data: me, response: meResponse },
+          { data: health },
+          { data: reviewData },
+          { data: engagementData },
+        ]) => {
+          if (cancelled) return;
+          if (meResponse.status === 401) {
+            router.replace("/login");
+            return;
+          }
+          if (me) setUser(me as User);
+          if (reviewData) setReview(reviewData as ReviewSummary);
+          if (engagementData) setEngagement(engagementData as EngagementSummary);
+          setSystem(health?.status === "ok" ? "ready" : "degraded");
+        },
+      )
       .catch(() => {
         if (!cancelled) setSystem("degraded");
       });
@@ -89,6 +121,8 @@ export default function DashboardPage() {
     router.replace("/login");
   }
 
+  const earnedBadges = engagement?.badges.filter((badge) => badge.earned).length ?? 0;
+
   return (
     <main className="dashboard-shell">
       <header className="dashboard-header">
@@ -101,12 +135,58 @@ export default function DashboardPage() {
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 7 · MOCK INTERVIEW & READINESS</div>
+          <div className="eyebrow">PHASE 8 · MOTIVATION & POLISH</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
             Learn silently, rehearse deliberately, speak when you can, then prove the transfer in a
-            durable German interview with contextual follow-ups and evidence-based readiness.
+            durable German interview. Momentum now reflects real learning evidence instead of a separate
+            gamification database.
           </p>
+
+          <section className="momentum-panel" aria-labelledby="momentum-title">
+            <div className="momentum-head">
+              <div>
+                <span className="card-kicker">YOUR MOMENTUM</span>
+                <h2 id="momentum-title">Level {engagement?.level ?? 1}</h2>
+              </div>
+              <strong>{engagement?.xp ?? 0} XP</strong>
+            </div>
+            <progress
+              className="level-progress"
+              max={100}
+              value={engagement?.level_progress_percent ?? 0}
+              aria-label={`Level progress ${engagement?.level_progress_percent ?? 0}%`}
+            />
+            <div className="momentum-metrics">
+              <div><strong>{engagement?.current_streak_days ?? 0}</strong><span>day streak</span></div>
+              <div><strong>{engagement?.total_reps ?? 0}</strong><span>graded reps</span></div>
+              <div><strong>{engagement?.accuracy_percent ?? 0}%</strong><span>accuracy</span></div>
+              <div><strong>{engagement?.mastered_targets ?? 0}</strong><span>mastered</span></div>
+            </div>
+            <div className="badge-summary">
+              <span>{earnedBadges}/{engagement?.badges.length ?? 6} badges earned</span>
+              <span>Best streak: {engagement?.longest_streak_days ?? 0} days</span>
+            </div>
+            <div className="badge-grid" aria-label="Achievement badges">
+              {(engagement?.badges ?? []).map((badge) => (
+                <article className={`badge-card ${badge.earned ? "earned" : ""}`} key={badge.key}>
+                  <div className="badge-mark" aria-hidden="true">{badge.earned ? "✓" : "○"}</div>
+                  <div>
+                    <strong>{badge.title}</strong>
+                    <p>{badge.description}</p>
+                    {!badge.earned ? (
+                      <span>{badge.progress_current}/{badge.progress_target}</span>
+                    ) : (
+                      <span>Earned</span>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className="gamification-note">
+              XP and badges never unlock or block learning. They are a read-only mirror of submitted evidence.
+            </p>
+          </section>
 
           <article className="check-card">
             <div>
@@ -231,7 +311,8 @@ export default function DashboardPage() {
             <li className="done"><span>05C</span> Interview drills</li>
             <li className="done"><span>05D</span> Full 21-day path</li>
             <li className="done"><span>06</span> Speech pipeline</li>
-            <li className="active"><span>07</span> Mock interview</li>
+            <li className="done"><span>07</span> Mock interview</li>
+            <li className="active"><span>08</span> Motivation & polish</li>
           </ol>
           <div className="identity-chip">
             <span>Signed in as</span>
