@@ -15,10 +15,9 @@ from app.schemas.mastery import (
     ReviewNextResponse,
     ReviewQueueItem,
 )
+from app.services.exercises import learning_target_for
 
 SCHEDULER_VERSION = 1
-SKILL_DIMENSION = "meaning_recognition"
-PRODUCTION_MODE = "recognition"
 
 
 def utcnow() -> datetime:
@@ -60,18 +59,19 @@ async def record_attempt_evidence(
     if existing is not None:
         return
 
+    skill_dimension, production_mode = learning_target_for(instance.exercise_type)
     target = await session.scalar(
         select(LearningTarget).where(
             LearningTarget.content_version_id == instance.content_version_id,
-            LearningTarget.skill_dimension == SKILL_DIMENSION,
-            LearningTarget.production_mode == PRODUCTION_MODE,
+            LearningTarget.skill_dimension == skill_dimension,
+            LearningTarget.production_mode == production_mode,
         )
     )
     if target is None:
         target = LearningTarget(
             content_version_id=instance.content_version_id,
-            skill_dimension=SKILL_DIMENSION,
-            production_mode=PRODUCTION_MODE,
+            skill_dimension=skill_dimension,
+            production_mode=production_mode,
             policy_version=SCHEDULER_VERSION,
         )
         session.add(target)
@@ -267,9 +267,13 @@ async def get_next_review(session: AsyncSession, user: User) -> ReviewNextRespon
             target_id=target.id,
             activity_instance_id=instance.id,
             content_version_id=target.content_version_id,
+            exercise_type=instance.exercise_type,
+            contract_version=instance.contract_version,
+            prompt_checksum=instance.prompt_checksum,
+            prompt=instance.prompt,
             lemma=verb.infinitive,
             question=str(instance.prompt["question"]),
-            choices=list(instance.prompt["choices"]),
+            choices=list(instance.prompt.get("choices", [])),
             reason_code=queue.reason_code,
             due_at=queue.due_at,
             state=mastery.state,
