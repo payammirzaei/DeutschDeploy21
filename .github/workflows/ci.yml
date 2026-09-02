@@ -11,6 +11,39 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: deutschdeploy
+          POSTGRES_USER: deutschdeploy
+          POSTGRES_PASSWORD: deutschdeploy
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U deutschdeploy -d deutschdeploy"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    env:
+      APP_ENV: test
+      APP_LOG_LEVEL: INFO
+      APP_SECRET_KEY: test-secret-key-that-is-longer-than-thirty-two-characters
+      APP_BOOTSTRAP_EMAIL: tester@example.com
+      APP_BOOTSTRAP_PASSWORD: ci-only-password-change-before-production
+      DATABASE_URL: postgresql://deutschdeploy:deutschdeploy@localhost:5432/deutschdeploy
+      REDIS_URL: redis://localhost:6379/15
+      WEB_ORIGIN: http://localhost:3000
+      RUN_PLATFORM_INTEGRATION: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -25,20 +58,17 @@ jobs:
       - name: Install API dependencies
         working-directory: apps/api
         run: uv sync --dev
+      - name: Migrate test database
+        working-directory: apps/api
+        run: uv run alembic upgrade head
       - name: Python lint and tests
         working-directory: apps/api
         run: |
           uv run ruff check .
           uv run pytest
       - name: Export OpenAPI
-        env:
-          APP_ENV: test
-          APP_SECRET_KEY: test-secret-key-that-is-longer-than-thirty-two-characters
-          DATABASE_URL: postgresql://user:pass@localhost:5432/unused
-          REDIS_URL: redis://localhost:6379/15
-        run: |
-          cd apps/api
-          uv run python -m app.scripts.export_openapi
+        working-directory: apps/api
+        run: uv run python -m app.scripts.export_openapi
       - name: Install web dependencies and generate API types
         run: |
           npm install
