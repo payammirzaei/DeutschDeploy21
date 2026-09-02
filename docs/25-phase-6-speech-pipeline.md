@@ -1,6 +1,6 @@
 # Phase 6 — Durable speech pipeline
 
-**Status:** Implemented; final CI and Railway deployment verification pending.
+**Status:** Implemented and CI verified; dedicated Railway deployment verification pending.
 
 ## 1. User outcome
 
