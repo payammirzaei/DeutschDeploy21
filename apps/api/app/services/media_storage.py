@@ -2,9 +2,9 @@ import asyncio
 import hashlib
 import tempfile
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from pathlib import Path
-from typing import AsyncContextManager, Protocol
+from typing import Protocol
 
 import boto3
 from botocore.config import Config
@@ -27,9 +27,13 @@ class MediaStorage(Protocol):
         max_bytes: int,
     ) -> tuple[int, str]: ...
 
-    def open_local(self, storage_key: str) -> AsyncContextManager[Path]: ...
+    def open_local(self, storage_key: str) -> AbstractAsyncContextManager[Path]: ...
 
     async def delete(self, storage_key: str) -> None: ...
+
+
+async def _unlink(path: Path) -> None:
+    await asyncio.to_thread(path.unlink, missing_ok=True)
 
 
 async def _stream_to_path(
@@ -53,10 +57,10 @@ async def _stream_to_path(
                 digest.update(chunk)
                 handle.write(chunk)
     except Exception:
-        path.unlink(missing_ok=True)
+        await _unlink(path)
         raise
     if size == 0:
-        path.unlink(missing_ok=True)
+        await _unlink(path)
         raise ValueError("Audio upload is empty")
     return size, digest.hexdigest()
 
@@ -94,7 +98,7 @@ class FilesystemMediaStorage:
         yield path
 
     async def delete(self, storage_key: str) -> None:
-        self.path_for(storage_key).unlink(missing_ok=True)
+        await _unlink(self.path_for(storage_key))
 
 
 class RailwayS3MediaStorage:
@@ -145,7 +149,7 @@ class RailwayS3MediaStorage:
             )
             return size, checksum
         finally:
-            temp_path.unlink(missing_ok=True)
+            await _unlink(temp_path)
 
     @asynccontextmanager
     async def open_local(self, storage_key: str):
@@ -160,7 +164,7 @@ class RailwayS3MediaStorage:
             )
             yield temp_path
         finally:
-            temp_path.unlink(missing_ok=True)
+            await _unlink(temp_path)
 
     async def delete(self, storage_key: str) -> None:
         await asyncio.to_thread(
