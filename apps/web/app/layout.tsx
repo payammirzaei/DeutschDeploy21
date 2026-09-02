@@ -4,6 +4,7 @@ import { OfflineAttemptSync } from "@/src/components/offline-attempt-sync";
 import { ServiceWorkerRegistration } from "@/src/components/service-worker-registration";
 
 import "./globals.css";
+import styles from "./layout.module.css";
 
 export const metadata: Metadata = {
   title: {
@@ -24,9 +25,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
+        <a className={styles.skipLink} href="#main-content">
+          Skip to main content
+        </a>
         <ServiceWorkerRegistration />
         <OfflineAttemptSync />
-        {children}
+        <div id="main-content" tabIndex={-1}>
+          {children}
+        </div>
       </body>
     </html>
   );
