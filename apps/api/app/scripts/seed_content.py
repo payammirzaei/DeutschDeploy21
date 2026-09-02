@@ -20,7 +20,12 @@ async def seed() -> None:
 
         payloads = load_starter_verbs()
         imported = await apply_verb_import(session, user, payloads)
-        drafts = await list_draft_verbs(session)
+        starter_ids = {payload.external_id for payload in payloads}
+        drafts = [
+            draft
+            for draft in await list_draft_verbs(session)
+            if draft.external_id in starter_ids
+        ]
         published = 0
         for draft in drafts:
             result = await publish_item(session, user, draft.item_id)
