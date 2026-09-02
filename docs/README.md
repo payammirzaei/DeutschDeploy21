@@ -29,7 +29,8 @@ This directory is the authoritative design baseline for the product. It explains
 23. [Phase 5C interview drills](23-phase-5c-interview-drills.md)
 24. [Phase 5D full 21-day curriculum](24-phase-5d-full-curriculum.md)
 25. [Phase 6 durable speech pipeline](25-phase-6-speech-pipeline.md)
-26. [Architecture Decision Records](adr/README.md)
+26. [Phase 7 mock interview and readiness](26-phase-7-mock-interview-readiness.md)
+27. [Architecture Decision Records](adr/README.md)
 
 ## Document authority
 
