@@ -346,7 +346,9 @@ async def _build_release(session: AsyncSession, release: CourseRelease) -> None:
                 raise RuntimeError(f"Cannot build release; content missing: {external_id}")
             version = await _latest_version(session, item.id)
             if version is None:
-                raise RuntimeError(f"Cannot build release; published version missing: {external_id}")
+                raise RuntimeError(
+                    f"Cannot build release; published version missing: {external_id}"
+                )
             session.add(
                 ReleaseActivity(
                     day_id=day.id,
@@ -630,4 +632,4 @@ def _attempt_result(
 
 
 def _choice_id(version_id: UUID, text: str) -> str:
-    return hashlib.sha256(f"{version_id}:{text}".encode("utf-8")).hexdigest()[:16]
+    return hashlib.sha256(f"{version_id}:{text}".encode()).hexdigest()[:16]
