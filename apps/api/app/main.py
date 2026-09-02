@@ -34,7 +34,12 @@ app.add_middleware(
     allow_origins=[settings.web_origin],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Idempotency-Key", "X-Correlation-ID"],
+    allow_headers=[
+        "Content-Type",
+        "Idempotency-Key",
+        "X-Audio-Duration-Ms",
+        "X-Correlation-ID",
+    ],
 )
 
 

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "speak.intro.60",
+    "category": "introduction",
+    "question": "Erzählen Sie bitte kurz etwas über sich und Ihren technischen Schwerpunkt.",
+    "support": ["Rolle", "2–3 relevante Schwerpunkte", "Was Sie als Nächstes suchen"],
+    "target_duration_seconds": 60
+  },
+  {
+    "id": "speak.project.75",
+    "category": "project",
+    "question": "Beschreiben Sie ein Softwareprojekt, an dem Sie zuletzt gearbeitet haben.",
+    "support": ["Ziel des Projekts", "Ihre Verantwortung", "Technologien", "Ergebnis"],
+    "target_duration_seconds": 75
+  },
+  {
+    "id": "speak.debugging.60",
+    "category": "problem-solving",
+    "question": "Wie gehen Sie vor, wenn ein Fehler nur in Produktion auftritt?",
+    "support": ["Reproduzieren", "Logs und Daten prüfen", "Hypothese testen", "Regression verhindern"],
+    "target_duration_seconds": 60
+  },
+  {
+    "id": "speak.api.60",
+    "category": "backend",
+    "question": "Wie würden Sie einen robusten REST-Endpunkt erklären?",
+    "support": ["Validierung", "Berechtigung", "Service-Logik", "Transaktion", "Response"],
+    "target_duration_seconds": 60
+  },
+  {
+    "id": "speak.architecture.75",
+    "category": "architecture",
+    "question": "Wie erklären Sie die Architektur einer typischen Webanwendung?",
+    "support": ["Frontend", "API", "Business-Logik", "Datenbank", "Deployment"],
+    "target_duration_seconds": 75
+  },
+  {
+    "id": "speak.cicd.60",
+    "category": "devops",
+    "question": "Wie sieht für Sie eine gute CI/CD-Pipeline aus?",
+    "support": ["Commit/PR", "Lint und Tests", "Build", "Freigabe", "Deployment"],
+    "target_duration_seconds": 60
+  },
+  {
+    "id": "speak.teamwork.60",
+    "category": "teamwork",
+    "question": "Wie lösen Sie eine technische Meinungsverschiedenheit im Team?",
+    "support": ["Anforderungen klären", "Optionen vergleichen", "Risiken", "Entscheidung dokumentieren"],
+    "target_duration_seconds": 60
+  },
+  {
+    "id": "speak.star.75",
+    "category": "behavioral",
+    "question": "Erzählen Sie von einer Situation, in der Sie ein schwieriges technisches Problem gelöst haben.",
+    "support": ["Situation", "Task", "Action", "Result"],
+    "target_duration_seconds": 75
+  }
+]

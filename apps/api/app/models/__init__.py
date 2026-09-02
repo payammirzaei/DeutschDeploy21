@@ -21,6 +21,14 @@ from app.models.learning import (
 )
 from app.models.mastery import LearnerMastery, LearningTarget, MasteryEvent, ReviewQueueEntry
 from app.models.platform_job import PlatformJob
+from app.models.speech import (
+    MediaObject,
+    ProviderInvocation,
+    SpeechAttempt,
+    SpeechConsent,
+    SpeechFeedback,
+    SpeechTranscript,
+)
 from app.models.user import User
 
 __all__ = [
@@ -36,12 +44,18 @@ __all__ = [
     "DraftLocalization",
     "Enrollment",
     "Evaluation",
-    "LearningTarget",
     "LearnerMastery",
+    "LearningTarget",
     "MasteryEvent",
+    "MediaObject",
     "PlatformJob",
+    "ProviderInvocation",
     "ReleaseActivity",
     "ReviewQueueEntry",
+    "SpeechAttempt",
+    "SpeechConsent",
+    "SpeechFeedback",
+    "SpeechTranscript",
     "User",
     "VerbDraft",
     "VerbVersion",

@@ -9,6 +9,7 @@ from app.api.routes import (
     platform,
     practice,
     review,
+    speech,
 )
 
 api_router = APIRouter(prefix="/api/v1")
@@ -20,3 +21,4 @@ api_router.include_router(learning.router)
 api_router.include_router(practice.router)
 api_router.include_router(interview_drills.router)
 api_router.include_router(review.router)
+api_router.include_router(speech.router)
