@@ -81,7 +81,11 @@ class LearnerMastery(Base):
     evidence_count: Mapped[int] = mapped_column(Integer, default=0)
     last_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     last_success_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    next_review_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+    next_review_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=utcnow,
+        index=True,
+    )
     last_event_sequence: Mapped[int] = mapped_column(Integer, default=0)
     scheduler_version: Mapped[int] = mapped_column(Integer, default=1)
     explanation_code: Mapped[str] = mapped_column(String(80), default="new_target")
