@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "key": "software-de-a2b1",
+  "version": 1,
+  "title": "German Software Developer Mock Interview",
+  "language": "de",
+  "target_cefr": "A2-B1",
+  "rubric_version": 1,
+  "modes": {
+    "guided": {
+      "question_keys": ["hr.intro", "project.walkthrough", "behavior.problem", "technical.api", "recovery.clarify"],
+      "prep_seconds": 0,
+      "support": "full"
+    },
+    "practice": {
+      "question_keys": ["hr.intro", "hr.motivation", "project.walkthrough", "behavior.problem", "technical.api", "architecture.system"],
+      "prep_seconds": 20,
+      "support": "on_request"
+    },
+    "realistic": {
+      "question_keys": ["hr.intro", "hr.motivation", "project.walkthrough", "behavior.problem", "technical.api", "architecture.system", "recovery.clarify"],
+      "prep_seconds": 30,
+      "support": "none"
+    }
+  },
+  "questions": [
+    {
+      "key": "hr.intro",
+      "category": "hr",
+      "question": "Erzählen Sie bitte kurz etwas über sich.",
+      "intent": "Give a concise professional introduction: current role/profile, relevant experience and what you build.",
+      "hints": ["Start with your professional profile, not your life story.", "Use: Ich arbeite als … / Ich habe Erfahrung mit …", "Finish with the kind of problems you like to solve."],
+      "target_duration_seconds": 60,
+      "required_signals": [["ich"], ["software", "entwickler", "entwicklung"], ["projekt", "system", "anwendung"]],
+      "follow_up": {
+        "key": "hr.intro.followup",
+        "question": "Welche Ihrer bisherigen Aufgaben ist für diese Stelle besonders relevant?",
+        "intent": "Connect one concrete responsibility to the target role.",
+        "hints": ["Name one responsibility.", "Explain why it is relevant."],
+        "target_duration_seconds": 45,
+        "required_signals": [["verantwortlich", "aufgabe"], ["relevant", "wichtig", "erfahrung"]]
+      }
+    },
+    {
+      "key": "hr.motivation",
+      "category": "hr",
+      "question": "Warum möchten Sie diese Stelle?",
+      "intent": "Connect the role, your skills and the work you want to do without generic flattery.",
+      "hints": ["Role → matching experience → contribution.", "Avoid saying only that the company is interesting."],
+      "target_duration_seconds": 55,
+      "required_signals": [["stelle", "rolle", "position"], ["erfahrung", "kenntnisse", "skills"], ["beitragen", "entwickeln", "arbeiten"]],
+      "follow_up": {
+        "key": "hr.motivation.followup",
+        "question": "Was möchten Sie in den ersten Monaten konkret beitragen?",
+        "intent": "Name a realistic early contribution without inventing company facts.",
+        "hints": ["Mention how you learn the system first.", "Then name one concrete contribution."],
+        "target_duration_seconds": 40,
+        "required_signals": [["lernen", "verstehen", "kennenlernen"], ["beitragen", "verbessern", "entwickeln"]]
+      }
+    },
+    {
+      "key": "project.walkthrough",
+      "category": "project",
+      "question": "Beschreiben Sie bitte ein technisches Projekt, an dem Sie gearbeitet haben.",
+      "intent": "Explain context, your responsibility, technical decisions and result.",
+      "hints": ["Context → responsibility → implementation → result.", "Say what YOU did."],
+      "target_duration_seconds": 90,
+      "required_signals": [["projekt", "system", "anwendung"], ["verantwortlich", "aufgabe", "ich habe"], ["entwickelt", "implementiert", "gebaut"], ["ergebnis", "dadurch", "am ende"]],
+      "follow_up": {
+        "key": "project.walkthrough.followup",
+        "question": "Welche technische Entscheidung haben Sie in diesem Projekt selbst getroffen?",
+        "intent": "Show ownership through one concrete decision and trade-off.",
+        "hints": ["Name the decision.", "Explain the reason or trade-off."],
+        "target_duration_seconds": 50,
+        "required_signals": [["entschieden", "entscheidung", "gewählt"], ["weil", "deshalb", "grund"]]
+      }
+    },
+    {
+      "key": "behavior.problem",
+      "category": "behavioral",
+      "question": "Erzählen Sie von einem schwierigen technischen Problem und wie Sie es gelöst haben.",
+      "intent": "Use a STAR-like structure and make your own action visible.",
+      "hints": ["Situation → Aufgabe → Aktion → Ergebnis.", "Use sequencing words such as zuerst, dann, danach."],
+      "target_duration_seconds": 90,
+      "required_signals": [["problem", "fehler", "störung"], ["analysiert", "geprüft", "gefunden"], ["gelöst", "behoben", "verbessert"], ["ergebnis", "dadurch", "am ende"]],
+      "follow_up": {
+        "key": "behavior.problem.followup",
+        "question": "Wie haben Sie überprüft, dass Ihre Lösung wirklich funktioniert?",
+        "intent": "Demonstrate validation rather than stopping at implementation.",
+        "hints": ["Mention tests, monitoring, comparison or user validation."],
+        "target_duration_seconds": 45,
+        "required_signals": [["test", "geprüft", "validiert", "monitor"], ["ergebnis", "funktioniert", "mess"]]
+      }
+    },
+    {
+      "key": "technical.api",
+      "category": "technical",
+      "question": "Wie würden Sie eine neue API-Schnittstelle planen und implementieren?",
+      "intent": "Explain a clear engineering sequence from contract to validation and operation.",
+      "hints": ["Requirements → contract → implementation → tests → observability.", "Mention error handling and data validation."],
+      "target_duration_seconds": 80,
+      "required_signals": [["anforderung", "requirement"], ["api", "schnittstelle", "endpoint"], ["test", "prüf", "valid"], ["fehler", "error", "logging", "monitor"]],
+      "follow_up": {
+        "key": "technical.api.followup",
+        "question": "Wie würden Sie verhindern, dass eine Änderung bestehende Clients kaputt macht?",
+        "intent": "Discuss compatibility and controlled API evolution.",
+        "hints": ["Think about contracts, versioning and tests."],
+        "target_duration_seconds": 45,
+        "required_signals": [["version", "kompatibel", "contract"], ["test", "client", "migration"]]
+      }
+    },
+    {
+      "key": "architecture.system",
+      "category": "architecture",
+      "question": "Wie würden Sie die Architektur eines neuen Web-Systems strukturieren?",
+      "intent": "Describe boundaries, data flow, deployment concerns and trade-offs before naming tools.",
+      "hints": ["Start with requirements and boundaries.", "Then explain frontend, API/services, data, async work and observability."],
+      "target_duration_seconds": 90,
+      "required_signals": [["anforderung", "ziel", "boundary"], ["frontend", "client"], ["api", "backend", "service"], ["datenbank", "postgres", "data"], ["deploy", "docker", "cloud", "monitor"]],
+      "follow_up": {
+        "key": "architecture.system.followup",
+        "question": "Welche Komponente würden Sie zuerst skalieren, wenn die Last stark steigt, und warum?",
+        "intent": "Reason from bottlenecks and measurements rather than guessing.",
+        "hints": ["Measure first.", "Name one likely bottleneck and the evidence you need."],
+        "target_duration_seconds": 50,
+        "required_signals": [["mess", "monitor", "metr"], ["last", "bottleneck", "engpass", "skal"]],
+        "technical_terms": ["cache", "queue", "database", "api"]
+      }
+    },
+    {
+      "key": "recovery.clarify",
+      "category": "recovery",
+      "question": "Was sagen Sie, wenn Sie eine technische Frage im Interview nicht ganz verstanden haben?",
+      "intent": "Recover professionally instead of guessing.",
+      "hints": ["Ask for repetition or clarification.", "Paraphrase what you think you understood."],
+      "target_duration_seconds": 35,
+      "required_signals": [["wiederholen", "noch einmal"], ["verstehe", "verstanden", "meinen sie"], ["bitte", "könnten sie"]]
+    }
+  ]
+}
