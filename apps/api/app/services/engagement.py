@@ -78,7 +78,13 @@ def _badges(total_reps: int, longest_streak: int, mastered_targets: int) -> list
         _badge("reps_100", "Century", "Complete 100 graded reps.", total_reps, 100),
         _badge("streak_3", "Three in a row", "Practice on three consecutive days.", longest_streak, 3),
         _badge("streak_7", "Week streak", "Practice on seven consecutive days.", longest_streak, 7),
-        _badge("mastery_10", "Ten mastered", "Reach mastered state on ten learning targets.", mastered_targets, 10),
+        _badge(
+            "mastery_10",
+            "Ten mastered",
+            "Reach mastered state on ten learning targets.",
+            mastered_targets,
+            10,
+        ),
     ]
 
 
