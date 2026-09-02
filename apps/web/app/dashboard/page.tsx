@@ -103,20 +103,20 @@ export default function DashboardPage() {
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 5A · EXERCISE ENGINE</div>
+          <div className="eyebrow">PHASE 5B · EXERCISE EXPLOSION</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            Learn when you can speak. Practice when you cannot. Silent drills now feed the same
-            durable mastery graph as the structured course and spaced-review system.
+            Learn when you can speak. Practice when you cannot. Ten silent exercise families now
+            train recognition, recall, grammar, matching, context and construction through one mastery graph.
           </p>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">🤫 SILENT MODE · BUS / TRAIN / OFFICE</span>
-              <h2>Tap, type and build German without saying a word.</h2>
+              <span className="card-kicker">🤫 SILENT MODE · 10 EXERCISE FAMILIES</span>
+              <h2>Tap, type, match and build German without saying a word.</h2>
               <p>
-                Five rotating exercise types cover meaning, active recall, Perfekt grammar and
-                sentence structure. No microphone and no drag-only interaction required.
+                Meaning, active recall, Perfekt, sentence structure, matching, cloze, error spotting
+                and phrase building rotate through one commute-friendly practice loop.
               </p>
             </div>
             <Link className="button button-accent" href="/practice">Start silent practice</Link>
@@ -192,7 +192,8 @@ export default function DashboardPage() {
             <li className="done"><span>02</span> Content & publishing</li>
             <li className="done"><span>03</span> Learning loop</li>
             <li className="done"><span>04</span> Mastery & review</li>
-            <li className="active"><span>05A</span> Silent exercise engine</li>
+            <li className="done"><span>05A</span> Silent engine</li>
+            <li className="active"><span>05B</span> Exercise explosion</li>
           </ol>
           <div className="identity-chip">
             <span>Signed in as</span>

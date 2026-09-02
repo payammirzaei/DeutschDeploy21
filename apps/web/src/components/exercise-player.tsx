@@ -8,10 +8,12 @@ export type ExerciseAnswer = {
   choice_id?: string;
   text?: string;
   token_ids?: string[];
+  pair_ids?: string[];
 };
 
 type Choice = { id: string; text: string };
 type Token = { id: string; text: string };
+type MatchItem = { id: string; text: string };
 
 export type ExercisePrompt = {
   kind?: string;
@@ -23,6 +25,8 @@ export type ExercisePrompt = {
   tap_hint?: string;
   choices?: Choice[];
   tokens?: Token[];
+  left_items?: MatchItem[];
+  right_items?: MatchItem[];
 };
 
 type Props = {
@@ -37,7 +41,16 @@ const choiceTypes = new Set([
   "meaning_multiple_choice",
   "perfect_participle_choice",
   "auxiliary_choice",
+  "usage_error_spotting",
 ]);
+
+const textTypes = new Set([
+  "reverse_typing",
+  "example_cloze",
+  "perfect_form_typing",
+]);
+
+const orderTypes = new Set(["sentence_order", "phrase_builder"]);
 
 export function ExercisePlayer({
   exerciseType,
@@ -49,6 +62,8 @@ export function ExercisePlayer({
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [orderedTokenIds, setOrderedTokenIds] = useState<string[]>([]);
+  const [activeLeftId, setActiveLeftId] = useState<string | null>(null);
+  const [matches, setMatches] = useState<Record<string, string>>({});
 
   const tokens = useMemo(() => prompt.tokens ?? [], [prompt.tokens]);
   const tokenById = useMemo(
@@ -99,11 +114,11 @@ export function ExercisePlayer({
     );
   }
 
-  if (exerciseType === "reverse_typing") {
+  if (textTypes.has(exerciseType)) {
     return (
       <form className={styles.player} onSubmit={submitText}>
         <ExerciseHeading prompt={prompt} />
-        {prompt.clue ? <div className={styles.clue} dir="rtl">{prompt.clue}</div> : null}
+        {prompt.clue ? <div className={styles.clue} dir="auto">{prompt.clue}</div> : null}
         <label className={styles.inputLabel}>
           <span>German answer</span>
           <input
@@ -123,12 +138,12 @@ export function ExercisePlayer({
     );
   }
 
-  if (exerciseType === "sentence_order") {
+  if (orderTypes.has(exerciseType)) {
     const complete = orderedTokenIds.length === tokens.length && tokens.length > 0;
     return (
       <div className={styles.player}>
         <ExerciseHeading prompt={prompt} />
-        <div className={styles.sentenceBoard} aria-label="Your sentence">
+        <div className={styles.sentenceBoard} aria-label="Your answer order">
           {orderedTokens.length ? (
             orderedTokens.map((token) => (
               <button
@@ -144,10 +159,10 @@ export function ExercisePlayer({
               </button>
             ))
           ) : (
-            <span>Tap the chunks below to build the sentence.</span>
+            <span>Tap the chunks below to build the answer.</span>
           )}
         </div>
-        <div className={styles.tokenBank} aria-label="Available sentence chunks">
+        <div className={styles.tokenBank} aria-label="Available answer chunks">
           {availableTokens.map((token) => (
             <button
               key={token.id}
@@ -172,6 +187,90 @@ export function ExercisePlayer({
             type="button"
             disabled={!complete || submitting}
             onClick={() => onSubmit({ token_ids: orderedTokenIds })}
+          >
+            {submitting ? "Saving…" : submitLabel}
+          </button>
+        </div>
+        {prompt.tap_hint ? <small className={styles.hint}>{prompt.tap_hint}</small> : null}
+      </div>
+    );
+  }
+
+  if (exerciseType === "meaning_matching") {
+    const leftItems = prompt.left_items ?? [];
+    const rightItems = prompt.right_items ?? [];
+    const usedRightIds = new Set(Object.values(matches));
+    const complete = leftItems.length > 0 && Object.keys(matches).length === leftItems.length;
+
+    function selectRight(rightId: string) {
+      if (!activeLeftId || usedRightIds.has(rightId)) return;
+      setMatches((current) => ({ ...current, [activeLeftId]: rightId }));
+      setActiveLeftId(null);
+    }
+
+    function removeMatch(leftId: string) {
+      setMatches((current) => {
+        const next = { ...current };
+        delete next[leftId];
+        return next;
+      });
+      setActiveLeftId(leftId);
+    }
+
+    return (
+      <div className={styles.player}>
+        <ExerciseHeading prompt={prompt} />
+        <div className={styles.matchGrid}>
+          <div className={styles.matchColumn} aria-label="German verbs">
+            {leftItems.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`${styles.matchItem} ${activeLeftId === item.id ? styles.matchActive : ""} ${matches[item.id] ? styles.matchDone : ""}`}
+                onClick={() => (matches[item.id] ? removeMatch(item.id) : setActiveLeftId(item.id))}
+              >
+                <strong>{item.text}</strong>
+                <span>{matches[item.id] ? "✓" : "DE"}</span>
+              </button>
+            ))}
+          </div>
+          <div className={styles.matchColumn} aria-label="Persian meanings">
+            {rightItems.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                dir="rtl"
+                className={`${styles.matchItem} ${usedRightIds.has(item.id) ? styles.matchDone : ""}`}
+                disabled={usedRightIds.has(item.id)}
+                onClick={() => selectRight(item.id)}
+              >
+                <strong>{item.text}</strong>
+                <span>FA</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className={styles.puzzleFooter}>
+          <button
+            className={styles.resetButton}
+            type="button"
+            disabled={!Object.keys(matches).length || submitting}
+            onClick={() => {
+              setMatches({});
+              setActiveLeftId(null);
+            }}
+          >
+            Reset
+          </button>
+          <button
+            className="button button-primary"
+            type="button"
+            disabled={!complete || submitting}
+            onClick={() =>
+              onSubmit({
+                pair_ids: Object.entries(matches).map(([left, right]) => `${left}:${right}`),
+              })
+            }
           >
             {submitting ? "Saving…" : submitLabel}
           </button>

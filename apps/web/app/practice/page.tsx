@@ -38,9 +38,14 @@ type AttemptResult = {
 const typeMeta: Record<string, { label: string; icon: string }> = {
   meaning_multiple_choice: { label: "Meaning", icon: "Aa" },
   reverse_typing: { label: "Type", icon: "⌨" },
-  perfect_participle_choice: { label: "Perfekt", icon: "II" },
+  perfect_participle_choice: { label: "Partizip", icon: "II" },
   auxiliary_choice: { label: "haben / sein", icon: "±" },
   sentence_order: { label: "Sentence", icon: "↔" },
+  meaning_matching: { label: "Match", icon: "⇄" },
+  example_cloze: { label: "Fill gap", icon: "__" },
+  usage_error_spotting: { label: "Spot error", icon: "!" },
+  perfect_form_typing: { label: "Perfekt type", icon: "⌨II" },
+  phrase_builder: { label: "Phrase", icon: "▦" },
 };
 
 export default function PracticePage() {
@@ -129,11 +134,11 @@ export default function PracticePage() {
 
       <section className={styles.hero}>
         <div>
-          <span className="eyebrow">🤫 SILENT MODE · COMMUTE FRIENDLY</span>
+          <span className="eyebrow">🤫 SILENT MODE · 10 EXERCISE FAMILIES</span>
           <h1>Practice anywhere.<br />No microphone needed.</h1>
           <p>
-            Short, tactile German drills for the bus, train, queue or office. Tap, type and build
-            sentences while the same mastery engine learns what you actually know.
+            Tap, type, match, fill gaps and rebuild interview language on the bus, train or in the
+            office while one mastery engine learns what you can actually recall.
           </p>
         </div>
         <div className={styles.sessionCard}>
@@ -161,13 +166,13 @@ export default function PracticePage() {
       <section className={styles.workspace}>
         <aside className={styles.contextPanel}>
           <span className="card-kicker">WHY THIS MODE</span>
-          <h2>Zero social friction.</h2>
+          <h2>Repetition without boredom.</h2>
           <p>
-            No speaking prompt blocks your session. Every interaction has a tap or keyboard path,
-            and sentence puzzles never require drag-and-drop.
+            The same interview vocabulary comes back through recognition, active recall, grammar,
+            matching, context and sentence construction instead of one repeated card shape.
           </p>
           <div className={styles.contextFacts}>
-            <div><strong>5</strong><span>exercise types</span></div>
+            <div><strong>10</strong><span>exercise types</span></div>
             <div><strong>30–90s</strong><span>per drill</span></div>
             <div><strong>1</strong><span>mastery graph</span></div>
           </div>

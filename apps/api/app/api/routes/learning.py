@@ -12,6 +12,8 @@ from app.schemas.learning import (
     NextActivityResponse,
     StartLearningResult,
 )
+from app.services.advanced_attempts import submit_advanced_attempt
+from app.services.advanced_exercises import ADVANCED_EXERCISE_TYPES
 from app.services.learning import (
     ensure_starter_learning,
     get_day_view,
@@ -85,17 +87,28 @@ async def create_attempt(
     idempotency_key: str = Header(alias="Idempotency-Key", min_length=8, max_length=180),
 ) -> AttemptResult:
     try:
-        result = await submit_attempt(
-            session,
-            user,
-            instance_id,
-            idempotency_key,
-            payload,
-        )
+        instance = await session.get(ActivityInstance, instance_id)
+        if instance is None:
+            raise LookupError("Activity instance not found")
+        if instance.exercise_type in ADVANCED_EXERCISE_TYPES:
+            result = await submit_advanced_attempt(
+                session,
+                user,
+                instance_id,
+                idempotency_key,
+                payload,
+            )
+        else:
+            result = await submit_attempt(
+                session,
+                user,
+                instance_id,
+                idempotency_key,
+                payload,
+            )
         attempt = await session.get(Attempt, result.attempt_id)
         evaluation = await session.get(Evaluation, result.evaluation_id)
-        instance = await session.get(ActivityInstance, instance_id)
-        if attempt is None or evaluation is None or instance is None:
+        if attempt is None or evaluation is None:
             raise RuntimeError("Submitted attempt could not be projected into mastery")
         await record_attempt_evidence(session, user, attempt, evaluation, instance)
         await session.commit()

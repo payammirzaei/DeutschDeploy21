@@ -51,7 +51,8 @@ docs/                   product, architecture, ADRs, delivery notes
 **Phase 2 — Content and publishing: merged and CI verified.**  
 **Phase 3 — Deterministic learning loop: merged and CI verified.**  
 **Phase 4 — Mastery and spaced review: merged and CI verified.**  
-**Phase 5A — Silent multi-exercise engine: implemented and CI verified.**
+**Phase 5A — Silent multi-exercise engine: merged and CI verified.**  
+**Phase 5B — Exercise explosion: implemented and CI verified.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
@@ -61,9 +62,11 @@ The learner-facing loop at `/learn` creates a version-pinned course release for 
 
 Every submitted learning, practice, or review attempt produces idempotent mastery evidence. `learning_targets`, append-only `mastery_events`, rebuildable `learner_mastery`, and `review_queue_entries` keep completion separate from memory reliability.
 
-Phase 5A adds `/practice`, a first-class Silent Mode for crowded buses, trains, offices and other places where speaking is impractical. Five deterministic exercise types currently share one generic attempt/evaluation pipeline: meaning choice, German typing recall, Partizip II choice, `haben`/`sein` choice, and tap-to-build sentence ordering. Silent practice is isolated from required course completion while still updating skill-specific mastery and spaced review.
+`/practice` is a first-class Silent Mode for crowded buses, trains, offices and other places where speaking is impractical. Phase 5B now provides ten deterministic exercise families through one attempt/evaluation/mastery pipeline: meaning choice, German typing recall, Partizip II choice, `haben`/`sein` choice, sentence ordering, German↔Persian matching, interview-example cloze, usage error spotting, typed Perfekt production, and phrase building. Silent practice remains isolated from required course completion while updating skill-specific mastery and spaced review.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), and [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md).
+The exercise system is now composed through base and advanced exercise packs. New families can be registered without changing the Phase 5A database model or creating exercise-specific submission endpoints.
+
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), and [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md).
 
 ## Local development
 
@@ -99,7 +102,7 @@ uv run python -m app.scripts.seed_content
 After signing in:
 
 - open `/learn` for the structured course;
-- open `/practice` for unlimited Silent Mode drills;
+- open `/practice` for unlimited ten-mode Silent Practice;
 - open `/review` for due spaced-review work and the mastery map.
 
 ## End-to-end proof paths
@@ -126,7 +129,7 @@ Published content version → course release → enrollment → course activity 
 Silent practice:
 
 ```text
-Pinned release content → keyed exercise variant → tap/type/order answer
+Pinned release content → registered exercise variant → tap/type/match/order answer
 → deterministic evaluation → skill-specific mastery evidence → review schedule
 ```
 
