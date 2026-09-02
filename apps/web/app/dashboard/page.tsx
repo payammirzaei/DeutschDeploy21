@@ -15,25 +15,37 @@ type Job = {
   result: Record<string, unknown> | null;
   error_code: string | null;
 };
+type ReviewSummary = {
+  due_count: number;
+  scheduled_count: number;
+  weak_count: number;
+  mastered_count: number;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [job, setJob] = useState<Job | null>(null);
+  const [review, setReview] = useState<ReviewSummary | null>(null);
   const [running, setRunning] = useState(false);
   const [system, setSystem] = useState<"checking" | "ready" | "degraded">("checking");
 
   useEffect(() => {
     let cancelled = false;
 
-    Promise.all([api.GET("/api/v1/auth/me"), api.GET("/api/v1/health/ready")])
-      .then(([{ data: me, response: meResponse }, { data: health }]) => {
+    Promise.all([
+      api.GET("/api/v1/auth/me"),
+      api.GET("/api/v1/health/ready"),
+      api.GET("/api/v1/review/home"),
+    ])
+      .then(([{ data: me, response: meResponse }, { data: health }, { data: reviewData }]) => {
         if (cancelled) return;
         if (meResponse.status === 401) {
           router.replace("/login");
           return;
         }
         if (me) setUser(me as User);
+        if (reviewData) setReview(reviewData as ReviewSummary);
         setSystem(health?.status === "ok" ? "ready" : "degraded");
       })
       .catch(() => {
@@ -82,38 +94,47 @@ export default function DashboardPage() {
   return (
     <main className="dashboard-shell">
       <header className="dashboard-header">
-        <div className="brand">
-          DD<span>21</span>
-        </div>
+        <div className="brand">DD<span>21</span></div>
         <div className="header-right">
           <span className={`status-dot ${system}`} aria-label={`System ${system}`} />
-          <button className="text-button" onClick={logout}>
-            Sign out
-          </button>
+          <button className="text-button" onClick={logout}>Sign out</button>
         </div>
       </header>
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 3 · LEARNING LOOP</div>
+          <div className="eyebrow">PHASE 4 · MASTERY & REVIEW</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            The content foundation is stable. Now it becomes practice: pinned course releases,
-            deterministic exercises, durable attempts, feedback and resume across sessions.
+            Practice now produces durable learning evidence. Weak targets return when they are due;
+            stable targets get longer intervals instead of disappearing behind a completion checkmark.
           </p>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">DAYS 1–3</span>
-              <h2>Start the first real interview-learning loop.</h2>
+              <span className="card-kicker">SPACED REVIEW · {review?.due_count ?? 0} DUE</span>
+              <h2>Review what your memory is most likely to lose.</h2>
               <p>
-                Twenty-one activities practice professional German through active recall. Every
-                attempt references the exact immutable content version shown to you.
+                {review?.scheduled_count
+                  ? `${review.scheduled_count} targets are scheduled, ${review.weak_count} are still learning/review, and ${review.mastered_count} are currently mastered.`
+                  : "Your queue is built automatically from submitted learning attempts."}
               </p>
             </div>
-            <Link className="button button-accent" href="/learn">
-              Start learning
+            <Link className="button button-accent" href="/review">
+              {review?.due_count ? "Review now" : "Open mastery"}
             </Link>
+          </article>
+
+          <article className="check-card">
+            <div>
+              <span className="card-kicker">DAYS 1–3</span>
+              <h2>Continue the interview-learning loop.</h2>
+              <p>
+                Twenty-one activities practice professional German through active recall. Every
+                answer now updates both curriculum progress and a separate mastery projection.
+              </p>
+            </div>
+            <Link className="button" href="/learn">Continue learning</Link>
           </article>
 
           <article className="check-card">
@@ -122,12 +143,10 @@ export default function DashboardPage() {
               <h2>Browse the versioned 100-verb foundation.</h2>
               <p>
                 Search German interview verbs, Persian and English meanings, Perfekt forms and
-                interview-focused examples. Publishing stays separate from learning progress.
+                interview-focused examples. Published content remains immutable under historical evidence.
               </p>
             </div>
-            <Link className="button" href="/catalog">
-              Open catalog
-            </Link>
+            <Link className="button" href="/catalog">Open catalog</Link>
           </article>
 
           <article className="check-card">
@@ -146,18 +165,9 @@ export default function DashboardPage() {
 
           {job ? (
             <article className="job-result" aria-live="polite">
-              <div className="job-row">
-                <span>Status</span>
-                <strong>{job.status}</strong>
-              </div>
-              <div className="job-row">
-                <span>Attempts</span>
-                <strong>{job.attempt_count}</strong>
-              </div>
-              <div className="job-row">
-                <span>Job</span>
-                <code>{job.id.slice(0, 8)}</code>
-              </div>
+              <div className="job-row"><span>Status</span><strong>{job.status}</strong></div>
+              <div className="job-row"><span>Attempts</span><strong>{job.attempt_count}</strong></div>
+              <div className="job-row"><span>Job</span><code>{job.id.slice(0, 8)}</code></div>
               {job.result ? <pre>{JSON.stringify(job.result, null, 2)}</pre> : null}
             </article>
           ) : null}
@@ -166,21 +176,11 @@ export default function DashboardPage() {
         <aside className="phase-card">
           <span className="card-kicker">DELIVERY</span>
           <ol className="phase-list">
-            <li className="done">
-              <span>01</span> Product architecture
-            </li>
-            <li className="done">
-              <span>02</span> Platform skeleton
-            </li>
-            <li className="done">
-              <span>03</span> Content & publishing
-            </li>
-            <li className="active">
-              <span>04</span> Learning loop
-            </li>
-            <li>
-              <span>05</span> Mastery & review
-            </li>
+            <li className="done"><span>01</span> Product architecture</li>
+            <li className="done"><span>02</span> Platform skeleton</li>
+            <li className="done"><span>03</span> Content & publishing</li>
+            <li className="done"><span>04</span> Learning loop</li>
+            <li className="active"><span>05</span> Mastery & review</li>
           </ol>
           <div className="identity-chip">
             <span>Signed in as</span>
