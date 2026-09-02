@@ -1,0 +1,28 @@
+{
+  "name": "@deutschdeploy21/web",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p ${PORT:-3000}",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "api:generate": "openapi-typescript ../../packages/api-contract/openapi.json -o src/lib/generated/api-schema.ts"
+  },
+  "dependencies": {
+    "next": "16.3.3",
+    "openapi-fetch": "^0.14.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "16.3.3",
+    "openapi-typescript": "^7.9.0",
+    "typescript": "^5.9.0"
+  }
+}

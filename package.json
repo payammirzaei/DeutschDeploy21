@@ -1,0 +1,14 @@
+{
+  "name": "deutschdeploy21",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["apps/web"],
+  "scripts": {
+    "web:dev": "npm --workspace apps/web run dev",
+    "web:build": "npm --workspace apps/web run build",
+    "web:lint": "npm --workspace apps/web run lint",
+    "web:typecheck": "npm --workspace apps/web run typecheck",
+    "api:generate": "npm --workspace apps/web run api:generate"
+  },
+  "engines": {"node": ">=22.0.0"}
+}
