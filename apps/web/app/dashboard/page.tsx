@@ -95,31 +95,45 @@ export default function DashboardPage() {
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 2 · CONTENT & PUBLISHING</div>
+          <div className="eyebrow">PHASE 3 · LEARNING LOOP</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            The platform foundation is proven. Now the German learning material is becoming
-            versioned data that can evolve without changing application code.
+            The content foundation is stable. Now it becomes practice: pinned course releases,
+            deterministic exercises, durable attempts, feedback and resume across sessions.
           </p>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">CONTENT CATALOG</span>
-              <h2>Install and browse the first 100 interview verbs.</h2>
+              <span className="card-kicker">DAYS 1–3</span>
+              <h2>Start the first real interview-learning loop.</h2>
               <p>
-                Imports are validated and idempotent. Drafts remain editable; publishing creates
-                immutable versions that future curriculum and progress can safely reference.
+                Twenty-one activities practice professional German through active recall. Every
+                attempt references the exact immutable content version shown to you.
               </p>
             </div>
-            <Link className="button button-accent" href="/catalog">
+            <Link className="button button-accent" href="/learn">
+              Start learning
+            </Link>
+          </article>
+
+          <article className="check-card">
+            <div>
+              <span className="card-kicker">CONTENT CATALOG</span>
+              <h2>Browse the versioned 100-verb foundation.</h2>
+              <p>
+                Search German interview verbs, Persian and English meanings, Perfekt forms and
+                interview-focused examples. Publishing stays separate from learning progress.
+              </p>
+            </div>
+            <Link className="button" href="/catalog">
               Open catalog
             </Link>
           </article>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">PHASE 1 PROOF</span>
-              <h2>The durable worker path stays testable.</h2>
+              <span className="card-kicker">PLATFORM PROOF</span>
+              <h2>The durable worker path remains testable.</h2>
               <p>
                 Browser → API → PostgreSQL → Redis → worker → PostgreSQL remains available as an
                 operational smoke test while the learning product grows.
@@ -158,10 +172,10 @@ export default function DashboardPage() {
             <li className="done">
               <span>02</span> Platform skeleton
             </li>
-            <li className="active">
+            <li className="done">
               <span>03</span> Content & publishing
             </li>
-            <li>
+            <li className="active">
               <span>04</span> Learning loop
             </li>
             <li>
