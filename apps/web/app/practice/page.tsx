@@ -76,7 +76,10 @@ export default function PracticePage() {
   }, [router]);
 
   useEffect(() => {
-    void loadNext();
+    const timer = window.setTimeout(() => {
+      void loadNext();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [loadNext]);
 
   async function submit(answer: ExerciseAnswer) {
