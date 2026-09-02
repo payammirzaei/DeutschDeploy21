@@ -1,8 +1,21 @@
-const CACHE = "dd21-shell-v1";
-const SHELL = ["/", "/login", "/icon.svg"];
+const CACHE = "dd21-public-v2";
+const PUBLIC_ASSETS = ["/icon.svg", "/manifest.webmanifest"];
+
+function isSafeStaticRequest(request) {
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return false;
+  if (request.destination === "document") return false;
+  if (url.pathname.startsWith("/api/")) return false;
+
+  return (
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname === "/icon.svg" ||
+    url.pathname === "/manifest.webmanifest"
+  );
+}
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PUBLIC_ASSETS)));
   self.skipWaiting();
 });
 
@@ -17,17 +30,19 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
-  if (request.method !== "GET" || new URL(request.url).pathname.startsWith("/api/")) return;
+  if (request.method !== "GET" || !isSafeStaticRequest(request)) return;
 
   event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (response.ok && request.url.startsWith(self.location.origin)) {
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+
+      return fetch(request).then((response) => {
+        if (response.ok) {
           const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put(request, copy));
+          void caches.open(CACHE).then((cache) => cache.put(request, copy));
         }
         return response;
-      })
-      .catch(() => caches.match(request).then((cached) => cached || caches.match("/"))),
+      });
+    }),
   );
 });
