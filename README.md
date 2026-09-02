@@ -2,7 +2,7 @@
 
 > **Speak German. Explain Your Work. Get Hired.**
 
-DeutschDeploy21 is a focused, mobile-first learning platform for software professionals preparing for German job interviews. It combines a structured 21-day curriculum, active recall, spaced repetition, silent practice, speaking practice, and realistic HR and technical mock interviews.
+DeutschDeploy21 is a focused, mobile-first learning platform for software professionals preparing for German job interviews. It combines a structured 21-day curriculum, active recall, spaced repetition, silent practice, interview-transfer drills, speaking practice, and realistic HR and technical mock interviews.
 
 The first release is personalized for one learner and the Software Developer track (German A2–B1), while the domain model is designed to later support multiple users, professions, languages, course lengths, and AI or speech providers without rewriting the learning core.
 
@@ -52,7 +52,8 @@ docs/                   product, architecture, ADRs, delivery notes
 **Phase 3 — Deterministic learning loop: merged and CI verified.**  
 **Phase 4 — Mastery and spaced review: merged and CI verified.**  
 **Phase 5A — Silent multi-exercise engine: merged and CI verified.**  
-**Phase 5B — Exercise explosion: implemented and CI verified.**
+**Phase 5B — Exercise explosion: merged and CI verified.**  
+**Phase 5C — Interview drills: implemented and CI verified.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
@@ -60,13 +61,15 @@ The content layer adds relational drafts, immutable published versions, typed ve
 
 The learner-facing loop at `/learn` creates a version-pinned course release for Days 1–3, materializes 21 required activities, persists append-only attempts and evaluations, gives immediate feedback, advances after submissions rather than retry-until-correct gating, and resumes from durable learner state.
 
-Every submitted learning, practice, or review attempt produces idempotent mastery evidence. `learning_targets`, append-only `mastery_events`, rebuildable `learner_mastery`, and `review_queue_entries` keep completion separate from memory reliability.
+Every submitted learning, practice, interview-drill, or review attempt produces idempotent mastery evidence. `learning_targets`, append-only `mastery_events`, rebuildable `learner_mastery`, and `review_queue_entries` keep completion separate from memory reliability.
 
-`/practice` is a first-class Silent Mode for crowded buses, trains, offices and other places where speaking is impractical. Phase 5B now provides ten deterministic exercise families through one attempt/evaluation/mastery pipeline: meaning choice, German typing recall, Partizip II choice, `haben`/`sein` choice, sentence ordering, German↔Persian matching, interview-example cloze, usage error spotting, typed Perfekt production, and phrase building. Silent practice remains isolated from required course completion while updating skill-specific mastery and spaced review.
+`/practice` is a first-class Silent Mode for crowded buses, trains, offices and other places where speaking is impractical. Phase 5B provides ten deterministic exercise families through one attempt/evaluation/mastery pipeline: meaning choice, German typing recall, Partizip II choice, `haben`/`sein` choice, sentence ordering, German↔Persian matching, interview-example cloze, usage error spotting, typed Perfekt production, and phrase building.
 
-The exercise system is now composed through base and advanced exercise packs. New families can be registered without changing the Phase 5A database model or creating exercise-specific submission endpoints.
+`/drills` is the first Interview Lab. Phase 5C adds 18 curated deterministic drills across six interview skills: best-answer quality, HR structure, STAR behavioral structure, technical explanation, architecture sequencing, and recovery-phrase recall under visible time pressure. These drills remain silent-first, do not fake course completion, and feed the same mastery and spaced-review system.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), and [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md).
+Phase 5C also generalizes immutable activity and mastery identity so interview skills no longer need a fake verb or content-version reference. Existing content activities remain pinned to exact content versions, while interview skills use stable semantic target keys.
+
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md), and [`docs/23-phase-5c-interview-drills.md`](docs/23-phase-5c-interview-drills.md).
 
 ## Local development
 
@@ -103,7 +106,8 @@ After signing in:
 
 - open `/learn` for the structured course;
 - open `/practice` for unlimited ten-mode Silent Practice;
-- open `/review` for due spaced-review work and the mastery map.
+- open `/drills` for silent-first interview-transfer drills;
+- open `/review` for due spaced-review work and the combined mastery map.
 
 ## End-to-end proof paths
 
@@ -133,10 +137,17 @@ Pinned release content → registered exercise variant → tap/type/match/order 
 → deterministic evaluation → skill-specific mastery evidence → review schedule
 ```
 
+Interview drills:
+
+```text
+Version-controlled drill blueprint → immutable interview activity instance
+→ choice/type/order answer → deterministic evaluation → interview-skill mastery → review
+```
+
 Mastery and review:
 
 ```text
-Attempt → evaluation → learning target → mastery event → rebuildable projection
+Attempt → evaluation → stable learning target → mastery event → rebuildable projection
 → explainable review queue → frozen exercise review → new evidence → reschedule
 ```
 

@@ -1,0 +1,225 @@
+.shell {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1rem 0 4rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0 1.5rem;
+}
+
+.header nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.hero {
+  display: grid;
+  gap: 1.2rem;
+  padding: 2rem 0;
+}
+
+.hero h1 {
+  margin: 0.6rem 0 0.8rem;
+  max-width: 12ch;
+  font-size: clamp(2.8rem, 10vw, 6.4rem);
+  line-height: 0.91;
+  letter-spacing: -0.06em;
+}
+
+.hero p {
+  max-width: 60ch;
+  margin: 0;
+  line-height: 1.65;
+  opacity: 0.72;
+}
+
+.counter {
+  display: grid;
+  align-content: center;
+  min-height: 10rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 1.5rem;
+  padding: 1.2rem;
+}
+
+.counter span,
+.counter small {
+  opacity: 0.62;
+}
+
+.counter strong {
+  font-size: 3.8rem;
+  line-height: 1;
+}
+
+.modeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.modeCard {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 6.5rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 1.1rem;
+  padding: 0.85rem;
+  opacity: 0.62;
+}
+
+.modeCard > span {
+  font-weight: 900;
+}
+
+.modeCard small {
+  opacity: 0.65;
+}
+
+.active {
+  opacity: 1;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.workspace {
+  display: grid;
+  gap: 1rem;
+}
+
+.sideCard,
+.exerciseCard,
+.feedbackCard,
+.loadingCard {
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 1.5rem;
+  padding: clamp(1rem, 4vw, 1.5rem);
+}
+
+.sideCard h2,
+.feedbackCard h2,
+.loadingCard h2 {
+  margin: 0.45rem 0 0.7rem;
+}
+
+.sideCard p,
+.feedbackCard p {
+  line-height: 1.6;
+  opacity: 0.72;
+}
+
+.factRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.factRow div {
+  display: grid;
+  border-radius: 1rem;
+  background: var(--surface-strong, #171717);
+  padding: 0.8rem;
+}
+
+.factRow strong {
+  font-size: 1.6rem;
+}
+
+.factRow span {
+  font-size: 0.78rem;
+  opacity: 0.6;
+}
+
+.stage {
+  min-width: 0;
+}
+
+.exerciseMeta {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.exerciseMeta > span {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 0.9rem;
+  background: var(--surface-strong, #171717);
+  font-weight: 900;
+}
+
+.exerciseMeta > div {
+  display: grid;
+}
+
+.exerciseMeta small {
+  opacity: 0.55;
+}
+
+.exerciseMeta code {
+  font-size: 0.9rem;
+}
+
+.expired {
+  font-weight: 900;
+  text-decoration: underline;
+}
+
+.timeNote,
+.error {
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+}
+
+.timeNote {
+  background: var(--surface-strong, #171717);
+}
+
+.error {
+  border: 1px solid currentColor;
+}
+
+.feedbackCard {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.correct {
+  border-width: 2px;
+}
+
+.review {
+  border-style: dashed;
+}
+
+@media (min-width: 760px) {
+  .hero {
+    grid-template-columns: 1fr 220px;
+    align-items: end;
+  }
+
+  .modeGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workspace {
+    grid-template-columns: minmax(230px, 0.34fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .sideCard {
+    position: sticky;
+    top: 1rem;
+  }
+}

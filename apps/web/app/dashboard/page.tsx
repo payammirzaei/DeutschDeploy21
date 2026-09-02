@@ -103,12 +103,24 @@ export default function DashboardPage() {
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 5B · EXERCISE EXPLOSION</div>
+          <div className="eyebrow">PHASE 5C · INTERVIEW DRILLS</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            Learn when you can speak. Practice when you cannot. Ten silent exercise families now
-            train recognition, recall, grammar, matching, context and construction through one mastery graph.
+            Vocabulary is only the raw material. Now train how to structure HR, behavioral,
+            technical and architecture answers before the microphone enters the loop.
           </p>
+
+          <article className="check-card">
+            <div>
+              <span className="card-kicker">INTERVIEW LAB · 18 CURATED DRILLS</span>
+              <h2>Build the answer before you have to say it.</h2>
+              <p>
+                Best-answer decisions, HR ordering, STAR stories, technical explanations,
+                architecture sequences and timed recovery phrases train six interview skills silently.
+              </p>
+            </div>
+            <Link className="button button-accent" href="/drills">Open Interview Lab</Link>
+          </article>
 
           <article className="check-card">
             <div>
@@ -119,13 +131,13 @@ export default function DashboardPage() {
                 and phrase building rotate through one commute-friendly practice loop.
               </p>
             </div>
-            <Link className="button button-accent" href="/practice">Start silent practice</Link>
+            <Link className="button" href="/practice">Start silent practice</Link>
           </article>
 
           <article className="check-card">
             <div>
               <span className="card-kicker">SPACED REVIEW · {review?.due_count ?? 0} DUE</span>
-              <h2>Review what your memory is most likely to lose.</h2>
+              <h2>Review vocabulary and interview structure in one queue.</h2>
               <p>
                 {review?.scheduled_count
                   ? `${review.scheduled_count} targets are scheduled, ${review.weak_count} are still learning/review, and ${review.mastered_count} are currently mastered.`
@@ -140,10 +152,10 @@ export default function DashboardPage() {
           <article className="check-card">
             <div>
               <span className="card-kicker">DAYS 1–3</span>
-              <h2>Continue the interview-learning loop.</h2>
+              <h2>Continue the structured learning loop.</h2>
               <p>
                 Twenty-one required activities keep curriculum progress separate from unlimited
-                optional practice, so a commute session never silently completes a course day.
+                optional practice and interview drills, so commute sessions never fake course completion.
               </p>
             </div>
             <Link className="button" href="/learn">Continue learning</Link>
@@ -193,7 +205,8 @@ export default function DashboardPage() {
             <li className="done"><span>03</span> Learning loop</li>
             <li className="done"><span>04</span> Mastery & review</li>
             <li className="done"><span>05A</span> Silent engine</li>
-            <li className="active"><span>05B</span> Exercise explosion</li>
+            <li className="done"><span>05B</span> Exercise explosion</li>
+            <li className="active"><span>05C</span> Interview drills</li>
           </ol>
           <div className="identity-chip">
             <span>Signed in as</span>

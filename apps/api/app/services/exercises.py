@@ -92,6 +92,8 @@ async def materialize_exercise(
     instance = ActivityInstance(
         enrollment_id=enrollment.id,
         release_activity_id=activity.id,
+        source_kind="release_activity",
+        source_key=str(activity.id),
         instance_key=instance_key,
         content_version_id=version.id,
         exercise_type=exercise_type,

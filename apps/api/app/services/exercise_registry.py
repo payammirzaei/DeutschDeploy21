@@ -23,6 +23,11 @@ from app.services.exercises import (
     learning_target_for,
     materialize_exercise,
 )
+from app.services.interview_drills import (
+    INTERVIEW_DRILL_TYPES,
+    UnsupportedInterviewDrillError,
+    evaluate_interview_drill,
+)
 
 ALL_SILENT_EXERCISE_TYPES = (*SILENT_EXERCISE_TYPES, *ADVANCED_EXERCISE_TYPES)
 TARGET_BY_EXERCISE.update(ADVANCED_TARGETS)
@@ -78,6 +83,8 @@ async def materialize_registered_exercise(
     instance = ActivityInstance(
         enrollment_id=enrollment.id,
         release_activity_id=activity.id,
+        source_kind="release_activity",
+        source_key=str(activity.id),
         instance_key=instance_key,
         content_version_id=version.id,
         exercise_type=exercise_type,
@@ -99,6 +106,24 @@ def evaluate_registered_exercise(
     token_ids: Sequence[str] | None,
     pair_ids: Sequence[str] | None,
 ) -> tuple[dict, dict, bool, int, str]:
+    if instance.exercise_type in INTERVIEW_DRILL_TYPES:
+        try:
+            raw, normalized, correct = evaluate_interview_drill(
+                instance,
+                choice_id=choice_id,
+                text=text,
+                token_ids=token_ids,
+            )
+        except UnsupportedInterviewDrillError as exc:
+            raise UnsupportedExerciseError(str(exc)) from exc
+        return (
+            raw,
+            normalized,
+            correct,
+            100 if correct else 0,
+            "correct" if correct else "review_needed",
+        )
+
     if instance.exercise_type not in ADVANCED_EXERCISE_TYPES:
         return evaluate_exercise(
             instance,
@@ -128,3 +153,39 @@ def evaluate_registered_exercise(
 
 def learning_target_for_registered(exercise_type: str) -> tuple[str, str]:
     return ADVANCED_TARGETS.get(exercise_type, learning_target_for(exercise_type))
+
+
+def learning_target_descriptor(instance: ActivityInstance) -> dict[str, str | None]:
+    if instance.source_kind == "interview_drill":
+        prompt = instance.prompt
+        required = (
+            "target_key",
+            "target_label",
+            "target_kind",
+            "skill_dimension",
+            "production_mode",
+        )
+        if any(not prompt.get(key) for key in required):
+            raise RuntimeError("Interview drill is missing mastery target metadata")
+        return {
+            "target_key": str(prompt["target_key"]),
+            "target_label": str(prompt["target_label"]),
+            "target_kind": str(prompt["target_kind"]),
+            "content_version_id": None,
+            "skill_dimension": str(prompt["skill_dimension"]),
+            "production_mode": str(prompt["production_mode"]),
+        }
+
+    if instance.content_version_id is None:
+        raise RuntimeError("Content exercise is missing its pinned content version")
+    skill_dimension, production_mode = learning_target_for_registered(instance.exercise_type)
+    return {
+        "target_key": (
+            f"content:{instance.content_version_id}:{skill_dimension}:{production_mode}"
+        ),
+        "target_label": None,
+        "target_kind": "content",
+        "content_version_id": str(instance.content_version_id),
+        "skill_dimension": skill_dimension,
+        "production_mode": production_mode,
+    }

@@ -1,0 +1,290 @@
+[
+  {
+    "external_id": "interview.best-answer.intro.01",
+    "family": "interview_best_answer",
+    "category": "introduction",
+    "question": "Welche Antwort ist für ‚Erzählen Sie etwas über sich‘ am stärksten?",
+    "target_key": "interview:answer-quality",
+    "target_label": "Interview answer quality",
+    "skill_dimension": "answer_quality",
+    "production_mode": "recognition",
+    "choices": [
+      "Ich bin Softwareentwickler und arbeite gern an praktischen Produkten. In meinen letzten Projekten habe ich Backend, Frontend und Deployment verbunden. Jetzt suche ich eine Rolle, in der ich mehr Verantwortung übernehmen kann.",
+      "Ich heiße Payam. Ich mag Computer und programmiere schon lange. Sonst gibt es nicht viel zu sagen.",
+      "Mein Lebenslauf enthält verschiedene Technologien. Ich kann Python, JavaScript, Docker, Datenbanken und viele andere Dinge."
+    ],
+    "correct_index": 0
+  },
+  {
+    "external_id": "interview.best-answer.motivation.02",
+    "family": "interview_best_answer",
+    "category": "motivation",
+    "question": "Welche Antwort auf ‚Warum möchten Sie diese Stelle?‘ ist am professionellsten?",
+    "target_key": "interview:answer-quality",
+    "target_label": "Interview answer quality",
+    "skill_dimension": "answer_quality",
+    "production_mode": "recognition",
+    "choices": [
+      "Die Rolle passt zu meiner Erfahrung mit Full-Stack- und Cloud-Themen. Besonders interessant finde ich, dass ich technische Entscheidungen mittragen und gleichzeitig nah am Produkt arbeiten kann.",
+      "Die Stelle klingt gut und ich brauche nach dem Studium einen Job.",
+      "Ich habe viele Stellen gesehen und diese war eine davon."
+    ],
+    "correct_index": 0
+  },
+  {
+    "external_id": "interview.best-answer.strength.03",
+    "family": "interview_best_answer",
+    "category": "strengths",
+    "question": "Welche Antwort zeigt eine Stärke mit glaubwürdiger Begründung?",
+    "target_key": "interview:answer-quality",
+    "target_label": "Interview answer quality",
+    "skill_dimension": "answer_quality",
+    "production_mode": "recognition",
+    "choices": [
+      "Eine meiner Stärken ist strukturiertes Problemlösen. Bei technischen Fehlern versuche ich zuerst, das Problem reproduzierbar zu machen, dann Logs und Daten zu prüfen und erst danach Änderungen vorzunehmen.",
+      "Meine größte Stärke ist, dass ich in allem sehr gut bin.",
+      "Ich habe eigentlich keine besondere Stärke, aber ich arbeite viel."
+    ],
+    "correct_index": 0
+  },
+  {
+    "external_id": "interview.hr-order.intro.01",
+    "family": "hr_answer_order",
+    "category": "introduction",
+    "question": "Baue eine klare 60-Sekunden-Vorstellung in der richtigen Reihenfolge.",
+    "target_key": "interview:hr-structure",
+    "target_label": "HR answer structure",
+    "skill_dimension": "hr_structure",
+    "production_mode": "construction",
+    "chunks": [
+      "Ich bin Softwareentwickler mit Schwerpunkt auf Full-Stack- und Cloud-Themen.",
+      "In meinen letzten Projekten habe ich APIs, Weboberflächen und Deployment-Pipelines umgesetzt.",
+      "Dabei war mir wichtig, technische Probleme strukturiert zu lösen und Verantwortung zu übernehmen.",
+      "Jetzt suche ich eine Rolle, in der ich diese Erfahrung in einem starken technischen Team weiter ausbauen kann."
+    ]
+  },
+  {
+    "external_id": "interview.hr-order.motivation.02",
+    "family": "hr_answer_order",
+    "category": "motivation",
+    "question": "Ordne eine überzeugende Motivationsantwort.",
+    "target_key": "interview:hr-structure",
+    "target_label": "HR answer structure",
+    "skill_dimension": "hr_structure",
+    "production_mode": "construction",
+    "chunks": [
+      "Die Aufgaben passen sehr gut zu meiner bisherigen Erfahrung.",
+      "Besonders interessant finde ich die Verbindung aus Softwareentwicklung und technischer Verantwortung.",
+      "Ich möchte nicht nur Features implementieren, sondern auch verstehen, wie das Gesamtsystem funktioniert.",
+      "Deshalb sehe ich in dieser Rolle einen guten nächsten Schritt."
+    ]
+  },
+  {
+    "external_id": "interview.hr-order.weakness.03",
+    "family": "hr_answer_order",
+    "category": "development",
+    "question": "Ordne eine sachliche Antwort auf eine Entwicklungsfrage.",
+    "target_key": "interview:hr-structure",
+    "target_label": "HR answer structure",
+    "skill_dimension": "hr_structure",
+    "production_mode": "construction",
+    "chunks": [
+      "Früher habe ich bei komplexen Aufgaben manchmal zu lange selbst nach einer Lösung gesucht.",
+      "Ich habe gemerkt, dass frühe Abstimmung oft effizienter ist.",
+      "Heute setze ich mir bewusst einen Zeitpunkt, an dem ich den aktuellen Stand teile und gezielt um Feedback bitte.",
+      "Dadurch löse ich Blocker schneller, ohne Verantwortung abzugeben."
+    ]
+  },
+  {
+    "external_id": "interview.star.incident.01",
+    "family": "star_builder",
+    "category": "problem-solving",
+    "question": "Baue die STAR-Struktur für einen Produktionsfehler.",
+    "target_key": "interview:star-structure",
+    "target_label": "STAR behavioral structure",
+    "skill_dimension": "star_structure",
+    "production_mode": "construction",
+    "chunks": [
+      "Situation: Nach einem Deployment trat in einem wichtigen Ablauf ein reproduzierbarer Fehler auf.",
+      "Task: Ich sollte die Ursache schnell eingrenzen und den stabilen Betrieb wiederherstellen.",
+      "Action: Ich habe Logs verglichen, den Fehler lokal reproduziert und die Änderung auf eine konkrete Schnittstelle eingegrenzt.",
+      "Result: Nach dem Fix lief der Ablauf wieder stabil und wir ergänzten einen Regressionstest für genau diesen Fall."
+    ]
+  },
+  {
+    "external_id": "interview.star.conflict.02",
+    "family": "star_builder",
+    "category": "teamwork",
+    "question": "Baue eine STAR-Antwort über eine technische Meinungsverschiedenheit.",
+    "target_key": "interview:star-structure",
+    "target_label": "STAR behavioral structure",
+    "skill_dimension": "star_structure",
+    "production_mode": "construction",
+    "chunks": [
+      "Situation: Im Team gab es zwei unterschiedliche Vorschläge für die technische Umsetzung.",
+      "Task: Wir mussten schnell zu einer nachvollziehbaren Entscheidung kommen.",
+      "Action: Ich habe die Anforderungen, Risiken und den Implementierungsaufwand für beide Optionen gegenübergestellt und mit dem Team besprochen.",
+      "Result: Wir konnten uns auf eine Lösung einigen und die Entscheidung später anhand derselben Kriterien erklären."
+    ]
+  },
+  {
+    "external_id": "interview.star.deadline.03",
+    "family": "star_builder",
+    "category": "prioritization",
+    "question": "Baue eine STAR-Antwort über eine enge Deadline.",
+    "target_key": "interview:star-structure",
+    "target_label": "STAR behavioral structure",
+    "skill_dimension": "star_structure",
+    "production_mode": "construction",
+    "chunks": [
+      "Situation: Vor einer Demo waren mehrere Aufgaben gleichzeitig offen.",
+      "Task: Ich musste sicherstellen, dass der zentrale Nutzerfluss zuverlässig funktioniert.",
+      "Action: Ich habe Must-haves von Nice-to-haves getrennt, Risiken priorisiert und den Fortschritt transparent abgestimmt.",
+      "Result: Der kritische Ablauf war rechtzeitig stabil und die weniger wichtigen Punkte wurden bewusst danach umgesetzt."
+    ]
+  },
+  {
+    "external_id": "interview.technical.api.01",
+    "family": "technical_explanation_order",
+    "category": "backend",
+    "question": "Ordne eine klare Erklärung eines REST-Endpunkts.",
+    "target_key": "interview:technical-explanation",
+    "target_label": "Technical explanation structure",
+    "skill_dimension": "technical_explanation",
+    "production_mode": "construction",
+    "chunks": [
+      "Zuerst validiert der Endpunkt die Eingabedaten und die Berechtigung des Benutzers.",
+      "Danach ruft die Service-Schicht die eigentliche Geschäftslogik auf.",
+      "Persistente Änderungen laufen innerhalb einer kontrollierten Datenbanktransaktion.",
+      "Am Ende gibt die API einen klaren Statuscode und eine definierte Response-Struktur zurück."
+    ]
+  },
+  {
+    "external_id": "interview.technical.debug.02",
+    "family": "technical_explanation_order",
+    "category": "debugging",
+    "question": "Ordne eine strukturierte Debugging-Erklärung.",
+    "target_key": "interview:technical-explanation",
+    "target_label": "Technical explanation structure",
+    "skill_dimension": "technical_explanation",
+    "production_mode": "construction",
+    "chunks": [
+      "Ich versuche zuerst, den Fehler zuverlässig zu reproduzieren.",
+      "Dann grenze ich anhand von Logs, Inputs und zuletzt geänderten Komponenten den betroffenen Bereich ein.",
+      "Danach teste ich eine möglichst kleine Hypothese statt mehrere Dinge gleichzeitig zu ändern.",
+      "Nach dem Fix ergänze ich einen Test oder eine Überwachung, damit derselbe Fehler schneller erkannt wird."
+    ]
+  },
+  {
+    "external_id": "interview.technical.database.03",
+    "family": "technical_explanation_order",
+    "category": "database",
+    "question": "Ordne eine Antwort zur Analyse einer langsamen Datenbankabfrage.",
+    "target_key": "interview:technical-explanation",
+    "target_label": "Technical explanation structure",
+    "skill_dimension": "technical_explanation",
+    "production_mode": "construction",
+    "chunks": [
+      "Zuerst messe ich, welche Abfrage tatsächlich langsam ist und wie häufig sie ausgeführt wird.",
+      "Dann prüfe ich den Query-Plan, Filter, Joins und vorhandene Indizes.",
+      "Anschließend ändere ich nur den Teil, für den die Messdaten einen klaren Engpass zeigen.",
+      "Zum Schluss vergleiche ich die Laufzeit vor und nach der Änderung unter ähnlichen Bedingungen."
+    ]
+  },
+  {
+    "external_id": "interview.architecture.request-flow.01",
+    "family": "architecture_sequence",
+    "category": "architecture",
+    "question": "Ordne einen Web-Request durch eine typische Anwendung.",
+    "target_key": "interview:architecture-explanation",
+    "target_label": "Architecture explanation sequence",
+    "skill_dimension": "architecture_sequence",
+    "production_mode": "construction",
+    "chunks": [
+      "Der Benutzer löst im Frontend eine Aktion aus.",
+      "Das Frontend sendet eine validierte Anfrage an die API.",
+      "Die API führt Geschäftslogik aus und liest oder schreibt über die Datenzugriffsschicht.",
+      "Die Antwort wird als definierter Vertrag an das Frontend zurückgegeben und dort dargestellt."
+    ]
+  },
+  {
+    "external_id": "interview.architecture.cicd.02",
+    "family": "architecture_sequence",
+    "category": "devops",
+    "question": "Ordne eine einfache CI/CD-Pipeline.",
+    "target_key": "interview:architecture-explanation",
+    "target_label": "Architecture explanation sequence",
+    "skill_dimension": "architecture_sequence",
+    "production_mode": "construction",
+    "chunks": [
+      "Ein Commit oder Pull Request startet die Pipeline.",
+      "Zuerst laufen Linting, Typprüfung und automatisierte Tests.",
+      "Danach wird ein reproduzierbares Artefakt oder Container-Image gebaut.",
+      "Erst nach erfolgreichen Gates wird die freigegebene Version in die Zielumgebung ausgerollt."
+    ]
+  },
+  {
+    "external_id": "interview.architecture.vision.03",
+    "family": "architecture_sequence",
+    "category": "computer-vision",
+    "question": "Ordne eine industrielle Vision-Pipeline auf hoher Ebene.",
+    "target_key": "interview:architecture-explanation",
+    "target_label": "Architecture explanation sequence",
+    "skill_dimension": "architecture_sequence",
+    "production_mode": "construction",
+    "chunks": [
+      "Ein Trigger startet die Aufnahme der Sensordaten.",
+      "RGB- und Tiefendaten werden synchronisiert und vorverarbeitet.",
+      "Die relevanten Vision-Modelle erzeugen Detektionen oder Posen.",
+      "Die Ergebnisse werden validiert und anschließend an Visualisierung oder nachgelagerte Planung übergeben."
+    ]
+  },
+  {
+    "external_id": "interview.recall.clarify.01",
+    "family": "timed_quick_recall",
+    "category": "recovery",
+    "question": "Du hast die Frage nicht ganz verstanden. Schreibe in 15 Sekunden eine höfliche Rückfrage.",
+    "target_key": "interview:recovery-recall",
+    "target_label": "Interview recovery phrases",
+    "skill_dimension": "recovery_recall",
+    "production_mode": "production",
+    "clue": "Bitte um eine andere Formulierung.",
+    "accepted_answers": [
+      "Könnten Sie die Frage bitte noch einmal formulieren?",
+      "Könnten Sie die Frage bitte anders formulieren?"
+    ],
+    "time_limit_seconds": 15
+  },
+  {
+    "external_id": "interview.recall.think.02",
+    "family": "timed_quick_recall",
+    "category": "recovery",
+    "question": "Du brauchst kurz Zeit zum Nachdenken. Schreibe die passende Phrase.",
+    "target_key": "interview:recovery-recall",
+    "target_label": "Interview recovery phrases",
+    "skill_dimension": "recovery_recall",
+    "production_mode": "production",
+    "clue": "Bitte professionell um einen kurzen Moment.",
+    "accepted_answers": [
+      "Darf ich kurz darüber nachdenken?",
+      "Einen Moment bitte, ich denke kurz darüber nach."
+    ],
+    "time_limit_seconds": 15
+  },
+  {
+    "external_id": "interview.recall.confirm.03",
+    "family": "timed_quick_recall",
+    "category": "recovery",
+    "question": "Du möchtest prüfen, ob du die Frage richtig verstanden hast. Schreibe eine passende Phrase.",
+    "target_key": "interview:recovery-recall",
+    "target_label": "Interview recovery phrases",
+    "skill_dimension": "recovery_recall",
+    "production_mode": "production",
+    "clue": "Bestätige dein Verständnis, bevor du antwortest.",
+    "accepted_answers": [
+      "Wenn ich Sie richtig verstanden habe, geht es um ...",
+      "Wenn ich die Frage richtig verstanden habe, meinen Sie ..."
+    ],
+    "time_limit_seconds": 15
+  }
+]
