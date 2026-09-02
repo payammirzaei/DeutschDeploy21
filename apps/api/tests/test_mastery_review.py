@@ -25,12 +25,18 @@ def _login(client: TestClient) -> None:
     assert response.status_code == 200
 
 
-def _first_activity(client: TestClient) -> dict:
+def _next_available_activity(client: TestClient) -> dict:
     start = client.post("/api/v1/learning/start")
     assert start.status_code == 200
-    response = client.post("/api/v1/learning/days/1/next")
-    assert response.status_code == 200
-    return response.json()["activity"]
+    home = client.get("/api/v1/learning/home")
+    assert home.status_code == 200
+    for day in home.json()["days"]:
+        response = client.post(f"/api/v1/learning/days/{day['day_number']}/next")
+        assert response.status_code == 200
+        body = response.json()
+        if not body["completed"]:
+            return body["activity"]
+    raise AssertionError("Expected at least one unfinished starter activity")
 
 
 def _target_for_activity(home: dict, activity: dict) -> dict:
@@ -44,7 +50,7 @@ def _target_for_activity(home: dict, activity: dict) -> dict:
 def test_attempt_projects_mastery_and_duplicate_is_idempotent() -> None:
     with TestClient(app) as client:
         _login(client)
-        activity = _first_activity(client)
+        activity = _next_available_activity(client)
         key = f"mastery-{uuid4()}"
         payload = {"choice_id": activity["choices"][0]["id"], "duration_ms": 3200}
         first = client.post(
@@ -77,7 +83,7 @@ def test_due_review_reuses_frozen_prompt_and_updates_projection(
 ) -> None:
     with TestClient(app) as client:
         _login(client)
-        activity = _first_activity(client)
+        activity = _next_available_activity(client)
 
         correct_choice = None
         for choice in activity["choices"]:
@@ -122,7 +128,7 @@ def test_due_review_reuses_frozen_prompt_and_updates_projection(
 def test_mastery_projection_rebuild_is_replayable() -> None:
     with TestClient(app) as client:
         _login(client)
-        activity = _first_activity(client)
+        activity = _next_available_activity(client)
         response = client.post(
             f"/api/v1/learning/instances/{activity['id']}/attempts",
             headers={"Idempotency-Key": f"rebuild-{uuid4()}"},
