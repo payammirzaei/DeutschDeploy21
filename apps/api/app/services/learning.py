@@ -1,9 +1,8 @@
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.content import ContentItem, ContentVersion
 from app.models.learning import (
     ActivityInstance,
     Attempt,
@@ -25,120 +24,157 @@ from app.schemas.learning import (
     LearningHome,
     NextActivityResponse,
     StartLearningResult,
+    UpgradeLearningResult,
 )
-from app.services.content import apply_verb_import, dry_run_verbs, load_starter_verbs, publish_item
-from app.services.exercise_registry import evaluate_registered_exercise
-from app.services.exercises import materialize_exercise
-
-COURSE_SLUG = "software-interview-21d"
-STARTER_DAYS = [
-    {
-        "day": 1,
-        "title": "Introduce yourself",
-        "objective": "Build the vocabulary for a clear 60-second professional introduction.",
-        "verbs": [
-            "verb.vorstellen",
-            "verb.arbeiten",
-            "verb.lernen",
-            "verb.sprechen",
-            "verb.erklaeren",
-            "verb.beschreiben",
-            "verb.fragen",
-        ],
-    },
-    {
-        "day": 2,
-        "title": "Explain what you build",
-        "objective": "Describe software work, tools and implementation responsibilities.",
-        "verbs": [
-            "verb.entwickeln",
-            "verb.programmieren",
-            "verb.implementieren",
-            "verb.bauen",
-            "verb.erstellen",
-            "verb.verwenden",
-            "verb.nutzen",
-        ],
-    },
-    {
-        "day": 3,
-        "title": "Problems and delivery",
-        "objective": "Explain testing, debugging, problem solving and improvement work.",
-        "verbs": [
-            "verb.testen",
-            "verb.pruefen",
-            "verb.analysieren",
-            "verb.loesen",
-            "verb.finden",
-            "verb.beheben",
-            "verb.verbessern",
-        ],
-    },
-]
+from app.services.curriculum import (
+    COURSE_SLUG,
+    LATEST_RELEASE_VERSION,
+    ensure_curriculum_releases,
+)
+from app.services.exercise_registry import (
+    evaluate_registered_exercise,
+    materialize_registered_exercise,
+)
+from app.services.interview_drills import (
+    load_interview_drills,
+    materialize_interview_drill,
+)
 
 
 async def ensure_starter_learning(
     session: AsyncSession,
     user: User,
 ) -> StartLearningResult:
-    await _ensure_required_content(session, user)
-    course = await session.scalar(select(Course).where(Course.slug == COURSE_SLUG))
-    if course is None:
-        course = Course(
-            slug=COURSE_SLUG,
-            title="21-Day German Software Interview Sprint",
-            target_language="de",
-            target_cefr="A2-B1",
-            duration_days=21,
-        )
-        session.add(course)
-        await session.flush()
-
-    release = await session.scalar(
-        select(CourseRelease)
-        .where(CourseRelease.course_id == course.id, CourseRelease.version_number == 1)
-        .limit(1)
-    )
-    if release is None:
-        release = CourseRelease(course_id=course.id, version_number=1, status="published")
-        session.add(release)
-        await session.flush()
-        await _build_release(session, release)
-
-    enrollment = await session.scalar(
-        select(Enrollment).where(
-            Enrollment.user_id == user.id,
-            Enrollment.course_release_id == release.id,
-        )
-    )
+    _, _, latest = await ensure_curriculum_releases(session, user)
+    enrollment = await get_active_enrollment(session, user.id)
     created_enrollment = enrollment is None
+
     if enrollment is None:
         enrollment = Enrollment(
             user_id=user.id,
-            course_release_id=release.id,
+            course_release_id=latest.id,
             status="active",
             current_day=1,
         )
         session.add(enrollment)
         await session.flush()
 
-    pinned_activity_count = await session.scalar(
-        select(func.count(ReleaseActivity.id))
-        .join(CourseDay, CourseDay.id == ReleaseActivity.day_id)
-        .where(CourseDay.release_id == release.id)
-    )
+    release = await session.get(CourseRelease, enrollment.course_release_id)
+    if release is None:
+        raise RuntimeError("Enrollment references a missing course release")
+
     return StartLearningResult(
         enrollment_id=enrollment.id,
         course_release_id=release.id,
+        release_version=release.version_number,
         created_enrollment=created_enrollment,
-        pinned_activity_count=int(pinned_activity_count or 0),
+        pinned_activity_count=await _release_activity_count(
+            session,
+            release.id,
+        ),
     )
 
 
-async def get_learning_home(session: AsyncSession, user: User) -> LearningHome:
+async def upgrade_to_latest_release(
+    session: AsyncSession,
+    user: User,
+) -> UpgradeLearningResult:
+    _, _, latest = await ensure_curriculum_releases(session, user)
+    active = await get_active_enrollment(session, user.id)
+
+    if active is None:
+        active = Enrollment(
+            user_id=user.id,
+            course_release_id=latest.id,
+            status="active",
+            current_day=1,
+        )
+        session.add(active)
+        await session.flush()
+        return UpgradeLearningResult(
+            enrollment_id=active.id,
+            from_release_version=None,
+            to_release_version=LATEST_RELEASE_VERSION,
+            created_enrollment=True,
+            carried_completed_days=0,
+            current_day=1,
+            pinned_activity_count=await _release_activity_count(
+                session,
+                latest.id,
+            ),
+        )
+
+    active_release = await session.get(
+        CourseRelease,
+        active.course_release_id,
+    )
+    if active_release is None:
+        raise RuntimeError("Active enrollment references a missing release")
+
+    if active_release.version_number == LATEST_RELEASE_VERSION:
+        days = await _day_views(session, active)
+        return UpgradeLearningResult(
+            enrollment_id=active.id,
+            from_release_version=active_release.version_number,
+            to_release_version=active_release.version_number,
+            created_enrollment=False,
+            carried_completed_days=sum(day.completed for day in days),
+            current_day=active.current_day,
+            pinned_activity_count=await _release_activity_count(
+                session,
+                active_release.id,
+            ),
+        )
+
+    existing_latest = await session.scalar(
+        select(Enrollment).where(
+            Enrollment.user_id == user.id,
+            Enrollment.course_release_id == latest.id,
+        )
+    )
+    created_enrollment = existing_latest is None
+    if existing_latest is None:
+        existing_latest = Enrollment(
+            user_id=user.id,
+            course_release_id=latest.id,
+            status="active",
+            current_day=1,
+        )
+        session.add(existing_latest)
+        await session.flush()
+    else:
+        existing_latest.status = "active"
+
+    active.status = "superseded"
+    days = await _day_views(session, existing_latest)
+    current_day = _first_incomplete_from_views(days)
+    existing_latest.current_day = current_day
+    await session.flush()
+
+    return UpgradeLearningResult(
+        enrollment_id=existing_latest.id,
+        from_release_version=active_release.version_number,
+        to_release_version=LATEST_RELEASE_VERSION,
+        created_enrollment=created_enrollment,
+        carried_completed_days=sum(day.completed for day in days),
+        current_day=current_day,
+        pinned_activity_count=await _release_activity_count(
+            session,
+            latest.id,
+        ),
+    )
+
+
+async def get_learning_home(
+    session: AsyncSession,
+    user: User,
+) -> LearningHome:
     enrollment = await get_active_enrollment(session, user.id)
     if enrollment is None:
-        return LearningHome(enrolled=False)
+        return LearningHome(
+            enrolled=False,
+            latest_release_version=LATEST_RELEASE_VERSION,
+        )
 
     release = await session.get(CourseRelease, enrollment.course_release_id)
     if release is None:
@@ -153,13 +189,23 @@ async def get_learning_home(session: AsyncSession, user: User) -> LearningHome:
         enrollment_id=enrollment.id,
         course_title=course.title,
         release_version=release.version_number,
+        latest_release_version=LATEST_RELEASE_VERSION,
+        upgrade_available=release.version_number < LATEST_RELEASE_VERSION,
         current_day=enrollment.current_day,
-        available_through_day=max((day.day_number for day in days), default=0),
+        available_through_day=max(
+            (day.day_number for day in days),
+            default=0,
+        ),
+        course_complete=bool(days) and all(day.completed for day in days),
         days=days,
     )
 
 
-async def get_day_view(session: AsyncSession, user: User, day_number: int) -> DayView:
+async def get_day_view(
+    session: AsyncSession,
+    user: User,
+    day_number: int,
+) -> DayView:
     enrollment = await _require_user_enrollment(session, user.id)
     days = await _day_views(session, enrollment)
     for day in days:
@@ -183,23 +229,35 @@ async def get_next_activity(
     if day is None:
         raise LookupError("Learning day not found")
 
-    activities = (
-        await session.execute(
-            select(ReleaseActivity)
-            .where(ReleaseActivity.day_id == day.id)
-            .order_by(ReleaseActivity.position)
-        )
-    ).scalars()
-    for activity in activities:
-        instance = await _get_or_create_instance(session, enrollment, day, activity)
-        submitted = await session.scalar(
-            select(Attempt.id).where(Attempt.activity_instance_id == instance.id).limit(1)
-        )
-        if submitted is None:
-            return NextActivityResponse(
-                completed=False,
-                activity=_instance_view(day.day_number, activity.position, instance),
+    activities = list(
+        (
+            await session.execute(
+                select(ReleaseActivity)
+                .where(ReleaseActivity.day_id == day.id)
+                .order_by(ReleaseActivity.position)
             )
+        ).scalars()
+    )
+    for activity in activities:
+        if await _activity_submitted(
+            session,
+            enrollment,
+            activity,
+        ):
+            continue
+        instance = await _get_or_create_instance(
+            session,
+            enrollment,
+            activity,
+        )
+        return NextActivityResponse(
+            completed=False,
+            activity=_instance_view(
+                day.day_number,
+                activity.position,
+                instance,
+            ),
+        )
 
     return NextActivityResponse(completed=True)
 
@@ -216,32 +274,51 @@ async def submit_attempt(
     )
     if existing is not None:
         if existing.user_id != user.id:
-            raise PermissionError("Idempotency key belongs to another user")
+            raise PermissionError(
+                "Idempotency key belongs to another user"
+            )
         evaluation = await session.scalar(
             select(Evaluation).where(Evaluation.attempt_id == existing.id)
         )
         if evaluation is None:
             raise RuntimeError("Attempt exists without evaluation")
-        instance = await session.get(ActivityInstance, existing.activity_instance_id)
+        instance = await session.get(
+            ActivityInstance,
+            existing.activity_instance_id,
+        )
         if instance is None:
-            raise RuntimeError("Attempt references a missing activity instance")
-        enrollment = await session.get(Enrollment, existing.enrollment_id)
+            raise RuntimeError(
+                "Attempt references a missing activity instance"
+            )
+        enrollment = await session.get(
+            Enrollment,
+            existing.enrollment_id,
+        )
         if enrollment is None:
-            raise RuntimeError("Attempt references a missing enrollment")
+            raise RuntimeError(
+                "Attempt references a missing enrollment"
+            )
         day_complete, next_day = await _progress_after_attempt(
             session,
             enrollment,
             instance,
             mutate=False,
         )
-        return _attempt_result(existing, evaluation, day_complete, next_day)
+        return _attempt_result(
+            existing,
+            evaluation,
+            day_complete,
+            next_day,
+        )
 
     instance = await session.get(ActivityInstance, instance_id)
     if instance is None:
         raise LookupError("Activity instance not found")
     enrollment = await session.get(Enrollment, instance.enrollment_id)
     if enrollment is None or enrollment.user_id != user.id:
-        raise PermissionError("Activity instance does not belong to this user")
+        raise PermissionError(
+            "Activity instance does not belong to this user"
+        )
 
     raw_answer, normalized_answer, correct, score, feedback_code = (
         evaluate_registered_exercise(
@@ -281,67 +358,12 @@ async def submit_attempt(
         instance,
         mutate=True,
     )
-    return _attempt_result(attempt, evaluation, day_complete, next_day)
-
-
-async def _ensure_required_content(session: AsyncSession, user: User) -> None:
-    payloads = load_starter_verbs()
-    required_ids = {external_id for day in STARTER_DAYS for external_id in day["verbs"]}
-    required_payloads = [payload for payload in payloads if payload.external_id in required_ids]
-    report = await dry_run_verbs(session, required_payloads)
-    actions = {row.external_id: row.action for row in report.rows}
-    missing = [
-        payload
-        for payload in required_payloads
-        if actions[payload.external_id] == "create"
-    ]
-    if missing:
-        await apply_verb_import(session, user, missing)
-
-    for external_id in required_ids:
-        item = await session.scalar(
-            select(ContentItem).where(ContentItem.external_id == external_id)
-        )
-        if item is None:
-            raise RuntimeError(f"Required content item missing: {external_id}")
-        latest = await _latest_version(session, item.id)
-        if latest is None:
-            await publish_item(session, user, item.id)
-
-
-async def _build_release(session: AsyncSession, release: CourseRelease) -> None:
-    for day_spec in STARTER_DAYS:
-        day = CourseDay(
-            release_id=release.id,
-            day_number=int(day_spec["day"]),
-            title=str(day_spec["title"]),
-            objective=str(day_spec["objective"]),
-        )
-        session.add(day)
-        await session.flush()
-
-        for position, external_id in enumerate(day_spec["verbs"], start=1):
-            item = await session.scalar(
-                select(ContentItem).where(ContentItem.external_id == external_id)
-            )
-            if item is None:
-                raise RuntimeError(f"Cannot build release; content missing: {external_id}")
-            version = await _latest_version(session, item.id)
-            if version is None:
-                raise RuntimeError(
-                    f"Cannot build release; published version missing: {external_id}"
-                )
-            session.add(
-                ReleaseActivity(
-                    day_id=day.id,
-                    position=position,
-                    exercise_type="meaning_multiple_choice",
-                    contract_version=1,
-                    content_version_id=version.id,
-                    required=True,
-                )
-            )
-    await session.flush()
+    return _attempt_result(
+        attempt,
+        evaluation,
+        day_complete,
+        next_day,
+    )
 
 
 async def get_active_enrollment(
@@ -350,7 +372,10 @@ async def get_active_enrollment(
 ) -> Enrollment | None:
     return await session.scalar(
         select(Enrollment)
-        .join(CourseRelease, CourseRelease.id == Enrollment.course_release_id)
+        .join(
+            CourseRelease,
+            CourseRelease.id == Enrollment.course_release_id,
+        )
         .join(Course, Course.id == CourseRelease.course_id)
         .where(
             Enrollment.user_id == user_id,
@@ -362,56 +387,58 @@ async def get_active_enrollment(
     )
 
 
-async def _require_user_enrollment(session: AsyncSession, user_id: UUID) -> Enrollment:
+async def _require_user_enrollment(
+    session: AsyncSession,
+    user_id: UUID,
+) -> Enrollment:
     enrollment = await get_active_enrollment(session, user_id)
     if enrollment is None:
         raise LookupError("Learning course has not been started")
     return enrollment
 
 
-async def _day_views(session: AsyncSession, enrollment: Enrollment) -> list[DayView]:
-    days = (
-        await session.execute(
-            select(CourseDay)
-            .where(CourseDay.release_id == enrollment.course_release_id)
-            .order_by(CourseDay.day_number)
-        )
-    ).scalars()
-    result: list[DayView] = []
-    for day in days:
-        activities = (
+async def _day_views(
+    session: AsyncSession,
+    enrollment: Enrollment,
+) -> list[DayView]:
+    days = list(
+        (
             await session.execute(
-                select(ReleaseActivity)
-                .where(ReleaseActivity.day_id == day.id)
-                .order_by(ReleaseActivity.position)
+                select(CourseDay)
+                .where(
+                    CourseDay.release_id == enrollment.course_release_id
+                )
+                .order_by(CourseDay.day_number)
             )
         ).scalars()
+    )
+    result: list[DayView] = []
+    for day in days:
+        activities = list(
+            (
+                await session.execute(
+                    select(ReleaseActivity)
+                    .where(ReleaseActivity.day_id == day.id)
+                    .order_by(ReleaseActivity.position)
+                )
+            ).scalars()
+        )
         activity_views: list[ActivitySummary] = []
         submitted_count = 0
         for activity in activities:
-            instance = await session.scalar(
-                select(ActivityInstance).where(
-                    ActivityInstance.enrollment_id == enrollment.id,
-                    ActivityInstance.release_activity_id == activity.id,
-                    ActivityInstance.instance_key == "course",
-                )
+            submitted = await _activity_submitted(
+                session,
+                enrollment,
+                activity,
             )
-            submitted = False
-            if instance is not None:
-                submitted = (
-                    await session.scalar(
-                        select(Attempt.id)
-                        .where(Attempt.activity_instance_id == instance.id)
-                        .limit(1)
-                    )
-                    is not None
-                )
             if submitted:
                 submitted_count += 1
             activity_views.append(
                 ActivitySummary(
                     activity_id=activity.id,
                     position=activity.position,
+                    source_kind=activity.source_kind,
+                    source_key=activity.source_key,
                     content_version_id=activity.content_version_id,
                     exercise_type=activity.exercise_type,
                     submitted=submitted,
@@ -422,7 +449,10 @@ async def _day_views(session: AsyncSession, enrollment: Enrollment) -> list[DayV
                 day_number=day.day_number,
                 title=day.title,
                 objective=day.objective,
-                completed=bool(activity_views) and submitted_count == len(activity_views),
+                completed=(
+                    bool(activity_views)
+                    and submitted_count == len(activity_views)
+                ),
                 submitted_count=submitted_count,
                 total_count=len(activity_views),
                 activities=activity_views,
@@ -431,28 +461,108 @@ async def _day_views(session: AsyncSession, enrollment: Enrollment) -> list[DayV
     return result
 
 
+async def _activity_submitted(
+    session: AsyncSession,
+    enrollment: Enrollment,
+    activity: ReleaseActivity,
+) -> bool:
+    current_attempt = await session.scalar(
+        select(Attempt.id)
+        .join(
+            ActivityInstance,
+            ActivityInstance.id == Attempt.activity_instance_id,
+        )
+        .where(
+            Attempt.enrollment_id == enrollment.id,
+            ActivityInstance.release_activity_id == activity.id,
+            ActivityInstance.instance_key == "course",
+        )
+        .limit(1)
+    )
+    if current_attempt is not None:
+        return True
+
+    if (
+        activity.source_kind != "content"
+        or activity.content_version_id is None
+    ):
+        return False
+
+    current_release = await session.get(
+        CourseRelease,
+        enrollment.course_release_id,
+    )
+    if current_release is None:
+        raise RuntimeError("Enrollment references a missing release")
+
+    carried_attempt = await session.scalar(
+        select(Attempt.id)
+        .join(
+            ActivityInstance,
+            ActivityInstance.id == Attempt.activity_instance_id,
+        )
+        .join(
+            Enrollment,
+            Enrollment.id == Attempt.enrollment_id,
+        )
+        .join(
+            CourseRelease,
+            CourseRelease.id == Enrollment.course_release_id,
+        )
+        .where(
+            Attempt.user_id == enrollment.user_id,
+            Attempt.enrollment_id != enrollment.id,
+            ActivityInstance.instance_key == "course",
+            ActivityInstance.content_version_id
+            == activity.content_version_id,
+            ActivityInstance.exercise_type == activity.exercise_type,
+            CourseRelease.course_id == current_release.course_id,
+            CourseRelease.version_number
+            < current_release.version_number,
+        )
+        .limit(1)
+    )
+    return carried_attempt is not None
+
+
 async def _get_or_create_instance(
     session: AsyncSession,
     enrollment: Enrollment,
-    day: CourseDay,
     activity: ReleaseActivity,
 ) -> ActivityInstance:
-    del day
-    return await materialize_exercise(
+    if activity.source_kind == "interview_drill":
+        drills = {
+            str(drill["external_id"]): drill
+            for drill in load_interview_drills()
+        }
+        drill = drills.get(activity.source_key)
+        if drill is None:
+            raise RuntimeError(
+                f"Interview drill missing: {activity.source_key}"
+            )
+        return await materialize_interview_drill(
+            session,
+            enrollment,
+            drill,
+            instance_key="course",
+            release_activity_id=activity.id,
+            runtime_source_key=f"{activity.source_key}:{activity.id}",
+        )
+
+    if activity.source_kind != "content":
+        raise RuntimeError(
+            f"Unsupported release source: {activity.source_kind}"
+        )
+    if activity.content_version_id is None:
+        raise RuntimeError(
+            "Content release activity is missing a pinned version"
+        )
+    return await materialize_registered_exercise(
         session,
         enrollment,
         activity,
         activity.exercise_type,
         "course",
-    )
-
-
-async def _latest_version(session: AsyncSession, item_id: UUID) -> ContentVersion | None:
-    return await session.scalar(
-        select(ContentVersion)
-        .where(ContentVersion.item_id == item_id)
-        .order_by(ContentVersion.version_number.desc())
-        .limit(1)
     )
 
 
@@ -466,18 +576,30 @@ async def _progress_after_attempt(
     if instance.instance_key != "course":
         return False, enrollment.current_day
     if instance.release_activity_id is None:
-        raise RuntimeError("Course instance is missing its release activity")
+        raise RuntimeError(
+            "Course instance is missing its release activity"
+        )
 
-    activity = await session.get(ReleaseActivity, instance.release_activity_id)
+    activity = await session.get(
+        ReleaseActivity,
+        instance.release_activity_id,
+    )
     if activity is None:
-        raise RuntimeError("Activity instance references a missing release activity")
+        raise RuntimeError(
+            "Activity instance references a missing release activity"
+        )
     day = await session.get(CourseDay, activity.day_id)
     if day is None:
         raise RuntimeError("Release activity references a missing day")
 
-    day_complete = await _is_day_complete(session, enrollment, day)
-    if mutate and day_complete and enrollment.current_day <= day.day_number:
-        enrollment.current_day = day.day_number + 1
+    day_complete = await _is_day_complete(
+        session,
+        enrollment,
+        day,
+    )
+    if mutate:
+        views = await _day_views(session, enrollment)
+        enrollment.current_day = _first_incomplete_from_views(views)
         await session.flush()
     return day_complete, enrollment.current_day
 
@@ -487,27 +609,47 @@ async def _is_day_complete(
     enrollment: Enrollment,
     day: CourseDay,
 ) -> bool:
-    total = await session.scalar(
-        select(func.count(ReleaseActivity.id)).where(
-            ReleaseActivity.day_id == day.id,
-            ReleaseActivity.required.is_(True),
-        )
+    activities = list(
+        (
+            await session.execute(
+                select(ReleaseActivity)
+                .where(
+                    ReleaseActivity.day_id == day.id,
+                    ReleaseActivity.required.is_(True),
+                )
+                .order_by(ReleaseActivity.position)
+            )
+        ).scalars()
     )
-    submitted = await session.scalar(
-        select(func.count(func.distinct(ReleaseActivity.id)))
-        .join(
-            ActivityInstance,
-            ActivityInstance.release_activity_id == ReleaseActivity.id,
-        )
-        .join(Attempt, Attempt.activity_instance_id == ActivityInstance.id)
-        .where(
-            ReleaseActivity.day_id == day.id,
-            ReleaseActivity.required.is_(True),
-            ActivityInstance.enrollment_id == enrollment.id,
-            ActivityInstance.instance_key == "course",
-        )
+    if not activities:
+        return False
+    for activity in activities:
+        if not await _activity_submitted(
+            session,
+            enrollment,
+            activity,
+        ):
+            return False
+    return True
+
+
+async def _release_activity_count(
+    session: AsyncSession,
+    release_id: UUID,
+) -> int:
+    rows = await session.execute(
+        select(ReleaseActivity.id)
+        .join(CourseDay, CourseDay.id == ReleaseActivity.day_id)
+        .where(CourseDay.release_id == release_id)
     )
-    return int(total or 0) > 0 and int(total or 0) == int(submitted or 0)
+    return len(rows.scalars().all())
+
+
+def _first_incomplete_from_views(days: list[DayView]) -> int:
+    for day in days:
+        if not day.completed:
+            return day.day_number
+    return max((day.day_number for day in days), default=0) + 1
 
 
 def _instance_view(
@@ -516,19 +658,28 @@ def _instance_view(
     instance: ActivityInstance,
 ) -> ActivityInstanceView:
     choices = instance.prompt.get("choices", [])
-    if instance.content_version_id is None:
-        raise RuntimeError("Course instance is missing its pinned content version")
+    label = (
+        instance.prompt.get("lemma")
+        or instance.prompt.get("target_label")
+        or instance.prompt.get("category")
+        or "Interview"
+    )
     return ActivityInstanceView(
         id=instance.id,
         day_number=day_number,
         position=position,
+        source_kind=instance.source_kind,
+        source_key=instance.source_key,
         content_version_id=instance.content_version_id,
         exercise_type=instance.exercise_type,
         contract_version=instance.contract_version,
         prompt_checksum=instance.prompt_checksum,
-        lemma=str(instance.prompt.get("lemma", "")),
+        lemma=str(label),
         question=str(instance.prompt["question"]),
-        choices=[ChoiceView.model_validate(choice) for choice in choices],
+        choices=[
+            ChoiceView.model_validate(choice)
+            for choice in choices
+        ],
         prompt=instance.prompt,
     )
 
