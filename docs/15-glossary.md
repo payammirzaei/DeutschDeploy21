@@ -1,0 +1,33 @@
+# Glossary
+
+- **Activity blueprint:** reusable editorial instructions for creating an interaction.
+- **Activity instance:** immutable prompt actually shown to a learner.
+- **Adapter:** infrastructure implementation of a domain/application port.
+- **Attempt:** one learner submission; retries are new attempts.
+- **Canonical content:** reviewed source of learning meaning.
+- **Content item:** stable logical identity such as a verb or question.
+- **Content version:** immutable published representation of an item.
+- **Course release:** immutable manifest of exact curriculum/content/evaluator versions.
+- **Curriculum:** planned sequence and prerequisites of objectives and activities.
+- **Deterministic evaluation:** judgment reproducible without generative interpretation.
+- **Domain event:** meaningful recorded business occurrence.
+- **Enrollment:** learner participation pinned to a course release.
+- **Evaluation:** versioned judgment of an attempt.
+- **Evidence:** target-specific information contributed by an attempt/evaluation.
+- **Exercise type:** registered interaction capability.
+- **External ID:** stable author/import identifier for idempotent content operations.
+- **Learner claim:** professional/personal fact available for personalization with origin and verification.
+- **Learning objective:** intended capability taught by curriculum.
+- **Learning target:** granular assessable capability used for mastery.
+- **Mastery:** derived evidence-based estimate of reliable independent performance.
+- **Materialization:** creating a stable activity instance from blueprint, content, and context.
+- **Modular monolith:** one product/deployment family with enforced internal module boundaries.
+- **Outbox:** durable database record used to reliably dispatch follow-up work.
+- **Port:** provider/infrastructure-neutral interface owned by inner application layers.
+- **Projection:** rebuildable read-optimized state derived from durable events/evidence.
+- **Provider invocation:** recorded AI/speech/storage operation with version, status, cost, and timing.
+- **Readiness:** evidence-based ability to perform across interview capabilities.
+- **Review schedule:** algorithm-versioned due time and memory parameters for a target.
+- **Scaffolding:** help shown during learning and progressively removed.
+- **Track:** specialized course path such as Software Developer Interview.
+- **Version pinning:** preserving exact versions used by an enrollment or attempt.
