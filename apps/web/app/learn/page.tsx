@@ -10,6 +10,12 @@ import {
   ExercisePrompt,
 } from "@/src/components/exercise-player";
 import { api } from "@/src/lib/api";
+import {
+  ATTEMPT_SYNCED_EVENT,
+  AttemptSyncDetail,
+  learningAttemptUrl,
+  submitLearningAttemptSafely,
+} from "@/src/lib/offline-attempts";
 
 import styles from "./learn.module.css";
 
@@ -94,6 +100,7 @@ export default function LearnPage() {
   const [starting, setStarting] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [queued, setQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [startedAt, setStartedAt] = useState<number | null>(null);
 
@@ -160,6 +167,21 @@ export default function LearnPage() {
     };
   }, [router]);
 
+  useEffect(() => {
+    if (!activity) return;
+    const expectedUrl = learningAttemptUrl(activity.id);
+    const onSynced = (event: Event) => {
+      const detail = (event as CustomEvent<AttemptSyncDetail<AttemptResult>>).detail;
+      if (detail.url !== expectedUrl) return;
+      setResult(detail.data);
+      setQueued(false);
+      setSubmitting(false);
+      setError(null);
+    };
+    window.addEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
+    return () => window.removeEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
+  }, [activity]);
+
   const currentDay = useMemo(
     () =>
       home.days.find((day) => day.day_number === activeDay) ?? null,
@@ -209,6 +231,7 @@ export default function LearnPage() {
     setError(null);
     setActivity(null);
     setResult(null);
+    setQueued(false);
 
     const { data, response } = await api.POST(
       "/api/v1/learning/upgrade",
@@ -234,6 +257,7 @@ export default function LearnPage() {
     setActiveDay(dayNumber);
     setActivity(null);
     setResult(null);
+    setQueued(false);
     setError(null);
 
     const { data, response } = await api.POST(
@@ -261,30 +285,24 @@ export default function LearnPage() {
   }
 
   async function submitAnswer(answer: ExerciseAnswer) {
-    if (!activity || submitting) return;
+    if (!activity || submitting || queued) return;
     setSubmitting(true);
     setError(null);
 
     const durationMs = startedAt
       ? Math.max(0, Date.now() - startedAt)
       : null;
-    const { data, response } = await api.POST(
-      "/api/v1/learning/instances/{instance_id}/attempts",
-      {
-        params: {
-          path: { instance_id: activity.id },
-          header: {
-            "Idempotency-Key": crypto.randomUUID(),
-          },
-        },
-        body: {
-          ...answer,
-          duration_ms: durationMs,
-        },
-      },
-    );
+    const submission = await submitLearningAttemptSafely<AttemptResult>(activity.id, {
+      ...answer,
+      duration_ms: durationMs,
+    });
 
-    if (!response.ok || !data) {
+    if (submission.status === "queued") {
+      setQueued(true);
+      setSubmitting(false);
+      return;
+    }
+    if (submission.status === "error") {
       setError(
         "Your answer could not be saved. Nothing was marked complete.",
       );
@@ -292,7 +310,7 @@ export default function LearnPage() {
       return;
     }
 
-    setResult(data as AttemptResult);
+    setResult(submission.data);
     await loadHome();
     setSubmitting(false);
   }
@@ -303,6 +321,7 @@ export default function LearnPage() {
       : activeDay;
     setActivity(null);
     setResult(null);
+    setQueued(false);
 
     if (nextDay > home.available_through_day) {
       await loadHome();
@@ -436,6 +455,7 @@ export default function LearnPage() {
                     setActiveDay(day.day_number);
                     setActivity(null);
                     setResult(null);
+                    setQueued(false);
                   }}
                 >
                   <span className={styles.dayNumber}>
@@ -532,7 +552,7 @@ export default function LearnPage() {
                   key={activity.id}
                   exerciseType={activity.exercise_type}
                   prompt={activity.prompt}
-                  submitting={submitting}
+                  submitting={submitting || queued}
                   onSubmit={submitAnswer}
                 />
                 <div className={styles.exerciseFooter}>
