@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class ChoiceView(BaseModel):
@@ -47,6 +47,7 @@ class ActivityInstanceView(BaseModel):
     lemma: str
     question: str
     choices: list[ChoiceView]
+    prompt: dict = Field(default_factory=dict)
 
 
 class NextActivityResponse(BaseModel):
@@ -55,8 +56,16 @@ class NextActivityResponse(BaseModel):
 
 
 class AttemptIn(BaseModel):
-    choice_id: str = Field(min_length=2, max_length=80)
+    choice_id: str | None = Field(default=None, min_length=1, max_length=120)
+    text: str | None = Field(default=None, max_length=600)
+    token_ids: list[str] | None = Field(default=None, max_length=40)
     duration_ms: int | None = Field(default=None, ge=0, le=3_600_000)
+
+    @model_validator(mode="after")
+    def require_answer(self) -> "AttemptIn":
+        if self.choice_id is None and self.text is None and not self.token_ids:
+            raise ValueError("An exercise answer is required")
+        return self
 
 
 class AttemptResult(BaseModel):

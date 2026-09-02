@@ -103,12 +103,24 @@ export default function DashboardPage() {
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 4 · MASTERY & REVIEW</div>
+          <div className="eyebrow">PHASE 5A · EXERCISE ENGINE</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            Practice now produces durable learning evidence. Weak targets return when they are due;
-            stable targets get longer intervals instead of disappearing behind a completion checkmark.
+            Learn when you can speak. Practice when you cannot. Silent drills now feed the same
+            durable mastery graph as the structured course and spaced-review system.
           </p>
+
+          <article className="check-card">
+            <div>
+              <span className="card-kicker">🤫 SILENT MODE · BUS / TRAIN / OFFICE</span>
+              <h2>Tap, type and build German without saying a word.</h2>
+              <p>
+                Five rotating exercise types cover meaning, active recall, Perfekt grammar and
+                sentence structure. No microphone and no drag-only interaction required.
+              </p>
+            </div>
+            <Link className="button button-accent" href="/practice">Start silent practice</Link>
+          </article>
 
           <article className="check-card">
             <div>
@@ -120,7 +132,7 @@ export default function DashboardPage() {
                   : "Your queue is built automatically from submitted learning attempts."}
               </p>
             </div>
-            <Link className="button button-accent" href="/review">
+            <Link className="button" href="/review">
               {review?.due_count ? "Review now" : "Open mastery"}
             </Link>
           </article>
@@ -130,8 +142,8 @@ export default function DashboardPage() {
               <span className="card-kicker">DAYS 1–3</span>
               <h2>Continue the interview-learning loop.</h2>
               <p>
-                Twenty-one activities practice professional German through active recall. Every
-                answer now updates both curriculum progress and a separate mastery projection.
+                Twenty-one required activities keep curriculum progress separate from unlimited
+                optional practice, so a commute session never silently completes a course day.
               </p>
             </div>
             <Link className="button" href="/learn">Continue learning</Link>
@@ -176,11 +188,11 @@ export default function DashboardPage() {
         <aside className="phase-card">
           <span className="card-kicker">DELIVERY</span>
           <ol className="phase-list">
-            <li className="done"><span>01</span> Product architecture</li>
-            <li className="done"><span>02</span> Platform skeleton</li>
-            <li className="done"><span>03</span> Content & publishing</li>
-            <li className="done"><span>04</span> Learning loop</li>
-            <li className="active"><span>05</span> Mastery & review</li>
+            <li className="done"><span>01</span> Platform skeleton</li>
+            <li className="done"><span>02</span> Content & publishing</li>
+            <li className="done"><span>03</span> Learning loop</li>
+            <li className="done"><span>04</span> Mastery & review</li>
+            <li className="active"><span>05A</span> Silent exercise engine</li>
           </ol>
           <div className="identity-chip">
             <span>Signed in as</span>

@@ -90,8 +90,7 @@ async def create_attempt(
             user,
             instance_id,
             idempotency_key,
-            payload.choice_id,
-            payload.duration_ms,
+            payload,
         )
         attempt = await session.get(Attempt, result.attempt_id)
         evaluation = await session.get(Evaluation, result.evaluation_id)

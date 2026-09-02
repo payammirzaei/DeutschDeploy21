@@ -46,9 +46,13 @@ class ReviewActivityView(BaseModel):
     target_id: UUID
     activity_instance_id: UUID
     content_version_id: UUID
+    exercise_type: str
+    contract_version: int
+    prompt_checksum: str
+    prompt: dict = Field(default_factory=dict)
     lemma: str
     question: str
-    choices: list[dict[str, str]]
+    choices: list[dict[str, str]] = Field(default_factory=list)
     reason_code: str
     due_at: datetime
     state: str

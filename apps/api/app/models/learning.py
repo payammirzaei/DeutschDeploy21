@@ -93,7 +93,8 @@ class ActivityInstance(Base):
         UniqueConstraint(
             "enrollment_id",
             "release_activity_id",
-            name="uq_enrollment_activity_instance",
+            "instance_key",
+            name="uq_enrollment_activity_instance_key",
         ),
     )
 
@@ -104,6 +105,7 @@ class ActivityInstance(Base):
     release_activity_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("release_activities.id", ondelete="RESTRICT"), index=True
     )
+    instance_key: Mapped[str] = mapped_column(String(120), default="course")
     content_version_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("content_versions.id", ondelete="RESTRICT"), index=True
     )

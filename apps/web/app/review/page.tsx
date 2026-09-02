@@ -4,11 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  ExerciseAnswer,
+  ExercisePlayer,
+  ExercisePrompt,
+} from "@/src/components/exercise-player";
 import { api } from "@/src/lib/api";
 
 import styles from "./review.module.css";
 
-type Choice = { id: string; text: string };
 type MasteryTarget = {
   target_id: string;
   content_version_id: string;
@@ -36,9 +40,12 @@ type ReviewActivity = {
   target_id: string;
   activity_instance_id: string;
   content_version_id: string;
+  exercise_type: string;
+  contract_version: number;
+  prompt_checksum: string;
+  prompt: ExercisePrompt;
   lemma: string;
   question: string;
-  choices: Choice[];
   reason_code: string;
   due_at: string;
   state: string;
@@ -68,7 +75,6 @@ export default function ReviewPage() {
   const router = useRouter();
   const [home, setHome] = useState<ReviewHome | null>(null);
   const [activity, setActivity] = useState<ReviewActivity | null>(null);
-  const [selected, setSelected] = useState<string | null>(null);
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -103,7 +109,6 @@ export default function ReviewPage() {
     }
     const body = data as { completed: boolean; activity: ReviewActivity | null };
     setActivity(body.activity);
-    setSelected(null);
     setResult(null);
     startedAt.current = Date.now();
   }, [router]);
@@ -132,8 +137,8 @@ export default function ReviewPage() {
     [home],
   );
 
-  async function submit() {
-    if (!activity || !selected || submitting) return;
+  async function submit(answer: ExerciseAnswer) {
+    if (!activity || submitting) return;
     setSubmitting(true);
     setError(null);
     const duration = startedAt.current === null
@@ -146,7 +151,7 @@ export default function ReviewPage() {
           path: { instance_id: activity.activity_instance_id },
           header: { "Idempotency-Key": crypto.randomUUID() },
         },
-        body: { choice_id: selected, duration_ms: duration },
+        body: { ...answer, duration_ms: duration },
       },
     );
     if (!response.ok || !data) {
@@ -181,8 +186,8 @@ export default function ReviewPage() {
           DD<span>21</span>
         </Link>
         <nav>
+          <Link href="/practice" className="text-link">Silent practice</Link>
           <Link href="/learn" className="text-link">Learn</Link>
-          <Link href="/catalog" className="text-link">Catalog</Link>
         </nav>
       </header>
 
@@ -215,27 +220,14 @@ export default function ReviewPage() {
               <p className={styles.reason}>
                 {reasonCopy[activity.reason_code] ?? "Scheduled from your learning evidence."}
               </p>
-              <h2>{activity.question}</h2>
-              <div className={styles.choices}>
-                {activity.choices.map((choice, index) => (
-                  <button
-                    key={choice.id}
-                    className={`${styles.choice} ${selected === choice.id ? styles.selected : ""}`}
-                    onClick={() => setSelected(choice.id)}
-                    type="button"
-                  >
-                    <span>{String.fromCharCode(65 + index)}</span>
-                    <strong dir="rtl">{choice.text}</strong>
-                  </button>
-                ))}
-              </div>
-              <button
-                className="button button-accent"
-                disabled={!selected || submitting}
-                onClick={submit}
-              >
-                {submitting ? "Saving…" : "Check review"}
-              </button>
+              <ExercisePlayer
+                key={activity.activity_instance_id}
+                exerciseType={activity.exercise_type}
+                prompt={activity.prompt}
+                submitting={submitting}
+                submitLabel="Check review"
+                onSubmit={submit}
+              />
             </article>
           ) : null}
 
@@ -268,7 +260,7 @@ export default function ReviewPage() {
                   ? `Next scheduled review: ${new Date(home.next_due_at).toLocaleString()}`
                   : "Complete learning activities and the scheduler will build your queue automatically."}
               </p>
-              <Link href="/learn" className="button button-accent">Continue learning</Link>
+              <Link href="/practice" className="button button-accent">Do silent practice</Link>
             </article>
           ) : null}
         </div>
@@ -283,7 +275,7 @@ export default function ReviewPage() {
               <article key={target.target_id} className={styles.masteryRow}>
                 <div>
                   <strong>{target.lemma}</strong>
-                  <span>{target.explanation_code.replaceAll("_", " ")}</span>
+                  <span>{target.skill_dimension.replaceAll("_", " ")}</span>
                 </div>
                 <div className={styles.masteryNumbers}>
                   <span>{target.state}</span>

@@ -1,16 +1,9 @@
-import hashlib
-import json
 from uuid import UUID
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.content import (
-    ContentItem,
-    ContentVersion,
-    VerbVersion,
-    VersionLocalization,
-)
+from app.models.content import ContentItem, ContentVersion
 from app.models.learning import (
     ActivityInstance,
     Attempt,
@@ -25,6 +18,7 @@ from app.models.user import User
 from app.schemas.learning import (
     ActivityInstanceView,
     ActivitySummary,
+    AttemptIn,
     AttemptResult,
     ChoiceView,
     DayView,
@@ -33,6 +27,7 @@ from app.schemas.learning import (
     StartLearningResult,
 )
 from app.services.content import apply_verb_import, dry_run_verbs, load_starter_verbs, publish_item
+from app.services.exercises import evaluate_exercise, materialize_exercise
 
 COURSE_SLUG = "software-interview-21d"
 STARTER_DAYS = [
@@ -140,7 +135,7 @@ async def ensure_starter_learning(
 
 
 async def get_learning_home(session: AsyncSession, user: User) -> LearningHome:
-    enrollment = await _get_user_enrollment(session, user.id)
+    enrollment = await get_active_enrollment(session, user.id)
     if enrollment is None:
         return LearningHome(enrolled=False)
 
@@ -213,8 +208,7 @@ async def submit_attempt(
     user: User,
     instance_id: UUID,
     idempotency_key: str,
-    choice_id: str,
-    duration_ms: int | None,
+    payload: AttemptIn,
 ) -> AttemptResult:
     existing = await session.scalar(
         select(Attempt).where(Attempt.idempotency_key == idempotency_key)
@@ -230,17 +224,16 @@ async def submit_attempt(
         instance = await session.get(ActivityInstance, existing.activity_instance_id)
         if instance is None:
             raise RuntimeError("Attempt references a missing activity instance")
-        activity = await session.get(ReleaseActivity, instance.release_activity_id)
-        if activity is None:
-            raise RuntimeError("Activity instance references a missing release activity")
-        day = await session.get(CourseDay, activity.day_id)
-        if day is None:
-            raise RuntimeError("Release activity references a missing day")
         enrollment = await session.get(Enrollment, existing.enrollment_id)
         if enrollment is None:
             raise RuntimeError("Attempt references a missing enrollment")
-        day_complete = await _is_day_complete(session, enrollment, day)
-        return _attempt_result(existing, evaluation, day_complete, enrollment.current_day)
+        day_complete, next_day = await _progress_after_attempt(
+            session,
+            enrollment,
+            instance,
+            mutate=False,
+        )
+        return _attempt_result(existing, evaluation, day_complete, next_day)
 
     instance = await session.get(ActivityInstance, instance_id)
     if instance is None:
@@ -249,20 +242,20 @@ async def submit_attempt(
     if enrollment is None or enrollment.user_id != user.id:
         raise PermissionError("Activity instance does not belong to this user")
 
-    valid_choice_ids = {choice["id"] for choice in instance.prompt.get("choices", [])}
-    if choice_id not in valid_choice_ids:
-        raise ValueError("Choice is not part of this activity instance")
-
-    normalized = choice_id.strip()
-    correct = normalized == instance.answer_key.get("choice_id")
+    raw_answer, normalized_answer, correct, score, feedback_code = evaluate_exercise(
+        instance,
+        choice_id=payload.choice_id,
+        text=payload.text,
+        token_ids=payload.token_ids,
+    )
     attempt = Attempt(
         user_id=user.id,
         enrollment_id=enrollment.id,
         activity_instance_id=instance.id,
         idempotency_key=idempotency_key,
-        raw_answer={"choice_id": choice_id},
-        normalized_answer={"choice_id": normalized},
-        client_duration_ms=duration_ms,
+        raw_answer=raw_answer,
+        normalized_answer=normalized_answer,
+        client_duration_ms=payload.duration_ms,
     )
     session.add(attempt)
     await session.flush()
@@ -272,39 +265,24 @@ async def submit_attempt(
         evaluator_type="deterministic",
         evaluator_version=1,
         correct=correct,
-        score=100 if correct else 0,
-        feedback_code="correct" if correct else "review_needed",
+        score=score,
+        feedback_code=feedback_code,
     )
     session.add(evaluation)
     await session.flush()
 
-    activity = await session.get(ReleaseActivity, instance.release_activity_id)
-    if activity is None:
-        raise RuntimeError("Activity instance references a missing release activity")
-    day = await session.get(CourseDay, activity.day_id)
-    if day is None:
-        raise RuntimeError("Release activity references a missing day")
-
-    day_complete = await _is_day_complete(session, enrollment, day)
-    if day_complete and enrollment.current_day <= day.day_number:
-        enrollment.current_day = day.day_number + 1
-        await session.flush()
-
-    return _attempt_result(
-        attempt,
-        evaluation,
-        day_complete,
-        enrollment.current_day,
+    day_complete, next_day = await _progress_after_attempt(
+        session,
+        enrollment,
+        instance,
+        mutate=True,
     )
+    return _attempt_result(attempt, evaluation, day_complete, next_day)
 
 
 async def _ensure_required_content(session: AsyncSession, user: User) -> None:
     payloads = load_starter_verbs()
-    required_ids = {
-        external_id
-        for day in STARTER_DAYS
-        for external_id in day["verbs"]
-    }
+    required_ids = {external_id for day in STARTER_DAYS for external_id in day["verbs"]}
     required_payloads = [payload for payload in payloads if payload.external_id in required_ids]
     report = await dry_run_verbs(session, required_payloads)
     actions = {row.external_id: row.action for row in report.rows}
@@ -362,7 +340,10 @@ async def _build_release(session: AsyncSession, release: CourseRelease) -> None:
     await session.flush()
 
 
-async def _get_user_enrollment(session: AsyncSession, user_id: UUID) -> Enrollment | None:
+async def get_active_enrollment(
+    session: AsyncSession,
+    user_id: UUID,
+) -> Enrollment | None:
     return await session.scalar(
         select(Enrollment)
         .join(CourseRelease, CourseRelease.id == Enrollment.course_release_id)
@@ -378,7 +359,7 @@ async def _get_user_enrollment(session: AsyncSession, user_id: UUID) -> Enrollme
 
 
 async def _require_user_enrollment(session: AsyncSession, user_id: UUID) -> Enrollment:
-    enrollment = await _get_user_enrollment(session, user_id)
+    enrollment = await get_active_enrollment(session, user_id)
     if enrollment is None:
         raise LookupError("Learning course has not been started")
     return enrollment
@@ -408,6 +389,7 @@ async def _day_views(session: AsyncSession, enrollment: Enrollment) -> list[DayV
                 select(ActivityInstance).where(
                     ActivityInstance.enrollment_id == enrollment.id,
                     ActivityInstance.release_activity_id == activity.id,
+                    ActivityInstance.instance_key == "course",
                 )
             )
             submitted = False
@@ -451,111 +433,13 @@ async def _get_or_create_instance(
     day: CourseDay,
     activity: ReleaseActivity,
 ) -> ActivityInstance:
-    existing = await session.scalar(
-        select(ActivityInstance).where(
-            ActivityInstance.enrollment_id == enrollment.id,
-            ActivityInstance.release_activity_id == activity.id,
-        )
-    )
-    if existing is not None:
-        return existing
-
-    version = await session.get(ContentVersion, activity.content_version_id)
-    verb = await session.get(VerbVersion, activity.content_version_id)
-    if version is None or verb is None:
-        raise RuntimeError("Pinned content version cannot be materialized")
-    correct_translation = await _translation(session, version.id, "fa")
-    if correct_translation is None:
-        raise RuntimeError("Pinned verb has no Persian translation")
-
-    distractors = await _distractors(
+    del day
+    return await materialize_exercise(
         session,
-        enrollment.course_release_id,
-        version.id,
-        correct_translation,
-    )
-    choice_texts = [correct_translation, *distractors]
-    choice_texts = sorted(
-        choice_texts,
-        key=lambda text: hashlib.sha256(f"{activity.id}:{text}".encode()).hexdigest(),
-    )
-    choices = [
-        {"id": _choice_id(version.id, text), "text": text}
-        for text in choice_texts
-    ]
-    correct_choice_id = _choice_id(version.id, correct_translation)
-    prompt = {
-        "kind": "meaning_multiple_choice",
-        "lemma": verb.infinitive,
-        "cefr": version.cefr,
-        "question": f"Choose the Persian meaning of ‘{verb.infinitive}’.",
-        "choices": choices,
-    }
-    checksum = hashlib.sha256(
-        json.dumps(prompt, ensure_ascii=False, sort_keys=True).encode("utf-8")
-    ).hexdigest()
-    instance = ActivityInstance(
-        enrollment_id=enrollment.id,
-        release_activity_id=activity.id,
-        content_version_id=version.id,
-        exercise_type=activity.exercise_type,
-        contract_version=activity.contract_version,
-        prompt=prompt,
-        answer_key={"choice_id": correct_choice_id},
-        prompt_checksum=checksum,
-    )
-    session.add(instance)
-    await session.flush()
-    return instance
-
-
-async def _distractors(
-    session: AsyncSession,
-    release_id: UUID,
-    target_version_id: UUID,
-    correct_translation: str,
-) -> list[str]:
-    rows = await session.execute(
-        select(VersionLocalization.value)
-        .join(
-            ReleaseActivity,
-            ReleaseActivity.content_version_id == VersionLocalization.version_id,
-        )
-        .join(CourseDay, CourseDay.id == ReleaseActivity.day_id)
-        .where(
-            CourseDay.release_id == release_id,
-            VersionLocalization.locale == "fa",
-            VersionLocalization.field == "translation",
-            VersionLocalization.position == 0,
-            VersionLocalization.version_id != target_version_id,
-        )
-        .order_by(VersionLocalization.value)
-    )
-    values = []
-    for value in rows.scalars():
-        if value != correct_translation and value not in values:
-            values.append(value)
-    if len(values) < 3:
-        raise RuntimeError("Not enough distinct translations for multiple choice")
-    offset = int(hashlib.sha256(str(target_version_id).encode()).hexdigest()[:8], 16) % len(values)
-    rotated = values[offset:] + values[:offset]
-    return rotated[:3]
-
-
-async def _translation(
-    session: AsyncSession,
-    version_id: UUID,
-    locale: str,
-) -> str | None:
-    return await session.scalar(
-        select(VersionLocalization.value)
-        .where(
-            VersionLocalization.version_id == version_id,
-            VersionLocalization.locale == locale,
-            VersionLocalization.field == "translation",
-            VersionLocalization.position == 0,
-        )
-        .limit(1)
+        enrollment,
+        activity,
+        activity.exercise_type,
+        "course",
     )
 
 
@@ -566,6 +450,30 @@ async def _latest_version(session: AsyncSession, item_id: UUID) -> ContentVersio
         .order_by(ContentVersion.version_number.desc())
         .limit(1)
     )
+
+
+async def _progress_after_attempt(
+    session: AsyncSession,
+    enrollment: Enrollment,
+    instance: ActivityInstance,
+    *,
+    mutate: bool,
+) -> tuple[bool, int]:
+    if instance.instance_key != "course":
+        return False, enrollment.current_day
+
+    activity = await session.get(ReleaseActivity, instance.release_activity_id)
+    if activity is None:
+        raise RuntimeError("Activity instance references a missing release activity")
+    day = await session.get(CourseDay, activity.day_id)
+    if day is None:
+        raise RuntimeError("Release activity references a missing day")
+
+    day_complete = await _is_day_complete(session, enrollment, day)
+    if mutate and day_complete and enrollment.current_day <= day.day_number:
+        enrollment.current_day = day.day_number + 1
+        await session.flush()
+    return day_complete, enrollment.current_day
 
 
 async def _is_day_complete(
@@ -590,6 +498,7 @@ async def _is_day_complete(
             ReleaseActivity.day_id == day.id,
             ReleaseActivity.required.is_(True),
             ActivityInstance.enrollment_id == enrollment.id,
+            ActivityInstance.instance_key == "course",
         )
     )
     return int(total or 0) > 0 and int(total or 0) == int(submitted or 0)
@@ -600,6 +509,7 @@ def _instance_view(
     position: int,
     instance: ActivityInstance,
 ) -> ActivityInstanceView:
+    choices = instance.prompt.get("choices", [])
     return ActivityInstanceView(
         id=instance.id,
         day_number=day_number,
@@ -608,9 +518,10 @@ def _instance_view(
         exercise_type=instance.exercise_type,
         contract_version=instance.contract_version,
         prompt_checksum=instance.prompt_checksum,
-        lemma=str(instance.prompt["lemma"]),
+        lemma=str(instance.prompt.get("lemma", "")),
         question=str(instance.prompt["question"]),
-        choices=[ChoiceView.model_validate(choice) for choice in instance.prompt["choices"]],
+        choices=[ChoiceView.model_validate(choice) for choice in choices],
+        prompt=instance.prompt,
     )
 
 
@@ -629,7 +540,3 @@ def _attempt_result(
         day_complete=day_complete,
         next_day=next_day,
     )
-
-
-def _choice_id(version_id: UUID, text: str) -> str:
-    return hashlib.sha256(f"{version_id}:{text}".encode()).hexdigest()[:16]
