@@ -36,6 +36,7 @@ class CourseRelease(Base):
     )
     version_number: Mapped[int] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(32), default="published", index=True)
+    manifest_checksum: Mapped[str | None] = mapped_column(String(64), nullable=True)
     published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
@@ -61,10 +62,15 @@ class ReleaseActivity(Base):
         UUID(as_uuid=True), ForeignKey("course_days.id", ondelete="CASCADE"), index=True
     )
     position: Mapped[int] = mapped_column(Integer)
+    source_kind: Mapped[str] = mapped_column(String(40), default="content")
+    source_key: Mapped[str] = mapped_column(String(180))
     exercise_type: Mapped[str] = mapped_column(String(80), default="meaning_multiple_choice")
     contract_version: Mapped[int] = mapped_column(Integer, default=1)
-    content_version_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("content_versions.id", ondelete="RESTRICT"), index=True
+    content_version_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("content_versions.id", ondelete="RESTRICT"),
+        nullable=True,
+        index=True,
     )
     required: Mapped[bool] = mapped_column(Boolean, default=True)
 

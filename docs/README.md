@@ -27,7 +27,8 @@ This directory is the authoritative design baseline for the product. It explains
 21. [Phase 5A silent multi-exercise engine](21-phase-5a-silent-exercise-engine.md)
 22. [Phase 5B exercise explosion](22-phase-5b-exercise-explosion.md)
 23. [Phase 5C interview drills](23-phase-5c-interview-drills.md)
-24. [Architecture Decision Records](adr/README.md)
+24. [Phase 5D full 21-day curriculum](24-phase-5d-full-curriculum.md)
+25. [Architecture Decision Records](adr/README.md)
 
 ## Document authority
 

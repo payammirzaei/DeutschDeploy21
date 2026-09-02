@@ -38,7 +38,7 @@ The implementation is a modular monolith with separate web, API, and worker proc
 apps/
   api/                 FastAPI application, migrations, worker
   web/                 Next.js mobile-first PWA
-content/                version-controlled source content for controlled imports
+content/                version-controlled source content and curriculum manifests
 packages/
   api-contract/        generated OpenAPI contract
 docs/                   product, architecture, ADRs, delivery notes
@@ -53,23 +53,26 @@ docs/                   product, architecture, ADRs, delivery notes
 **Phase 4 — Mastery and spaced review: merged and CI verified.**  
 **Phase 5A — Silent multi-exercise engine: merged and CI verified.**  
 **Phase 5B — Exercise explosion: merged and CI verified.**  
-**Phase 5C — Interview drills: implemented and CI verified.**
+**Phase 5C — Interview drills: merged and CI verified.**  
+**Phase 5D — Full 21-day curriculum: implementation / CI verification.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
 The content layer adds relational drafts, immutable published versions, typed verb grammar, localizations, examples, dry-run/idempotent imports, publication history, and a controlled 100-verb software-interview catalog.
 
-The learner-facing loop at `/learn` creates a version-pinned course release for Days 1–3, materializes 21 required activities, persists append-only attempts and evaluations, gives immediate feedback, advances after submissions rather than retry-until-correct gating, and resumes from durable learner state.
+`/learn` now consumes an immutable, version-controlled curriculum manifest. CourseRelease v2 contains 21 days and 133 required activities: the complete 100-verb foundation, all ten deterministic content exercise families, and structured interview-transfer drills. Days 1–15 introduce all 100 starter verbs exactly once; later days emphasize role depth, behavioral structure, architecture reasoning, recovery and deterministic final validation.
+
+Existing three-day CourseRelease v1 remains immutable. New learners start v2. Existing v1 learners receive an explicit upgrade path instead of silent repinning. Compatible historical course work carries only when the exact pinned content version and exercise type match; original attempts, evaluations and mastery history are never copied or rewritten.
 
 Every submitted learning, practice, interview-drill, or review attempt produces idempotent mastery evidence. `learning_targets`, append-only `mastery_events`, rebuildable `learner_mastery`, and `review_queue_entries` keep completion separate from memory reliability.
 
-`/practice` is a first-class Silent Mode for crowded buses, trains, offices and other places where speaking is impractical. Phase 5B provides ten deterministic exercise families through one attempt/evaluation/mastery pipeline: meaning choice, German typing recall, Partizip II choice, `haben`/`sein` choice, sentence ordering, German↔Persian matching, interview-example cloze, usage error spotting, typed Perfekt production, and phrase building.
+`/practice` is a first-class Silent Mode for crowded buses, trains, offices and other places where speaking is impractical. Ten deterministic exercise families share one attempt/evaluation/mastery pipeline: meaning choice, German typing recall, Partizip II choice, `haben`/`sein` choice, sentence ordering, German↔Persian matching, interview-example cloze, usage error spotting, typed Perfekt production, and phrase building.
 
-`/drills` is the first Interview Lab. Phase 5C adds 18 curated deterministic drills across six interview skills: best-answer quality, HR structure, STAR behavioral structure, technical explanation, architecture sequencing, and recovery-phrase recall under visible time pressure. These drills remain silent-first, do not fake course completion, and feed the same mastery and spaced-review system.
+`/drills` is the Interview Lab. It provides 18 curated deterministic drills across six interview skills: best-answer quality, HR structure, STAR behavioral structure, technical explanation, architecture sequencing, and recovery-phrase recall under visible time pressure. The same drills can also appear as required late-course activities without optional Interview Lab sessions satisfying course progress.
 
-Phase 5C also generalizes immutable activity and mastery identity so interview skills no longer need a fake verb or content-version reference. Existing content activities remain pinned to exact content versions, while interview skills use stable semantic target keys.
+ReleaseActivity can now reference either an exact content version or a version-controlled interview drill source. The runtime keeps source identity, course placement, immutable learner-facing instances and mastery targets separate.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md), and [`docs/23-phase-5c-interview-drills.md`](docs/23-phase-5c-interview-drills.md).
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md), [`docs/23-phase-5c-interview-drills.md`](docs/23-phase-5c-interview-drills.md), and [`docs/24-phase-5d-full-curriculum.md`](docs/24-phase-5d-full-curriculum.md).
 
 ## Local development
 
@@ -95,7 +98,7 @@ make api-client
 make check
 ```
 
-Install the starter learning catalog after migration with either the private `/catalog` screen or:
+Install the starter content catalog after migration with either the private `/catalog` screen or:
 
 ```bash
 cd apps/api
@@ -104,7 +107,7 @@ uv run python -m app.scripts.seed_content
 
 After signing in:
 
-- open `/learn` for the structured course;
+- open `/learn` for the complete 21-day structured course;
 - open `/practice` for unlimited ten-mode Silent Practice;
 - open `/drills` for silent-first interview-transfer drills;
 - open `/review` for due spaced-review work and the combined mastery map.
@@ -123,11 +126,26 @@ Content:
 CSV/JSON → validate → dry-run → draft → publish → immutable version → API → catalog
 ```
 
+Curriculum publication:
+
+```text
+Version-controlled manifest → validate coverage/workload → checksum
+→ immutable CourseRelease → pinned content/drill sources → enrollment
+```
+
 Learning:
 
 ```text
-Published content version → course release → enrollment → course activity instance
-→ idempotent attempt → deterministic evaluation → curriculum progress/resume
+Pinned release activity → immutable activity instance → idempotent attempt
+→ deterministic evaluation → curriculum progress + mastery evidence → review schedule
+```
+
+Release upgrade:
+
+```text
+v1 enrollment + historical course attempts → explicit upgrade
+→ new v2 enrollment → exact compatible completion carry-over
+→ original attempts/history unchanged
 ```
 
 Silent practice:
@@ -156,8 +174,8 @@ Attempt → evaluation → stable learning target → mastery event → rebuilda
 1. Learning content is data, never hard-coded page logic.
 2. Curriculum placement is separate from reusable content.
 3. Exercise rendering, generation, and evaluation are separate.
-4. Published content is versioned; edits never silently invalidate history.
-5. Progress references immutable learning targets, not screen positions.
+4. Published content and curriculum releases are immutable; edits never silently invalidate history.
+5. Progress references immutable learning targets and compatible evidence, not screen positions.
 6. AI may propose or evaluate, but canonical content remains reviewable.
 7. External providers are replaceable through ports and adapters.
 8. Railway is the deployment target, not a domain dependency.
