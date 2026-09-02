@@ -1,12 +1,11 @@
 from datetime import UTC, datetime, timedelta
-from uuid import UUID
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.content import VerbVersion
 from app.models.learning import ActivityInstance, Attempt, Evaluation
-from app.models.mastery import LearningTarget, LearnerMastery, MasteryEvent, ReviewQueueEntry
+from app.models.mastery import LearnerMastery, LearningTarget, MasteryEvent, ReviewQueueEntry
 from app.models.user import User
 from app.schemas.mastery import (
     MasteryTargetView,
@@ -26,9 +25,19 @@ def utcnow() -> datetime:
     return datetime.now(UTC)
 
 
-def _schedule(correct: bool, streak: int, lapses: int) -> tuple[str, timedelta, float, float, str]:
+def _schedule(
+    correct: bool,
+    streak: int,
+    lapses: int,
+) -> tuple[str, timedelta, float, float, str]:
     if not correct:
-        return "review", timedelta(minutes=10), 0.35, min(1.0, 0.6 + lapses * 0.05), "recent_failure"
+        return (
+            "review",
+            timedelta(minutes=10),
+            0.35,
+            min(1.0, 0.6 + lapses * 0.05),
+            "recent_failure",
+        )
     if streak <= 1:
         return "learning", timedelta(days=1), 1.0, 0.5, "first_success"
     if streak == 2:
@@ -45,7 +54,9 @@ async def record_attempt_evidence(
     evaluation: Evaluation,
     instance: ActivityInstance,
 ) -> None:
-    existing = await session.scalar(select(MasteryEvent).where(MasteryEvent.attempt_id == attempt.id))
+    existing = await session.scalar(
+        select(MasteryEvent).where(MasteryEvent.attempt_id == attempt.id)
+    )
     if existing is not None:
         return
 
@@ -224,7 +235,13 @@ async def get_next_review(session: AsyncSession, user: User) -> ReviewNextRespon
     now = utcnow()
     row = (
         await session.execute(
-            select(ReviewQueueEntry, LearningTarget, LearnerMastery, ActivityInstance, VerbVersion)
+            select(
+                ReviewQueueEntry,
+                LearningTarget,
+                LearnerMastery,
+                ActivityInstance,
+                VerbVersion,
+            )
             .join(LearningTarget, LearningTarget.id == ReviewQueueEntry.target_id)
             .join(
                 LearnerMastery,
@@ -233,7 +250,10 @@ async def get_next_review(session: AsyncSession, user: User) -> ReviewNextRespon
             )
             .join(ActivityInstance, ActivityInstance.id == ReviewQueueEntry.activity_instance_id)
             .join(VerbVersion, VerbVersion.version_id == LearningTarget.content_version_id)
-            .where(ReviewQueueEntry.user_id == user.id, ReviewQueueEntry.due_at <= now)
+            .where(
+                ReviewQueueEntry.user_id == user.id,
+                ReviewQueueEntry.due_at <= now,
+            )
             .order_by(ReviewQueueEntry.priority.desc(), ReviewQueueEntry.due_at)
             .limit(1)
         )
@@ -267,7 +287,9 @@ async def rebuild_mastery(session: AsyncSession, user: User) -> RebuildMasteryRe
             .order_by(Attempt.submitted_at, Attempt.id)
         )
     ).all()
-    await session.execute(delete(ReviewQueueEntry).where(ReviewQueueEntry.user_id == user.id))
+    await session.execute(
+        delete(ReviewQueueEntry).where(ReviewQueueEntry.user_id == user.id)
+    )
     await session.execute(delete(LearnerMastery).where(LearnerMastery.user_id == user.id))
     await session.execute(delete(MasteryEvent).where(MasteryEvent.user_id == user.id))
     await session.flush()
