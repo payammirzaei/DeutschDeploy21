@@ -20,9 +20,11 @@ export type ExercisePrompt = {
   input?: string;
   question?: string;
   lemma?: string;
+  category?: string;
   clue?: string;
   placeholder?: string;
   tap_hint?: string;
+  time_limit_seconds?: number;
   choices?: Choice[];
   tokens?: Token[];
   left_items?: MatchItem[];
@@ -42,15 +44,24 @@ const choiceTypes = new Set([
   "perfect_participle_choice",
   "auxiliary_choice",
   "usage_error_spotting",
+  "interview_best_answer",
 ]);
 
 const textTypes = new Set([
   "reverse_typing",
   "example_cloze",
   "perfect_form_typing",
+  "timed_quick_recall",
 ]);
 
-const orderTypes = new Set(["sentence_order", "phrase_builder"]);
+const orderTypes = new Set([
+  "sentence_order",
+  "phrase_builder",
+  "hr_answer_order",
+  "star_builder",
+  "technical_explanation_order",
+  "architecture_sequence",
+]);
 
 export function ExercisePlayer({
   exerciseType,
@@ -289,9 +300,10 @@ export function ExercisePlayer({
 }
 
 function ExerciseHeading({ prompt }: { prompt: ExercisePrompt }) {
+  const badge = prompt.lemma ?? prompt.category;
   return (
     <div className={styles.heading}>
-      {prompt.lemma ? <code>{prompt.lemma}</code> : null}
+      {badge ? <code>{badge}</code> : null}
       <h2>{prompt.question ?? "Practice"}</h2>
     </div>
   );
