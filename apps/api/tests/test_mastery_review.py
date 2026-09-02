@@ -33,6 +33,14 @@ def _first_activity(client: TestClient) -> dict:
     return response.json()["activity"]
 
 
+def _target_for_activity(home: dict, activity: dict) -> dict:
+    return next(
+        row
+        for row in home["mastery"]
+        if row["content_version_id"] == activity["content_version_id"]
+    )
+
+
 def test_attempt_projects_mastery_and_duplicate_is_idempotent() -> None:
     with TestClient(app) as client:
         _login(client)
@@ -58,13 +66,15 @@ def test_attempt_projects_mastery_and_duplicate_is_idempotent() -> None:
         assert home.status_code == 200
         body = home.json()
         assert body["scheduled_count"] >= 1
-        target = next(row for row in body["mastery"] if row["content_version_id"] == activity["content_version_id"])
+        target = _target_for_activity(body, activity)
         assert target["evidence_count"] == 1
         assert target["state"] in {"learning", "review"}
         assert target["explanation_code"] in {"first_success", "recent_failure"}
 
 
-def test_due_review_reuses_frozen_prompt_and_updates_projection(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_due_review_reuses_frozen_prompt_and_updates_projection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     with TestClient(app) as client:
         _login(client)
         activity = _first_activity(client)
@@ -104,7 +114,7 @@ def test_due_review_reuses_frozen_prompt_and_updates_projection(monkeypatch: pyt
 
         home = client.get("/api/v1/review/home")
         assert home.status_code == 200
-        target = next(row for row in home.json()["mastery"] if row["content_version_id"] == activity["content_version_id"])
+        target = _target_for_activity(home.json(), activity)
         assert target["success_streak"] >= 2
         assert target["evidence_count"] >= 2
 
@@ -122,7 +132,7 @@ def test_mastery_projection_rebuild_is_replayable() -> None:
 
         before = client.get("/api/v1/review/home")
         assert before.status_code == 200
-        before_target = next(row for row in before.json()["mastery"] if row["content_version_id"] == activity["content_version_id"])
+        before_target = _target_for_activity(before.json(), activity)
 
         rebuild = client.post("/api/v1/review/rebuild")
         assert rebuild.status_code == 200
@@ -131,7 +141,7 @@ def test_mastery_projection_rebuild_is_replayable() -> None:
 
         after = client.get("/api/v1/review/home")
         assert after.status_code == 200
-        after_target = next(row for row in after.json()["mastery"] if row["content_version_id"] == activity["content_version_id"])
+        after_target = _target_for_activity(after.json(), activity)
         assert after_target["state"] == before_target["state"]
         assert after_target["success_streak"] == before_target["success_streak"]
         assert after_target["lapses"] == before_target["lapses"]
