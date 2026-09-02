@@ -70,7 +70,8 @@ def upgrade() -> None:
     )
     op.execute(
         "UPDATE learning_targets SET target_key = "
-        "'content:' || content_version_id::text || ':' || skill_dimension || ':' || production_mode "
+        "'content:' || content_version_id::text || ':' || "
+        "skill_dimension || ':' || production_mode "
         "WHERE target_key IS NULL"
     )
     op.alter_column("learning_targets", "target_key", nullable=False)
