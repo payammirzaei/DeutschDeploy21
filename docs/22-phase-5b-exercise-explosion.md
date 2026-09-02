@@ -1,6 +1,6 @@
 # Phase 5B — Exercise explosion
 
-**Status:** Implementation / CI verification
+**Status:** Implemented / CI verified
 
 ## Outcome
 
@@ -155,7 +155,7 @@ Therefore:
 more practice ≠ fake course completion
 ```
 
-Ten Silent Mode submissions must leave structured day `submitted_count` and `current_day` unchanged.
+Ten Silent Mode submissions leave structured day `submitted_count` and `current_day` unchanged.
 
 ## Mastery model
 
@@ -190,23 +190,26 @@ ordered chunks
 matching pairs
 ```
 
-Those primitives currently render all ten exercise families in both Practice and Review.
+Those primitives render all ten exercise families in both Practice and Review.
 
 Matching uses two tap columns with clear selected/completed states. Existing sentence and phrase builders use tap/remove/reset rather than drag-only controls.
 
-## Verification target
+## Verified CI proof
 
-The Phase 5B integration test must prove:
+CI run `33618746469` completed successfully on the Phase 5B implementation and documentation state before the final status-only documentation commit.
 
-- the scheduler exposes all ten registered families across a ten-attempt session;
-- all ten answers pass through the same public attempt endpoint;
-- matching accepts the extended `pair_ids` contract;
-- ten distinct mastery dimensions are projected;
-- Silent Mode does not change structured course submitted counts;
-- Silent Mode does not advance `current_day`;
-- OpenAPI exports the new answer contract;
-- generated TypeScript accepts matching submissions;
-- Practice and Review pass ESLint, strict typecheck and production build.
+Verified gates:
+
+- PostgreSQL migrations through Phase 5A schema head;
+- Ruff;
+- complete backend integration suite, including the ten-family Silent Mode session;
+- ten distinct mastery dimensions;
+- course-progress isolation;
+- OpenAPI export with `pair_ids`;
+- OpenAPI → TypeScript generation;
+- frontend ESLint;
+- strict TypeScript typecheck;
+- Next.js production build.
 
 ## Next exercise depth
 
