@@ -50,7 +50,7 @@ export function ExercisePlayer({
   const [text, setText] = useState("");
   const [orderedTokenIds, setOrderedTokenIds] = useState<string[]>([]);
 
-  const tokens = prompt.tokens ?? [];
+  const tokens = useMemo(() => prompt.tokens ?? [], [prompt.tokens]);
   const tokenById = useMemo(
     () => new Map(tokens.map((token) => [token.id, token])),
     [tokens],
