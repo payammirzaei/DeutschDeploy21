@@ -8,6 +8,7 @@
     "web:build": "npm --workspace apps/web run build",
     "web:lint": "npm --workspace apps/web run lint",
     "web:typecheck": "npm --workspace apps/web run typecheck",
+    "web:test": "npm --workspace apps/web run test",
     "api:generate": "npm --workspace apps/web run api:generate"
   },
   "engines": {"node": ">=22.0.0"}
