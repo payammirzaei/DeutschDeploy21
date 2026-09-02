@@ -28,38 +28,28 @@ export default function DashboardPage() {
   const [job, setJob] = useState<Job | null>(null);
   const [review, setReview] = useState<ReviewSummary | null>(null);
   const [running, setRunning] = useState(false);
-  const [system, setSystem] = useState<
-    "checking" | "ready" | "degraded"
-  >("checking");
+  const [system, setSystem] = useState<"checking" | "ready" | "degraded">("checking");
 
   useEffect(() => {
     let cancelled = false;
-
     Promise.all([
       api.GET("/api/v1/auth/me"),
       api.GET("/api/v1/health/ready"),
       api.GET("/api/v1/review/home"),
     ])
-      .then(
-        ([
-          { data: me, response: meResponse },
-          { data: health },
-          { data: reviewData },
-        ]) => {
-          if (cancelled) return;
-          if (meResponse.status === 401) {
-            router.replace("/login");
-            return;
-          }
-          if (me) setUser(me as User);
-          if (reviewData) setReview(reviewData as ReviewSummary);
-          setSystem(health?.status === "ok" ? "ready" : "degraded");
-        },
-      )
+      .then(([{ data: me, response: meResponse }, { data: health }, { data: reviewData }]) => {
+        if (cancelled) return;
+        if (meResponse.status === 401) {
+          router.replace("/login");
+          return;
+        }
+        if (me) setUser(me as User);
+        if (reviewData) setReview(reviewData as ReviewSummary);
+        setSystem(health?.status === "ok" ? "ready" : "degraded");
+      })
       .catch(() => {
         if (!cancelled) setSystem("degraded");
       });
-
     return () => {
       cancelled = true;
     };
@@ -111,12 +101,24 @@ export default function DashboardPage() {
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">PHASE 6 · DURABLE SPEAK MODE</div>
+          <div className="eyebrow">PHASE 7 · MOCK INTERVIEW & READINESS</div>
           <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            Silent practice stays first-class. When you can speak, turn the same interview language
-            into durable voice reps with transcript correction, feedback and retry-safe processing.
+            Learn silently, rehearse deliberately, speak when you can, then prove the transfer in a
+            durable German interview with contextual follow-ups and evidence-based readiness.
           </p>
+
+          <article className="check-card">
+            <div>
+              <span className="card-kicker">💼 MOCK INTERVIEW · GUIDED → REALISTIC</span>
+              <h2>Turn practice into interview performance.</h2>
+              <p>
+                Run resumable guided, practice or realistic sessions. Answer by text or voice, receive
+                contextual follow-ups, and compare baseline and final readiness under a pinned rubric.
+              </p>
+            </div>
+            <Link className="button button-accent" href="/mock">Start Mock Interview</Link>
+          </article>
 
           <article className="check-card">
             <div>
@@ -124,11 +126,10 @@ export default function DashboardPage() {
               <h2>Say the answer, inspect the transcript, then repeat.</h2>
               <p>
                 Record privately, upload once, let the worker transcribe asynchronously, correct the
-                raw transcript if needed and get transparent text-level feedback. A provider failure
-                never erases the attempt.
+                raw transcript if needed and get transparent text-level feedback.
               </p>
             </div>
-            <Link className="button button-accent" href="/speak">Open Speak Mode</Link>
+            <Link className="button" href="/speak">Open Speak Mode</Link>
           </article>
 
           <article className="check-card">
@@ -161,7 +162,7 @@ export default function DashboardPage() {
               <h2>Tap, type, match and build German without saying a word.</h2>
               <p>
                 Recognition, active recall, Perfekt, sentence structure, matching, cloze, error spotting
-                and phrase building stay independent from required course completion and voice consent.
+                and phrase building stay independent from voice consent.
               </p>
             </div>
             <Link className="button" href="/practice">Start silent practice</Link>
@@ -200,7 +201,7 @@ export default function DashboardPage() {
               <h2>The durable worker path remains testable.</h2>
               <p>
                 Browser → API → PostgreSQL → Redis → worker → PostgreSQL remains available as an
-                operational smoke test; speech transcription now uses that same durable job pattern.
+                operational smoke test and also powers speech transcription.
               </p>
             </div>
             <button className="button" onClick={runWorkerCheck} disabled={running}>
@@ -229,7 +230,8 @@ export default function DashboardPage() {
             <li className="done"><span>05B</span> Exercise explosion</li>
             <li className="done"><span>05C</span> Interview drills</li>
             <li className="done"><span>05D</span> Full 21-day path</li>
-            <li className="active"><span>06</span> Speech pipeline</li>
+            <li className="done"><span>06</span> Speech pipeline</li>
+            <li className="active"><span>07</span> Mock interview</li>
           </ol>
           <div className="identity-chip">
             <span>Signed in as</span>
