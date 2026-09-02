@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
+
+import { OfflineAttemptSync } from "@/src/components/offline-attempt-sync";
 import { ServiceWorkerRegistration } from "@/src/components/service-worker-registration";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,6 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <ServiceWorkerRegistration />
+        <OfflineAttemptSync />
         {children}
       </body>
     </html>

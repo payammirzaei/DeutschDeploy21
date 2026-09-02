@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.routes import (
     auth,
     content,
+    engagement,
     health,
     interview_drills,
     learning,
@@ -24,3 +25,4 @@ api_router.include_router(interview_drills.router)
 api_router.include_router(review.router)
 api_router.include_router(speech.router)
 api_router.include_router(mock_interview.router)
+api_router.include_router(engagement.router)

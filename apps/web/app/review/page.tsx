@@ -10,6 +10,12 @@ import {
   ExercisePrompt,
 } from "@/src/components/exercise-player";
 import { api } from "@/src/lib/api";
+import {
+  ATTEMPT_SYNCED_EVENT,
+  AttemptSyncDetail,
+  learningAttemptUrl,
+  submitLearningAttemptSafely,
+} from "@/src/lib/offline-attempts";
 
 import styles from "./review.module.css";
 
@@ -78,6 +84,7 @@ export default function ReviewPage() {
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [queued, setQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const startedAt = useRef<number | null>(null);
 
@@ -110,6 +117,7 @@ export default function ReviewPage() {
     const body = data as { completed: boolean; activity: ReviewActivity | null };
     setActivity(body.activity);
     setResult(null);
+    setQueued(false);
     startedAt.current = Date.now();
   }, [router]);
 
@@ -127,6 +135,22 @@ export default function ReviewPage() {
     };
   }, [loadHome, loadNext]);
 
+  useEffect(() => {
+    if (!activity) return;
+    const expectedUrl = learningAttemptUrl(activity.activity_instance_id);
+    const onSynced = (event: Event) => {
+      const detail = (event as CustomEvent<AttemptSyncDetail<AttemptResult>>).detail;
+      if (detail.url !== expectedUrl) return;
+      setResult(detail.data);
+      setQueued(false);
+      setSubmitting(false);
+      setError(null);
+      void loadHome();
+    };
+    window.addEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
+    return () => window.removeEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
+  }, [activity, loadHome]);
+
   const sortedMastery = useMemo(
     () =>
       [...(home?.mastery ?? [])].sort(
@@ -138,28 +162,27 @@ export default function ReviewPage() {
   );
 
   async function submit(answer: ExerciseAnswer) {
-    if (!activity || submitting) return;
+    if (!activity || submitting || queued) return;
     setSubmitting(true);
     setError(null);
     const duration = startedAt.current === null
       ? 0
       : Math.max(0, Date.now() - startedAt.current);
-    const { data, response } = await api.POST(
-      "/api/v1/learning/instances/{instance_id}/attempts",
-      {
-        params: {
-          path: { instance_id: activity.activity_instance_id },
-          header: { "Idempotency-Key": crypto.randomUUID() },
-        },
-        body: { ...answer, duration_ms: duration },
-      },
+    const submission = await submitLearningAttemptSafely<AttemptResult>(
+      activity.activity_instance_id,
+      { ...answer, duration_ms: duration },
     );
-    if (!response.ok || !data) {
+    if (submission.status === "queued") {
+      setQueued(true);
+      setSubmitting(false);
+      return;
+    }
+    if (submission.status === "error") {
       setError("Your review answer was not saved. Please try again.");
       setSubmitting(false);
       return;
     }
-    setResult(data as AttemptResult);
+    setResult(submission.data);
     await loadHome();
     setSubmitting(false);
   }
@@ -224,7 +247,7 @@ export default function ReviewPage() {
                 key={activity.activity_instance_id}
                 exerciseType={activity.exercise_type}
                 prompt={activity.prompt}
-                submitting={submitting}
+                submitting={submitting || queued}
                 submitLabel="Check review"
                 onSubmit={submit}
               />

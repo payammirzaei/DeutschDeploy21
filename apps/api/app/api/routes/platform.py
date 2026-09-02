@@ -6,7 +6,9 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api.deps import CurrentUser, DbSession, IdempotencyKey
 from app.models.platform_job import PlatformJob
+from app.schemas.operations import OperationsSummary
 from app.services.jobs import enqueue_job_signal, get_job, get_job_by_idempotency_key
+from app.services.operations import get_operations_summary
 
 router = APIRouter(prefix="/platform", tags=["platform"])
 
@@ -33,6 +35,11 @@ def to_response(job: PlatformJob) -> JobResponse:
         result=job.result,
         error_code=job.error_code,
     )
+
+
+@router.get("/operations", response_model=OperationsSummary)
+async def operations(session: DbSession, _user: CurrentUser) -> OperationsSummary:
+    return await get_operations_summary(session)
 
 
 @router.post("/jobs", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)

@@ -14,6 +14,10 @@ body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--p
 a { color: inherit; text-decoration: none; }
 button, input { font: inherit; }
 button { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
 
 .landing, .dashboard-shell { min-height: 100dvh; padding: 28px clamp(20px, 4vw, 64px) 48px; }
 .topbar, .dashboard-header { display: flex; align-items: center; justify-content: space-between; max-width: 1440px; margin: 0 auto; }
@@ -27,7 +31,7 @@ button { color: inherit; }
 .hero h1 em { color: #6c860c; font-family: Georgia, serif; font-weight: 400; }
 .hero-copy { max-width: 620px; font-size: clamp(18px, 2vw, 24px); line-height: 1.45; color: #4f4c45; }
 .hero-actions { margin-top: 34px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
-.button { border: 1px solid var(--ink); padding: 15px 18px; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; gap: 18px; font-weight: 700; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, opacity .15s; }
+.button { border: 1px solid var(--ink); min-height: 44px; padding: 15px 18px; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; gap: 18px; font-weight: 700; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, opacity .15s; }
 .button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--ink); }
 .button:disabled { opacity: .55; cursor: wait; }
 .button-primary { background: var(--ink); color: var(--paper); }
@@ -46,7 +50,7 @@ button { color: inherit; }
 .auth-card > p { color: var(--muted); line-height: 1.5; }
 .auth-form { margin-top: 30px; display: grid; gap: 18px; }
 .auth-form label { display: grid; gap: 7px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
-.auth-form input { width: 100%; background: transparent; border: 1px solid var(--line); padding: 14px; border-radius: 2px; outline: none; }
+.auth-form input { width: 100%; min-height: 44px; background: transparent; border: 1px solid var(--line); padding: 14px; border-radius: 2px; outline: none; }
 .auth-form input:focus { border-color: var(--ink); box-shadow: 0 0 0 2px rgba(23,23,20,.08); }
 .form-error { color: var(--danger); font-size: 13px; }
 
@@ -57,7 +61,25 @@ button { color: inherit; }
 .status-dot.degraded { background: #c77100; }
 .dashboard-grid { max-width: 1440px; margin: clamp(50px, 8vw, 110px) auto 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: clamp(40px, 8vw, 120px); }
 .dashboard-main h1 { font-size: clamp(52px, 7vw, 96px); letter-spacing: -.065em; line-height: .92; margin: 14px 0 18px; }
-.dashboard-lead { color: var(--muted); font-size: 20px; max-width: 680px; line-height: 1.45; }
+.dashboard-lead { color: var(--muted); font-size: 20px; max-width: 760px; line-height: 1.45; }
+.momentum-panel { margin-top: 40px; padding: clamp(22px, 4vw, 34px); border: 1px solid var(--ink); background: var(--ink); color: var(--paper); }
+.momentum-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; }
+.momentum-head h2 { margin: 8px 0 0; font-size: clamp(34px, 5vw, 52px); letter-spacing: -.05em; }
+.momentum-head > strong { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.04em; color: var(--acid); }
+.level-progress { width: 100%; height: 14px; margin-top: 22px; accent-color: var(--acid); }
+.momentum-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 22px; border-top: 1px solid rgba(244, 239, 228, .22); border-bottom: 1px solid rgba(244, 239, 228, .22); }
+.momentum-metrics div { padding: 18px 14px 18px 0; display: grid; gap: 5px; }
+.momentum-metrics strong { font-size: 27px; letter-spacing: -.04em; }
+.momentum-metrics span, .badge-summary, .gamification-note { color: rgba(244, 239, 228, .72); font-size: 12px; }
+.badge-summary { margin-top: 18px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.badge-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.badge-card { border: 1px solid rgba(244, 239, 228, .2); padding: 14px; display: grid; grid-template-columns: 28px 1fr; gap: 10px; min-width: 0; }
+.badge-card.earned { border-color: var(--acid); }
+.badge-mark { font-size: 20px; color: var(--acid); }
+.badge-card strong { display: block; font-size: 13px; }
+.badge-card p { margin: 4px 0 7px; color: rgba(244, 239, 228, .68); font-size: 12px; line-height: 1.35; }
+.badge-card span { font-size: 11px; font-weight: 800; color: var(--acid); }
+.gamification-note { margin: 16px 0 0; line-height: 1.5; }
 .check-card { margin-top: 58px; padding: 28px; border: 1px solid var(--ink); display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 28px; background: #faf7f0; }
 .check-card h2 { margin: 9px 0; font-size: 28px; letter-spacing: -.035em; }
 .check-card p { margin: 0; max-width: 670px; color: var(--muted); line-height: 1.5; }
@@ -81,6 +103,7 @@ button { color: inherit; }
   .dashboard-grid { grid-template-columns: 1fr; }
   .phase-card { order: -1; }
   .check-card { grid-template-columns: 1fr; align-items: stretch; }
+  .momentum-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 520px) {
@@ -88,6 +111,12 @@ button { color: inherit; }
   .hero { margin-top: 80px; }
   .hero h1 { font-size: clamp(50px, 16vw, 72px); }
   .auth-card { box-shadow: 7px 7px 0 var(--ink); }
+  .dashboard-header { align-items: flex-start; }
+  .dashboard-main h1 { font-size: clamp(48px, 15vw, 70px); }
+  .dashboard-lead { font-size: 17px; }
+  .momentum-head { align-items: flex-start; flex-direction: column; }
+  .badge-grid { grid-template-columns: 1fr; }
+  .check-card { margin-top: 34px; padding: 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
