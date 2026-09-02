@@ -20,6 +20,12 @@ from app.models.learning import (
     ReleaseActivity,
 )
 from app.models.mastery import LearnerMastery, LearningTarget, MasteryEvent, ReviewQueueEntry
+from app.models.mock_interview import (
+    MockInterviewSession,
+    MockInterviewTurn,
+    MockInterviewTurnEvaluation,
+    MockReadinessReport,
+)
 from app.models.platform_job import PlatformJob
 from app.models.speech import (
     MediaObject,
@@ -48,6 +54,10 @@ __all__ = [
     "LearningTarget",
     "MasteryEvent",
     "MediaObject",
+    "MockInterviewSession",
+    "MockInterviewTurn",
+    "MockInterviewTurnEvaluation",
+    "MockReadinessReport",
     "PlatformJob",
     "ProviderInvocation",
     "ReleaseActivity",
