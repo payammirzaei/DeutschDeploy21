@@ -28,9 +28,8 @@ from app.schemas.speech import (
 )
 from app.services.jobs import enqueue_job_signal
 from app.services.learning import ensure_starter_learning, get_active_enrollment
-from app.services.media_storage import MediaTooLargeError, get_media_storage
+from app.services.media_storage import get_media_storage
 from app.services.speech_feedback import build_speech_feedback
-
 
 ALLOWED_AUDIO_TYPES = {
     "audio/webm": ".webm",
@@ -198,14 +197,11 @@ async def upload_audio(
     storage_key = f"{uuid4().hex[:2]}/{uuid4().hex}{extension}"
     storage = get_media_storage()
     settings = get_settings()
-    try:
-        byte_size, checksum = await storage.save_stream(
-            storage_key,
-            request.stream(),
-            max_bytes=settings.media_max_audio_bytes,
-        )
-    except MediaTooLargeError:
-        raise
+    byte_size, checksum = await storage.save_stream(
+        storage_key,
+        request.stream(),
+        max_bytes=settings.media_max_audio_bytes,
+    )
 
     media = MediaObject(
         user_id=user.id,
