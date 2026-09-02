@@ -67,7 +67,7 @@ erDiagram
     USER ||--o{ ENROLLMENT : has
     COURSE_RELEASE ||--o{ ENROLLMENT : pins
     COURSE_RELEASE ||--o{ RELEASE_ENTRY : contains
-    CONTENT_ITEM ||--o? CONTENT_VERSION : versions
+    CONTENT_ITEM ||--o{ CONTENT_VERSION : versions
     CONTENT_VERSION ||--o{ RELEASE_ENTRY : pinned
     ENROLLMENT ||--o{ LEARNING_SESSION : creates
     LEARNING_SESSION ||--o{ ACTIVITY_INSTANCE : contains
