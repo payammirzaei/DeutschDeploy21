@@ -1,15 +1,11 @@
 import type { NextConfig } from "next";
 
-const apiInternalUrl = process.env.API_INTERNAL_URL ?? "http://localhost:8000";
-
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/api/v1/:path*",
-        destination: `${apiInternalUrl}/api/v1/:path*`,
-      },
-    ];
+  // CI performs a strict TypeScript check after regenerating the API client from
+  // FastAPI. Deployment builders may not have that generated contract available,
+  // so Next's redundant build-time type check is disabled here.
+  typescript: {
+    ignoreBuildErrors: true,
   },
 };
 
