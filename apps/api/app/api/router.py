@@ -6,6 +6,7 @@ from app.api.routes import (
     health,
     interview_drills,
     learning,
+    mock_interview,
     platform,
     practice,
     review,
@@ -22,3 +23,4 @@ api_router.include_router(practice.router)
 api_router.include_router(interview_drills.router)
 api_router.include_router(review.router)
 api_router.include_router(speech.router)
+api_router.include_router(mock_interview.router)
