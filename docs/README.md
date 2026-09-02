@@ -24,7 +24,8 @@ This directory is the authoritative design baseline for the product. It explains
 18. [Phase 2 content and publishing](18-phase-2-content-publishing.md)
 19. [Phase 3 deterministic learning loop](19-phase-3-learning-loop.md)
 20. [Phase 4 mastery and spaced review](20-phase-4-mastery-review.md)
-21. [Architecture Decision Records](adr/README.md)
+21. [Phase 5A silent multi-exercise engine](21-phase-5a-silent-exercise-engine.md)
+22. [Architecture Decision Records](adr/README.md)
 
 ## Document authority
 
