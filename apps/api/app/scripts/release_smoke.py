@@ -5,10 +5,12 @@ from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
 import httpx
-from sqlalchemy import select
+from sqlalchemy import select, update
 
+from app.core.config import get_settings
 from app.core.security import hash_password
 from app.db.session import SessionFactory
+from app.models.content import ContentDraft, ContentItem, ContentVersion
 from app.models.mastery import LearnerMastery, ReviewQueueEntry
 from app.models.user import User
 
@@ -33,6 +35,7 @@ ORDER_TYPES = {
     "technical_explanation_order",
     "architecture_sequence",
 }
+SMOKE_EMAIL_PATTERN = "release-smoke-%@example.com"
 
 
 def require_env(name: str) -> str:
@@ -123,13 +126,47 @@ async def create_smoke_user() -> tuple[UUID, str, str]:
         return user.id, email, password
 
 
-async def delete_smoke_user(user_id: UUID) -> None:
+async def cleanup_smoke_users(*, only_user_id: UUID | None = None) -> int:
+    """Delete smoke identities without leaving global catalog ownership behind."""
+    settings = get_settings()
+    if not settings.app_bootstrap_email:
+        raise RuntimeError("APP_BOOTSTRAP_EMAIL is required for release-smoke cleanup")
+
     async with SessionFactory() as session:
-        user = await session.get(User, user_id)
-        if user is None:
-            return
-        await session.delete(user)
+        bootstrap = await session.scalar(
+            select(User).where(User.email == str(settings.app_bootstrap_email).lower())
+        )
+        if bootstrap is None:
+            raise RuntimeError("Bootstrap user does not exist for release-smoke cleanup")
+
+        statement = select(User).where(User.email.like(SMOKE_EMAIL_PATTERN))
+        if only_user_id is not None:
+            statement = statement.where(User.id == only_user_id)
+        smoke_users = list((await session.execute(statement)).scalars())
+
+        for smoke_user in smoke_users:
+            if smoke_user.id == bootstrap.id:
+                raise RuntimeError("Bootstrap user must not be a release-smoke identity")
+
+            await session.execute(
+                update(ContentItem)
+                .where(ContentItem.created_by_user_id == smoke_user.id)
+                .values(created_by_user_id=bootstrap.id)
+            )
+            await session.execute(
+                update(ContentDraft)
+                .where(ContentDraft.updated_by_user_id == smoke_user.id)
+                .values(updated_by_user_id=bootstrap.id)
+            )
+            await session.execute(
+                update(ContentVersion)
+                .where(ContentVersion.created_by_user_id == smoke_user.id)
+                .values(created_by_user_id=bootstrap.id)
+            )
+            await session.delete(smoke_user)
+
         await session.commit()
+        return len(smoke_users)
 
 
 async def force_target_due(user_id: UUID, target_id: UUID) -> None:
@@ -184,8 +221,12 @@ async def next_unfinished_activity(client: httpx.AsyncClient) -> tuple[int, dict
 
 async def run() -> None:
     api_url = require_env("RELEASE_SMOKE_API_URL").rstrip("/")
+    cleaned_before = await cleanup_smoke_users()
     user_id, email, password = await create_smoke_user()
-    summary: dict[str, object] = {"user_id": str(user_id)}
+    summary: dict[str, object] = {
+        "user_id": str(user_id),
+        "stale_smoke_users_cleaned": cleaned_before,
+    }
 
     try:
         async with httpx.AsyncClient(
@@ -309,10 +350,11 @@ async def run() -> None:
             if operations.get("status") != "ok" or operations.get("alert_codes"):
                 raise RuntimeError(f"Operations summary contains alerts: {operations}")
             summary["operations"] = "ok"
-
-        print("RELEASE_SMOKE_OK", summary)
     finally:
-        await delete_smoke_user(user_id)
+        cleaned_after = await cleanup_smoke_users(only_user_id=user_id)
+        summary["smoke_user_cleaned"] = cleaned_after == 1
+
+    print("RELEASE_SMOKE_OK", summary)
 
 
 if __name__ == "__main__":
