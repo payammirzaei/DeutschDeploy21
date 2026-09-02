@@ -34,6 +34,7 @@
       "required_signals": [["ich"], ["software", "entwickler", "entwicklung"], ["projekt", "system", "anwendung"]],
       "follow_up": {
         "key": "hr.intro.followup",
+        "category": "hr",
         "question": "Welche Ihrer bisherigen Aufgaben ist für diese Stelle besonders relevant?",
         "intent": "Connect one concrete responsibility to the target role.",
         "hints": ["Name one responsibility.", "Explain why it is relevant."],
@@ -51,6 +52,7 @@
       "required_signals": [["stelle", "rolle", "position"], ["erfahrung", "kenntnisse", "skills"], ["beitragen", "entwickeln", "arbeiten"]],
       "follow_up": {
         "key": "hr.motivation.followup",
+        "category": "hr",
         "question": "Was möchten Sie in den ersten Monaten konkret beitragen?",
         "intent": "Name a realistic early contribution without inventing company facts.",
         "hints": ["Mention how you learn the system first.", "Then name one concrete contribution."],
@@ -68,6 +70,7 @@
       "required_signals": [["projekt", "system", "anwendung"], ["verantwortlich", "aufgabe", "ich habe"], ["entwickelt", "implementiert", "gebaut"], ["ergebnis", "dadurch", "am ende"]],
       "follow_up": {
         "key": "project.walkthrough.followup",
+        "category": "project",
         "question": "Welche technische Entscheidung haben Sie in diesem Projekt selbst getroffen?",
         "intent": "Show ownership through one concrete decision and trade-off.",
         "hints": ["Name the decision.", "Explain the reason or trade-off."],
@@ -85,6 +88,7 @@
       "required_signals": [["problem", "fehler", "störung"], ["analysiert", "geprüft", "gefunden"], ["gelöst", "behoben", "verbessert"], ["ergebnis", "dadurch", "am ende"]],
       "follow_up": {
         "key": "behavior.problem.followup",
+        "category": "behavioral",
         "question": "Wie haben Sie überprüft, dass Ihre Lösung wirklich funktioniert?",
         "intent": "Demonstrate validation rather than stopping at implementation.",
         "hints": ["Mention tests, monitoring, comparison or user validation."],
@@ -102,6 +106,7 @@
       "required_signals": [["anforderung", "requirement"], ["api", "schnittstelle", "endpoint"], ["test", "prüf", "valid"], ["fehler", "error", "logging", "monitor"]],
       "follow_up": {
         "key": "technical.api.followup",
+        "category": "technical",
         "question": "Wie würden Sie verhindern, dass eine Änderung bestehende Clients kaputt macht?",
         "intent": "Discuss compatibility and controlled API evolution.",
         "hints": ["Think about contracts, versioning and tests."],
@@ -119,6 +124,7 @@
       "required_signals": [["anforderung", "ziel", "boundary"], ["frontend", "client"], ["api", "backend", "service"], ["datenbank", "postgres", "data"], ["deploy", "docker", "cloud", "monitor"]],
       "follow_up": {
         "key": "architecture.system.followup",
+        "category": "architecture",
         "question": "Welche Komponente würden Sie zuerst skalieren, wenn die Last stark steigt, und warum?",
         "intent": "Reason from bottlenecks and measurements rather than guessing.",
         "hints": ["Measure first.", "Name one likely bottleneck and the evidence you need."],
