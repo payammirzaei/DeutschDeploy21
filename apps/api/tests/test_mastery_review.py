@@ -51,6 +51,27 @@ def _target_by_id(home: dict, target_id: str) -> dict:
     return next(row for row in home["mastery"] if row["target_id"] == target_id)
 
 
+def _answer_for_review(activity: dict) -> dict:
+    prompt = activity["prompt"]
+    input_kind = prompt.get("input")
+    if input_kind == "choice":
+        return {"choice_id": prompt["choices"][0]["id"]}
+    if input_kind == "text":
+        return {"text": "probe"}
+    if input_kind == "token_order":
+        return {"token_ids": [token["id"] for token in prompt["tokens"]]}
+    if input_kind == "matching":
+        left_items = prompt["left_items"]
+        right_items = prompt["right_items"]
+        return {
+            "pair_ids": [
+                f"{left['id']}:{right['id']}"
+                for left, right in zip(left_items, right_items, strict=True)
+            ]
+        }
+    raise AssertionError(f"Unsupported review input: {input_kind}")
+
+
 def test_attempt_projects_mastery_and_duplicate_is_idempotent() -> None:
     with TestClient(app) as client:
         _login(client)
@@ -115,20 +136,21 @@ def test_due_review_reuses_frozen_prompt_and_updates_projection(
             if row["activity_instance_id"] == review_activity["activity_instance_id"]
         )
         assert review_activity["target_id"] == queue_item["target_id"]
+        assert review_activity["target_kind"] == queue_item["target_kind"]
         assert review_activity["content_version_id"] == queue_item["content_version_id"]
         assert review_activity["lemma"] == queue_item["lemma"]
         assert review_activity["reason_code"] == queue_item["reason_code"]
         assert review_activity["state"] == queue_item["state"]
         assert review_activity["question"]
-        assert len(review_activity["choices"]) == 4
-        assert len({choice["id"] for choice in review_activity["choices"]}) == 4
-        assert len({choice["text"] for choice in review_activity["choices"]}) == 4
+        assert review_activity["prompt"]["question"] == review_activity["question"]
+        assert review_activity["prompt_checksum"]
+        assert review_activity["exercise_type"]
 
         before_target = _target_by_id(due_body, review_activity["target_id"])
         retry = client.post(
             f"/api/v1/learning/instances/{review_activity['activity_instance_id']}/attempts",
             headers={"Idempotency-Key": f"review-{uuid4()}"},
-            json={"choice_id": review_activity["choices"][0]["id"]},
+            json=_answer_for_review(review_activity),
         )
         assert retry.status_code == 200
 
