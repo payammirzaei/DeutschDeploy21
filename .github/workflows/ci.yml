@@ -65,7 +65,7 @@ jobs:
         working-directory: apps/api
         run: |
           uv run ruff check .
-          uv run pytest
+          uv run python -m pytest
       - name: Export OpenAPI
         working-directory: apps/api
         run: uv run python -m app.scripts.export_openapi
