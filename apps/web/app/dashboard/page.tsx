@@ -52,12 +52,8 @@ export default function DashboardPage() {
             return;
           }
           if (me) setUser(me as User);
-          if (reviewData) {
-            setReview(reviewData as ReviewSummary);
-          }
-          setSystem(
-            health?.status === "ok" ? "ready" : "degraded",
-          );
+          if (reviewData) setReview(reviewData as ReviewSummary);
+          setSystem(health?.status === "ok" ? "ready" : "degraded");
         },
       )
       .catch(() => {
@@ -70,22 +66,15 @@ export default function DashboardPage() {
   }, [router]);
 
   useEffect(() => {
-    if (!job || !["queued", "running"].includes(job.status)) {
-      return;
-    }
+    if (!job || !["queued", "running"].includes(job.status)) return;
     const timer = window.setInterval(async () => {
-      const { data } = await api.GET(
-        "/api/v1/platform/jobs/{job_id}",
-        {
-          params: { path: { job_id: job.id } },
-        },
-      );
+      const { data } = await api.GET("/api/v1/platform/jobs/{job_id}", {
+        params: { path: { job_id: job.id } },
+      });
       if (data) {
         const next = data as Job;
         setJob(next);
-        if (!["queued", "running"].includes(next.status)) {
-          setRunning(false);
-        }
+        if (!["queued", "running"].includes(next.status)) setRunning(false);
       }
     }, 650);
     return () => window.clearInterval(timer);
@@ -94,19 +83,10 @@ export default function DashboardPage() {
   async function runWorkerCheck() {
     setRunning(true);
     const key = crypto.randomUUID();
-    const { data, response } = await api.POST(
-      "/api/v1/platform/jobs",
-      {
-        params: {
-          header: { "Idempotency-Key": key },
-        },
-        body: {
-          message: (
-            "Web → API → PostgreSQL → Redis → Worker → PostgreSQL"
-          ),
-        },
-      },
-    );
+    const { data, response } = await api.POST("/api/v1/platform/jobs", {
+      params: { header: { "Idempotency-Key": key } },
+      body: { message: "Web → API → PostgreSQL → Redis → Worker → PostgreSQL" },
+    });
     if (!response.ok || !data) {
       setRunning(false);
       return;
@@ -122,100 +102,75 @@ export default function DashboardPage() {
   return (
     <main className="dashboard-shell">
       <header className="dashboard-header">
-        <div className="brand">
-          DD<span>21</span>
-        </div>
+        <div className="brand">DD<span>21</span></div>
         <div className="header-right">
-          <span
-            className={`status-dot ${system}`}
-            aria-label={`System ${system}`}
-          />
-          <button className="text-button" onClick={logout}>
-            Sign out
-          </button>
+          <span className={`status-dot ${system}`} aria-label={`System ${system}`} />
+          <button className="text-button" onClick={logout}>Sign out</button>
         </div>
       </header>
 
       <section className="dashboard-grid">
         <div className="dashboard-main">
-          <div className="eyebrow">
-            PHASE 5D · COMPLETE 21-DAY CURRICULUM
-          </div>
-          <h1>
-            Guten Morgen{user ? ", developer" : ""}.
-          </h1>
+          <div className="eyebrow">PHASE 6 · DURABLE SPEAK MODE</div>
+          <h1>Guten Morgen{user ? ", developer" : ""}.</h1>
           <p className="dashboard-lead">
-            The full path is now connected: learn the language, build the
-            answer, transfer it into interview structure, then keep weak
-            targets alive through spaced review.
+            Silent practice stays first-class. When you can speak, turn the same interview language
+            into durable voice reps with transcript correction, feedback and retry-safe processing.
           </p>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">
-                21-DAY PATH · 133 REQUIRED ACTIVITIES
-              </span>
-              <h2>
-                Move from first vocabulary to final interview validation.
-              </h2>
+              <span className="card-kicker">🎙 SPEAK MODE · DURABLE VOICE REPS</span>
+              <h2>Say the answer, inspect the transcript, then repeat.</h2>
               <p>
-                All 100 starter verbs, ten deterministic exercise families
-                and the curated interview drills now live inside one immutable
-                curriculum release with explicit progress and resume state.
+                Record privately, upload once, let the worker transcribe asynchronously, correct the
+                raw transcript if needed and get transparent text-level feedback. A provider failure
+                never erases the attempt.
               </p>
             </div>
-            <Link
-              className="button button-accent"
-              href="/learn"
-            >
-              Continue 21-day path
-            </Link>
+            <Link className="button button-accent" href="/speak">Open Speak Mode</Link>
           </article>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">
-                INTERVIEW LAB · 18 CURATED DRILLS
-              </span>
+              <span className="card-kicker">21-DAY PATH · 133 REQUIRED ACTIVITIES</span>
+              <h2>Keep the structured path moving.</h2>
+              <p>
+                All 100 starter verbs, ten deterministic exercise families and the curated interview
+                drills remain inside one immutable curriculum release with explicit progress and resume.
+              </p>
+            </div>
+            <Link className="button" href="/learn">Continue 21-day path</Link>
+          </article>
+
+          <article className="check-card">
+            <div>
+              <span className="card-kicker">INTERVIEW LAB · 18 CURATED DRILLS</span>
               <h2>Build the answer before you have to say it.</h2>
               <p>
-                Best-answer decisions, HR ordering, STAR stories, technical
-                explanations, architecture sequences and timed recovery
-                phrases remain available as unlimited optional practice.
+                Best-answer decisions, HR ordering, STAR stories, technical explanations,
+                architecture sequences and timed recovery phrases stay available silently.
               </p>
             </div>
-            <Link className="button" href="/drills">
-              Open Interview Lab
-            </Link>
+            <Link className="button" href="/drills">Open Interview Lab</Link>
           </article>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">
-                🤫 SILENT MODE · 10 EXERCISE FAMILIES
-              </span>
-              <h2>
-                Tap, type, match and build German without saying a word.
-              </h2>
+              <span className="card-kicker">🤫 SILENT MODE · 10 EXERCISE FAMILIES</span>
+              <h2>Tap, type, match and build German without saying a word.</h2>
               <p>
-                Recognition, active recall, Perfekt, sentence structure,
-                matching, cloze, error spotting and phrase building still
-                rotate independently from required course completion.
+                Recognition, active recall, Perfekt, sentence structure, matching, cloze, error spotting
+                and phrase building stay independent from required course completion and voice consent.
               </p>
             </div>
-            <Link className="button" href="/practice">
-              Start silent practice
-            </Link>
+            <Link className="button" href="/practice">Start silent practice</Link>
           </article>
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">
-                SPACED REVIEW · {review?.due_count ?? 0} DUE
-              </span>
-              <h2>
-                Review vocabulary and interview structure in one queue.
-              </h2>
+              <span className="card-kicker">SPACED REVIEW · {review?.due_count ?? 0} DUE</span>
+              <h2>Review vocabulary and interview structure in one queue.</h2>
               <p>
                 {review?.scheduled_count
                   ? `${review.scheduled_count} targets are scheduled, ${review.weak_count} are still learning/review, and ${review.mastered_count} are currently mastered.`
@@ -232,14 +187,11 @@ export default function DashboardPage() {
               <span className="card-kicker">CONTENT CATALOG</span>
               <h2>Browse the versioned 100-verb foundation.</h2>
               <p>
-                Search German interview verbs, Persian and English meanings,
-                Perfekt forms and interview-focused examples. Published
-                content remains immutable under historical evidence.
+                Search German interview verbs, meanings, Perfekt forms and interview-focused examples.
+                Published content remains immutable under historical evidence.
               </p>
             </div>
-            <Link className="button" href="/catalog">
-              Open catalog
-            </Link>
+            <Link className="button" href="/catalog">Open catalog</Link>
           </article>
 
           <article className="check-card">
@@ -247,37 +199,21 @@ export default function DashboardPage() {
               <span className="card-kicker">PLATFORM PROOF</span>
               <h2>The durable worker path remains testable.</h2>
               <p>
-                Browser → API → PostgreSQL → Redis → worker → PostgreSQL
-                remains available as an operational smoke test while the
-                learning product grows.
+                Browser → API → PostgreSQL → Redis → worker → PostgreSQL remains available as an
+                operational smoke test; speech transcription now uses that same durable job pattern.
               </p>
             </div>
-            <button
-              className="button"
-              onClick={runWorkerCheck}
-              disabled={running}
-            >
+            <button className="button" onClick={runWorkerCheck} disabled={running}>
               {running ? "Running…" : "Run platform check"}
             </button>
           </article>
 
           {job ? (
             <article className="job-result" aria-live="polite">
-              <div className="job-row">
-                <span>Status</span>
-                <strong>{job.status}</strong>
-              </div>
-              <div className="job-row">
-                <span>Attempts</span>
-                <strong>{job.attempt_count}</strong>
-              </div>
-              <div className="job-row">
-                <span>Job</span>
-                <code>{job.id.slice(0, 8)}</code>
-              </div>
-              {job.result ? (
-                <pre>{JSON.stringify(job.result, null, 2)}</pre>
-              ) : null}
+              <div className="job-row"><span>Status</span><strong>{job.status}</strong></div>
+              <div className="job-row"><span>Attempts</span><strong>{job.attempt_count}</strong></div>
+              <div className="job-row"><span>Job</span><code>{job.id.slice(0, 8)}</code></div>
+              {job.result ? <pre>{JSON.stringify(job.result, null, 2)}</pre> : null}
             </article>
           ) : null}
         </div>
@@ -285,30 +221,15 @@ export default function DashboardPage() {
         <aside className="phase-card">
           <span className="card-kicker">DELIVERY</span>
           <ol className="phase-list">
-            <li className="done">
-              <span>01</span> Platform skeleton
-            </li>
-            <li className="done">
-              <span>02</span> Content & publishing
-            </li>
-            <li className="done">
-              <span>03</span> Learning loop
-            </li>
-            <li className="done">
-              <span>04</span> Mastery & review
-            </li>
-            <li className="done">
-              <span>05A</span> Silent engine
-            </li>
-            <li className="done">
-              <span>05B</span> Exercise explosion
-            </li>
-            <li className="done">
-              <span>05C</span> Interview drills
-            </li>
-            <li className="active">
-              <span>05D</span> Full 21-day path
-            </li>
+            <li className="done"><span>01</span> Platform skeleton</li>
+            <li className="done"><span>02</span> Content & publishing</li>
+            <li className="done"><span>03</span> Learning loop</li>
+            <li className="done"><span>04</span> Mastery & review</li>
+            <li className="done"><span>05A</span> Silent engine</li>
+            <li className="done"><span>05B</span> Exercise explosion</li>
+            <li className="done"><span>05C</span> Interview drills</li>
+            <li className="done"><span>05D</span> Full 21-day path</li>
+            <li className="active"><span>06</span> Speech pipeline</li>
           </ol>
           <div className="identity-chip">
             <span>Signed in as</span>

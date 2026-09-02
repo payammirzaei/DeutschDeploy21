@@ -10,6 +10,7 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.db.session import SessionFactory
 from app.models.platform_job import PlatformJob
+from app.services.speech_processing import process_speech_transcription
 
 configure_logging()
 logger = structlog.get_logger()
@@ -27,6 +28,19 @@ async def claim_fallback_job() -> UUID | None:
         return result.scalar_one_or_none()
 
 
+async def _execute_job(job: PlatformJob, session) -> dict:
+    if job.job_type == "platform.echo":
+        await asyncio.sleep(0.15)
+        return {
+            "echo": job.payload.get("message"),
+            "worker": "deutschdeploy21-worker",
+            "schema_version": job.schema_version,
+        }
+    if job.job_type == "speech.transcribe":
+        return await process_speech_transcription(session, job)
+    raise ValueError(f"Unsupported job type: {job.job_type}")
+
+
 async def process_job(job_id: UUID) -> None:
     async with SessionFactory() as session:
         job = await session.get(PlatformJob, job_id, with_for_update=True)
@@ -39,14 +53,7 @@ async def process_job(job_id: UUID) -> None:
         await session.commit()
 
         try:
-            if job.job_type != "platform.echo":
-                raise ValueError(f"Unsupported job type: {job.job_type}")
-            await asyncio.sleep(0.15)
-            job.result = {
-                "echo": job.payload.get("message"),
-                "worker": "deutschdeploy21-worker",
-                "schema_version": job.schema_version,
-            }
+            job.result = await _execute_job(job, session)
             job.status = "succeeded"
             job.finished_at = datetime.now(UTC)
             job.error_code = None

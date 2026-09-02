@@ -1,7 +1,7 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import EmailStr, Field, model_validator
+from pydantic import EmailStr, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,6 +21,21 @@ class Settings(BaseSettings):
     auth_cookie_name: str = "dd21_session"
     redis_job_queue: str = "dd21:jobs"
 
+    media_storage_backend: Literal["filesystem", "railway_s3"] = "filesystem"
+    media_root: str = "/data/media"
+    media_max_audio_bytes: int = 25_000_000
+    bucket: str | None = None
+    access_key_id: str | None = None
+    secret_access_key: SecretStr | None = None
+    region: str | None = None
+    endpoint: str | None = None
+
+    speech_consent_version: str = "2026-09-02-v1"
+    speech_transcription_provider: Literal["mock", "openai"] = "mock"
+    speech_provider_timeout_seconds: float = 90.0
+    openai_api_key: SecretStr | None = None
+    openai_transcription_model: str = "gpt-4o-transcribe"
+
     @model_validator(mode="after")
     def validate_production_secrets(self) -> "Settings":
         if self.app_env in {"staging", "production"}:
@@ -30,6 +45,26 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "development bootstrap password cannot be used outside development/test"
                 )
+            if self.media_storage_backend != "railway_s3":
+                raise ValueError(
+                    "staging/production speech media must use Railway S3-compatible bucket storage"
+                )
+            if not all(
+                [
+                    self.bucket,
+                    self.access_key_id,
+                    self.secret_access_key,
+                    self.region,
+                    self.endpoint,
+                ]
+            ):
+                raise ValueError("Railway Bucket credentials are required outside development/test")
+            if self.speech_transcription_provider != "openai":
+                raise ValueError(
+                    "staging/production must use a real speech transcription provider"
+                )
+        if self.speech_transcription_provider == "openai" and self.openai_api_key is None:
+            raise ValueError("OPENAI_API_KEY is required when speech provider is openai")
         return self
 
     @property

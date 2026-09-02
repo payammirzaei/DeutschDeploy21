@@ -26,9 +26,9 @@ DeutschDeploy21 does **not** attempt to teach all German. It optimizes for a con
 - **Database:** PostgreSQL
 - **Queue/cache:** Redis
 - **Async work:** separate background worker with durable PostgreSQL job state
-- **Media:** S3-compatible object storage behind an adapter (Phase 6)
+- **Media:** private S3-compatible object storage behind an adapter; filesystem only for development/test and Railway Bucket-compatible storage for staging/production
 - **Deployment:** Docker services on Railway
-- **AI and speech:** provider-neutral gateways (later phases)
+- **AI and speech:** provider-neutral gateways; speech-to-text is wired while richer AI evaluation remains optional and replaceable
 
 The implementation is a modular monolith with separate web, API, and worker processes. Microservices are not required until operational evidence justifies them.
 
@@ -54,13 +54,14 @@ docs/                   product, architecture, ADRs, delivery notes
 **Phase 5A — Silent multi-exercise engine: merged and CI verified.**  
 **Phase 5B — Exercise explosion: merged and CI verified.**  
 **Phase 5C — Interview drills: merged and CI verified.**  
-**Phase 5D — Full 21-day curriculum: implementation / CI verification.**
+**Phase 5D — Full 21-day curriculum: merged and CI verified.**  
+**Phase 6 — Durable speech pipeline: implemented and CI verified; production Railway provisioning remains an environment step.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
 The content layer adds relational drafts, immutable published versions, typed verb grammar, localizations, examples, dry-run/idempotent imports, publication history, and a controlled 100-verb software-interview catalog.
 
-`/learn` now consumes an immutable, version-controlled curriculum manifest. CourseRelease v2 contains 21 days and 133 required activities: the complete 100-verb foundation, all ten deterministic content exercise families, and structured interview-transfer drills. Days 1–15 introduce all 100 starter verbs exactly once; later days emphasize role depth, behavioral structure, architecture reasoning, recovery and deterministic final validation.
+`/learn` consumes an immutable, version-controlled curriculum manifest. CourseRelease v2 contains 21 days and 133 required activities: the complete 100-verb foundation, all ten deterministic content exercise families, and structured interview-transfer drills. Days 1–15 introduce all 100 starter verbs exactly once; later days emphasize role depth, behavioral structure, architecture reasoning, recovery and deterministic final validation.
 
 Existing three-day CourseRelease v1 remains immutable. New learners start v2. Existing v1 learners receive an explicit upgrade path instead of silent repinning. Compatible historical course work carries only when the exact pinned content version and exercise type match; original attempts, evaluations and mastery history are never copied or rewritten.
 
@@ -70,9 +71,11 @@ Every submitted learning, practice, interview-drill, or review attempt produces 
 
 `/drills` is the Interview Lab. It provides 18 curated deterministic drills across six interview skills: best-answer quality, HR structure, STAR behavioral structure, technical explanation, architecture sequencing, and recovery-phrase recall under visible time pressure. The same drills can also appear as required late-course activities without optional Interview Lab sessions satisfying course progress.
 
-ReleaseActivity can now reference either an exact content version or a version-controlled interview drill source. The runtime keeps source identity, course placement, immutable learner-facing instances and mastery targets separate.
+`/speak` is the first durable Speak Mode. Recording is consent-gated and optional. A speech attempt and frozen prompt are persisted before provider analysis; private audio is uploaded with size/type/duration bounds, transcription runs through the durable worker queue, the raw provider transcript remains immutable, learner corrections are append-only, and text-level feedback is versioned. Failed transcription can be retried without losing the attempt, manual text fallback keeps the mode usable without microphone access, and raw audio can be deleted while derived transcript/feedback remain. Pronunciation and accent are intentionally not scored without credible assessment evidence.
 
-See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md), [`docs/23-phase-5c-interview-drills.md`](docs/23-phase-5c-interview-drills.md), and [`docs/24-phase-5d-full-curriculum.md`](docs/24-phase-5d-full-curriculum.md).
+ReleaseActivity can reference either an exact content version or a version-controlled interview drill source. The runtime keeps source identity, course placement, immutable learner-facing instances and mastery targets separate.
+
+See [`docs/17-phase-1-platform-skeleton.md`](docs/17-phase-1-platform-skeleton.md), [`docs/18-phase-2-content-publishing.md`](docs/18-phase-2-content-publishing.md), [`docs/19-phase-3-learning-loop.md`](docs/19-phase-3-learning-loop.md), [`docs/20-phase-4-mastery-review.md`](docs/20-phase-4-mastery-review.md), [`docs/21-phase-5a-silent-exercise-engine.md`](docs/21-phase-5a-silent-exercise-engine.md), [`docs/22-phase-5b-exercise-explosion.md`](docs/22-phase-5b-exercise-explosion.md), [`docs/23-phase-5c-interview-drills.md`](docs/23-phase-5c-interview-drills.md), [`docs/24-phase-5d-full-curriculum.md`](docs/24-phase-5d-full-curriculum.md), and [`docs/25-phase-6-speech-pipeline.md`](docs/25-phase-6-speech-pipeline.md).
 
 ## Local development
 
@@ -110,6 +113,7 @@ After signing in:
 - open `/learn` for the complete 21-day structured course;
 - open `/practice` for unlimited ten-mode Silent Practice;
 - open `/drills` for silent-first interview-transfer drills;
+- open `/speak` for consent-gated recording, transcription, correction and speaking feedback;
 - open `/review` for due spaced-review work and the combined mastery map.
 
 ## End-to-end proof paths
@@ -160,6 +164,14 @@ Interview drills:
 ```text
 Version-controlled drill blueprint → immutable interview activity instance
 → choice/type/order answer → deterministic evaluation → interview-skill mastery → review
+```
+
+Speech:
+
+```text
+Browser MediaRecorder → private media adapter → durable SpeechAttempt + PlatformJob
+→ Redis signal → worker → provider-neutral transcription → immutable raw transcript
+→ learner correction → versioned text-level feedback → retry/new rep
 ```
 
 Mastery and review:
