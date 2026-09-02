@@ -4,10 +4,14 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.learning import ActivityInstance, Attempt, CourseDay, Enrollment, ReleaseActivity
+from app.models.learning import ActivityInstance, Attempt, CourseDay, ReleaseActivity
 from app.models.user import User
 from app.schemas.practice import PracticeActivityView, PracticeNextResponse
-from app.services.exercises import SILENT_EXERCISE_TYPES, UnsupportedExerciseError, materialize_exercise
+from app.services.exercises import (
+    SILENT_EXERCISE_TYPES,
+    UnsupportedExerciseError,
+    materialize_exercise,
+)
 from app.services.learning import ensure_starter_learning, get_active_enrollment
 
 
