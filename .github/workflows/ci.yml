@@ -78,3 +78,17 @@ jobs:
           npm run web:lint
           npm run web:typecheck
           npm run web:build
+      - name: Build deployment images
+        run: |
+          docker build -f apps/api/Dockerfile -t deutschdeploy21-api:ci .
+          docker build -f apps/web/Dockerfile -t deutschdeploy21-web:ci .
+      - name: Smoke packaged API import
+        run: |
+          docker run --rm \
+            -e APP_ENV=test \
+            -e APP_SECRET_KEY=test-secret-key-that-is-longer-than-thirty-two-characters \
+            -e DATABASE_URL=postgresql://build:build@localhost:5432/build \
+            -e REDIS_URL=redis://localhost:6379/0 \
+            -e WEB_ORIGIN=http://localhost:3000 \
+            deutschdeploy21-api:ci \
+            python -c "import app.main; print('packaged api import ok')"

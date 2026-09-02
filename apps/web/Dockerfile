@@ -1,3 +1,21 @@
+FROM python:3.14-slim AS api-contract
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_LINK_MODE=copy \
+    APP_ENV=test \
+    APP_SECRET_KEY=container-build-secret-key-longer-than-thirty-two-characters \
+    DATABASE_URL=postgresql://build:build@localhost:5432/build \
+    REDIS_URL=redis://localhost:6379/0 \
+    WEB_ORIGIN=http://localhost:3000
+
+COPY --from=ghcr.io/astral-sh/uv:0.10.0 /uv /uvx /bin/
+WORKDIR /app/apps/api
+COPY apps/api/pyproject.toml ./
+RUN uv sync --no-dev
+COPY apps/api/app ./app
+RUN uv run python -m app.scripts.export_openapi
+
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json ./
@@ -11,6 +29,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json ./
 COPY apps/web ./apps/web
 COPY packages ./packages
+COPY --from=api-contract /app/packages/api-contract/openapi.json ./packages/api-contract/openapi.json
+RUN npm --workspace apps/web run api:generate
 RUN npm --workspace apps/web run build
 
 FROM node:22-alpine AS runner
