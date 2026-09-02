@@ -51,7 +51,7 @@ docs/                   product, architecture, ADRs, delivery notes
 **Phase 2 — Content and publishing: merged and CI verified.**  
 **Phase 3 — Deterministic learning loop: merged and CI verified.**  
 **Phase 4 — Mastery and spaced review: merged and CI verified.**  
-**Phase 5A — Silent multi-exercise engine: implementation / CI verification.**
+**Phase 5A — Silent multi-exercise engine: implemented and CI verified.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
