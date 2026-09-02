@@ -56,7 +56,7 @@ docs/                   product, architecture, ADRs, delivery notes
 **Phase 5C — Interview drills: merged and CI verified.**  
 **Phase 5D — Full 21-day curriculum: merged and CI verified.**  
 **Phase 6 — Durable speech pipeline: merged and CI verified; production Railway provisioning remains an environment step.**  
-**Phase 7 — Mock interview and readiness: implementation / final CI verification.**
+**Phase 7 — Mock interview and readiness: implemented and CI verified on PR #10; merge pending.**
 
 The executable platform includes private authentication, PostgreSQL migrations, Redis-assisted durable jobs, a worker, health checks, same-origin web→API routing, PWA shell, OpenAPI-generated TypeScript contracts, Docker Compose, Railway configuration, and CI.
 
