@@ -43,6 +43,19 @@ type EngagementSummary = {
   timezone: string;
   badges: EngagementBadge[];
 };
+type OperationsSummary = {
+  status: "ok" | "attention";
+  queued_jobs: number;
+  running_jobs: number;
+  failed_jobs_24h: number;
+  succeeded_jobs_24h: number;
+  oldest_queued_seconds: number | null;
+  redis_queue_depth: number | null;
+  provider_invocations_24h: number;
+  provider_failures_24h: number;
+  estimated_provider_cost_microusd_24h: number;
+  alert_codes: string[];
+};
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -50,6 +63,7 @@ export default function DashboardPage() {
   const [job, setJob] = useState<Job | null>(null);
   const [review, setReview] = useState<ReviewSummary | null>(null);
   const [engagement, setEngagement] = useState<EngagementSummary | null>(null);
+  const [operations, setOperations] = useState<OperationsSummary | null>(null);
   const [running, setRunning] = useState(false);
   const [system, setSystem] = useState<"checking" | "ready" | "degraded">("checking");
 
@@ -60,6 +74,7 @@ export default function DashboardPage() {
       api.GET("/api/v1/health/ready"),
       api.GET("/api/v1/review/home"),
       api.GET("/api/v1/engagement/summary"),
+      api.GET("/api/v1/platform/operations"),
     ])
       .then(
         ([
@@ -67,6 +82,7 @@ export default function DashboardPage() {
           { data: health },
           { data: reviewData },
           { data: engagementData },
+          { data: operationsData },
         ]) => {
           if (cancelled) return;
           if (meResponse.status === 401) {
@@ -76,7 +92,12 @@ export default function DashboardPage() {
           if (me) setUser(me as User);
           if (reviewData) setReview(reviewData as ReviewSummary);
           if (engagementData) setEngagement(engagementData as EngagementSummary);
-          setSystem(health?.status === "ok" ? "ready" : "degraded");
+          if (operationsData) setOperations(operationsData as OperationsSummary);
+          setSystem(
+            health?.status === "ok" && operationsData?.status !== "attention"
+              ? "ready"
+              : "degraded",
+          );
         },
       )
       .catch(() => {
@@ -122,6 +143,9 @@ export default function DashboardPage() {
   }
 
   const earnedBadges = engagement?.badges.filter((badge) => badge.earned).length ?? 0;
+  const estimatedCostUsd = operations
+    ? (operations.estimated_provider_cost_microusd_24h / 1_000_000).toFixed(4)
+    : "0.0000";
 
   return (
     <main className="dashboard-shell">
@@ -277,12 +301,18 @@ export default function DashboardPage() {
 
           <article className="check-card">
             <div>
-              <span className="card-kicker">PLATFORM PROOF</span>
-              <h2>The durable worker path remains testable.</h2>
+              <span className="card-kicker">
+                OPERATIONS · {operations?.status === "attention" ? "ATTENTION" : "HEALTHY"}
+              </span>
+              <h2>Worker, queue and provider signals are visible.</h2>
               <p>
-                Browser → API → PostgreSQL → Redis → worker → PostgreSQL remains available as an
-                operational smoke test and also powers speech transcription.
+                {operations
+                  ? `${operations.queued_jobs} queued, ${operations.running_jobs} running, ${operations.failed_jobs_24h} worker failures and ${operations.provider_failures_24h} provider failures in the last 24h. Estimated provider cost: $${estimatedCostUsd}.`
+                  : "Loading queue, worker and provider telemetry…"}
               </p>
+              {operations?.alert_codes.length ? (
+                <p><code>{operations.alert_codes.join(" · ")}</code></p>
+              ) : null}
             </div>
             <button className="button" onClick={runWorkerCheck} disabled={running}>
               {running ? "Running…" : "Run platform check"}
