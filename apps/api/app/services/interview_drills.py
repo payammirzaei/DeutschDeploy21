@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.learning import ActivityInstance, Attempt, Enrollment
 from app.models.user import User
 from app.schemas.interview_drills import InterviewDrillActivityView, InterviewDrillNextResponse
-from app.services.learning import ensure_starter_learning, get_active_enrollment
 
 CONTRACT_VERSION = 1
 INTERVIEW_DRILL_TYPES = (
@@ -59,6 +58,10 @@ async def get_next_interview_drill(
     session: AsyncSession,
     user: User,
 ) -> InterviewDrillNextResponse:
+    # Local import keeps the exercise registry dependency one-way:
+    # learning -> registry -> interview_drills.
+    from app.services.learning import ensure_starter_learning, get_active_enrollment
+
     await ensure_starter_learning(session, user)
     enrollment = await get_active_enrollment(session, user.id)
     if enrollment is None:
