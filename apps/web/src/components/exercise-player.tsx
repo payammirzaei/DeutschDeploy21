@@ -98,17 +98,16 @@ export function ExercisePlayer({
     return (
       <div className={styles.player}>
         <ExerciseHeading prompt={prompt} />
-        <div className={styles.choices} role="radiogroup" aria-label="Answer choices">
+        <div className={styles.choices} role="group" aria-label="Answer choices">
           {choices.map((choice, index) => (
             <button
               key={choice.id}
               className={`${styles.choice} ${selectedChoice === choice.id ? styles.selected : ""}`}
               type="button"
-              role="radio"
-              aria-checked={selectedChoice === choice.id}
+              aria-pressed={selectedChoice === choice.id}
               onClick={() => setSelectedChoice(choice.id)}
             >
-              <span>{String.fromCharCode(65 + index)}</span>
+              <span aria-hidden="true">{String.fromCharCode(65 + index)}</span>
               <strong dir="auto">{choice.text}</strong>
             </button>
           ))}
@@ -133,6 +132,7 @@ export function ExercisePlayer({
         <label className={styles.inputLabel}>
           <span>German answer</span>
           <input
+            lang="de"
             autoCapitalize="none"
             autoComplete="off"
             autoCorrect="off"
@@ -154,7 +154,7 @@ export function ExercisePlayer({
     return (
       <div className={styles.player}>
         <ExerciseHeading prompt={prompt} />
-        <div className={styles.sentenceBoard} aria-label="Your answer order">
+        <div className={styles.sentenceBoard} role="group" aria-label="Your answer order">
           {orderedTokens.length ? (
             orderedTokens.map((token) => (
               <button
@@ -173,7 +173,7 @@ export function ExercisePlayer({
             <span>Tap the chunks below to build the answer.</span>
           )}
         </div>
-        <div className={styles.tokenBank} aria-label="Available answer chunks">
+        <div className={styles.tokenBank} role="group" aria-label="Available answer chunks">
           {availableTokens.map((token) => (
             <button
               key={token.id}
@@ -232,31 +232,34 @@ export function ExercisePlayer({
       <div className={styles.player}>
         <ExerciseHeading prompt={prompt} />
         <div className={styles.matchGrid}>
-          <div className={styles.matchColumn} aria-label="German verbs">
+          <div className={styles.matchColumn} role="group" aria-label="German verbs">
             {leftItems.map((item) => (
               <button
                 key={item.id}
                 type="button"
+                lang="de"
                 className={`${styles.matchItem} ${activeLeftId === item.id ? styles.matchActive : ""} ${matches[item.id] ? styles.matchDone : ""}`}
+                aria-pressed={activeLeftId === item.id}
                 onClick={() => (matches[item.id] ? removeMatch(item.id) : setActiveLeftId(item.id))}
               >
                 <strong>{item.text}</strong>
-                <span>{matches[item.id] ? "✓" : "DE"}</span>
+                <span aria-hidden="true">{matches[item.id] ? "✓" : "DE"}</span>
               </button>
             ))}
           </div>
-          <div className={styles.matchColumn} aria-label="Persian meanings">
+          <div className={styles.matchColumn} role="group" aria-label="Persian meanings">
             {rightItems.map((item) => (
               <button
                 key={item.id}
                 type="button"
+                lang="fa"
                 dir="rtl"
                 className={`${styles.matchItem} ${usedRightIds.has(item.id) ? styles.matchDone : ""}`}
                 disabled={usedRightIds.has(item.id)}
                 onClick={() => selectRight(item.id)}
               >
                 <strong>{item.text}</strong>
-                <span>FA</span>
+                <span aria-hidden="true">FA</span>
               </button>
             ))}
           </div>
