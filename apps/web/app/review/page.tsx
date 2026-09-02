@@ -57,6 +57,13 @@ const reasonCopy: Record<string, string> = {
   mastery_maintenance: "Long-term maintenance review.",
 };
 
+const stateRank: Record<string, number> = {
+  review: 0,
+  learning: 1,
+  stable: 2,
+  mastered: 3,
+};
+
 export default function ReviewPage() {
   const router = useRouter();
   const [home, setHome] = useState<ReviewHome | null>(null);
@@ -117,10 +124,11 @@ export default function ReviewPage() {
 
   const sortedMastery = useMemo(
     () =>
-      [...(home?.mastery ?? [])].sort((a, b) => {
-        const rank = (state: string) => ({ review: 0, learning: 1, stable: 2, mastered: 3 }[state] ?? 4);
-        return rank(a.state) - rank(b.state) || a.lemma.localeCompare(b.lemma, "de");
-      }),
+      [...(home?.mastery ?? [])].sort(
+        (a, b) =>
+          (stateRank[a.state] ?? 4) - (stateRank[b.state] ?? 4) ||
+          a.lemma.localeCompare(b.lemma, "de"),
+      ),
     [home],
   );
 
@@ -157,13 +165,19 @@ export default function ReviewPage() {
   }
 
   if (loading) {
-    return <main className={styles.shell}><p className={styles.loading}>Building your review queue…</p></main>;
+    return (
+      <main className={styles.shell}>
+        <p className={styles.loading}>Building your review queue…</p>
+      </main>
+    );
   }
 
   return (
     <main className={styles.shell}>
       <header className={styles.header}>
-        <Link href="/dashboard" className="brand">DD<span>21</span></Link>
+        <Link href="/dashboard" className="brand">
+          DD<span>21</span>
+        </Link>
         <nav>
           <Link href="/learn" className="text-link">Learn</Link>
           <Link href="/catalog" className="text-link">Catalog</Link>
@@ -233,7 +247,11 @@ export default function ReviewPage() {
                   : "This target stays in review with a shorter interval and higher priority."}
               </p>
               <div className={styles.score}><strong>{result.score}</strong><span>/ 100</span></div>
-              <button className="button button-accent" onClick={continueReview} disabled={submitting}>
+              <button
+                className="button button-accent"
+                onClick={continueReview}
+                disabled={submitting}
+              >
                 {submitting ? "Loading…" : "Next review"}
               </button>
             </article>
@@ -272,7 +290,9 @@ export default function ReviewPage() {
               </article>
             ))}
             {!sortedMastery.length ? (
-              <p className={styles.emptyMastery}>Your first submitted answer will create the first mastery target.</p>
+              <p className={styles.emptyMastery}>
+                Your first submitted answer will create the first mastery target.
+              </p>
             ) : null}
           </div>
         </aside>
