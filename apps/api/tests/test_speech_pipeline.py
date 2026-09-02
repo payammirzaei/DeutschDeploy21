@@ -33,6 +33,13 @@ def test_speech_attempt_survives_async_transcription_and_correction() -> None:
     with TestClient(app) as client:
         _login(client)
 
+        reset_consent = client.post(
+            "/api/v1/speech/consent",
+            json={"accepted": False},
+        )
+        assert reset_consent.status_code == 200
+        assert reset_consent.json()["accepted"] is False
+
         consent = client.get("/api/v1/speech/consent")
         assert consent.status_code == 200
         assert consent.json()["accepted"] is False
