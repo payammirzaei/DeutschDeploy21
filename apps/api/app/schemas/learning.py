@@ -33,7 +33,7 @@ class LearningHome(BaseModel):
     enrollment_id: UUID | None = None
     course_title: str | None = None
     release_version: int | None = None
-    latest_release_version: int = 2
+    latest_release_version: int = 3
     upgrade_available: bool = False
     current_day: int = 1
     available_through_day: int = 21
