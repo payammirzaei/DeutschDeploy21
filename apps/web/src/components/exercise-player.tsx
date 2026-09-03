@@ -106,6 +106,7 @@ const COPY = {
     practice: "Practice",
     context: "German in context",
     meaning: "Meaning",
+    language: "Instruction language",
   },
   fa: {
     check: "بررسی جواب",
@@ -120,6 +121,7 @@ const COPY = {
     practice: "تمرین",
     context: "آلمانی در متن واقعی",
     meaning: "معنی",
+    language: "زبان توضیحات",
   },
 } as const;
 
@@ -136,11 +138,12 @@ function choiceText(choice: Choice | MatchItem, locale: ExerciseLocale) {
 export function ExercisePlayer({
   exerciseType,
   prompt,
-  locale = "en",
+  locale: initialLocale = "en",
   submitting = false,
   submitLabel,
   onSubmit,
 }: Props) {
+  const [locale, setLocale] = useState<ExerciseLocale>(initialLocale);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [orderedTokenIds, setOrderedTokenIds] = useState<string[]>([]);
@@ -166,12 +169,34 @@ export function ExercisePlayer({
     await onSubmit({ text: value });
   }
 
+  const languageSwitch = (
+    <div className={styles.languageSwitch} role="group" aria-label={copy.language}>
+      <button
+        type="button"
+        className={locale === "en" ? styles.languageActive : ""}
+        aria-pressed={locale === "en"}
+        onClick={() => setLocale("en")}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        className={locale === "fa" ? styles.languageActive : ""}
+        aria-pressed={locale === "fa"}
+        onClick={() => setLocale("fa")}
+      >
+        فارسی
+      </button>
+    </div>
+  );
+
   const lesson = <LearningContext exerciseType={exerciseType} prompt={prompt} locale={locale} />;
 
   if (choiceTypes.has(exerciseType)) {
     const choices = prompt.choices ?? [];
     return (
       <div className={styles.player}>
+        {languageSwitch}
         {lesson}
         <ExerciseHeading prompt={prompt} locale={locale} />
         <div className={styles.choices} role="group" aria-label="Answer choices">
@@ -205,6 +230,7 @@ export function ExercisePlayer({
     const placeholder = localize(prompt.placeholder_i18n, locale) ?? prompt.placeholder ?? copy.typeAnswer;
     return (
       <form className={styles.player} onSubmit={submitText}>
+        {languageSwitch}
         {lesson}
         <ExerciseHeading prompt={prompt} locale={locale} />
         {clue ? <div className={styles.clue} dir={locale === "fa" ? "rtl" : "auto"}>{clue}</div> : null}
@@ -234,6 +260,7 @@ export function ExercisePlayer({
     const hint = localize(prompt.tap_hint_i18n, locale) ?? prompt.tap_hint;
     return (
       <div className={styles.player}>
+        {languageSwitch}
         {lesson}
         <ExerciseHeading prompt={prompt} locale={locale} />
         <div className={styles.sentenceBoard} role="group" aria-label="Your answer order" lang="de" dir="ltr">
@@ -313,6 +340,7 @@ export function ExercisePlayer({
 
     return (
       <div className={styles.player}>
+        {languageSwitch}
         {lesson}
         <ExerciseHeading prompt={prompt} locale={locale} />
         <div className={styles.matchGrid}>
@@ -380,6 +408,7 @@ export function ExercisePlayer({
 
   return (
     <div className={styles.player}>
+      {languageSwitch}
       {lesson}
       <ExerciseHeading prompt={prompt} locale={locale} />
       <p className={styles.unsupported}>{copy.unsupported}</p>
