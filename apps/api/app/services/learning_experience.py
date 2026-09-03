@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.content import ContentVersion, VerbVersion, VersionExample, VersionLocalization
+from app.models.content import ContentVersion, VersionExample, VersionLocalization
 from app.models.learning import ActivityInstance, CourseDay, CourseRelease, ReleaseActivity
 
 PROMPT_CONTRACT_VERSION = 2
@@ -98,44 +98,104 @@ GOAL_I18N: dict[str, dict[str, str]] = {
 
 EXPLANATION_I18N: dict[str, dict[str, str]] = {
     "meaning_multiple_choice": {
-        "en": "Read the German example first. Use the situation and surrounding words before looking at the answer choices.",
-        "fa": "اول مثال آلمانی را بخوان. قبل از نگاه‌کردن به گزینه‌ها از موقعیت و کلمات اطراف کمک بگیر.",
+        "en": (
+            "Read the German example first. Use the situation and surrounding "
+            "words before looking at the answer choices."
+        ),
+        "fa": (
+            "اول مثال آلمانی را بخوان. قبل از نگاه‌کردن به گزینه‌ها از موقعیت "
+            "و کلمات اطراف کمک بگیر."
+        ),
     },
     "reverse_typing": {
-        "en": "Try to say the German verb in your head before typing. Active recall is harder than recognition and builds stronger memory.",
-        "fa": "قبل از تایپ، فعل آلمانی را در ذهنت بگو. یادآوری فعال سخت‌تر از شناختن است و حافظه را قوی‌تر می‌کند.",
+        "en": (
+            "Try to say the German verb in your head before typing. Active recall "
+            "is harder than recognition and builds stronger memory."
+        ),
+        "fa": (
+            "قبل از تایپ، فعل آلمانی را در ذهنت بگو. یادآوری فعال سخت‌تر از "
+            "شناختن است و حافظه را قوی‌تر می‌کند."
+        ),
     },
     "perfect_participle_choice": {
-        "en": "Perfekt normally combines haben or sein with Partizip II. Learn the participle together with the infinitive.",
-        "fa": "Perfekt معمولاً از haben یا sein همراه Partizip II ساخته می‌شود. Partizip II را همراه خود فعل یاد بگیر.",
+        "en": (
+            "Perfekt normally combines haben or sein with Partizip II. Learn the "
+            "participle together with the infinitive."
+        ),
+        "fa": (
+            "Perfekt معمولاً از haben یا sein همراه Partizip II ساخته می‌شود. "
+            "Partizip II را همراه خود فعل یاد بگیر."
+        ),
     },
     "auxiliary_choice": {
-        "en": "Treat the auxiliary as part of the verb's past-tense pattern. Most verbs use haben; movement/change-of-state verbs often use sein.",
-        "fa": "فعل کمکی را بخشی از الگوی گذشته‌ی فعل بدان. بیشتر فعل‌ها haben می‌گیرند و بسیاری از فعل‌های حرکت/تغییر حالت sein.",
+        "en": (
+            "Treat the auxiliary as part of the verb's past-tense pattern. Most "
+            "verbs use haben; movement/change-of-state verbs often use sein."
+        ),
+        "fa": (
+            "فعل کمکی را بخشی از الگوی گذشته‌ی فعل بدان. بیشتر فعل‌ها haben "
+            "می‌گیرند و بسیاری از فعل‌های حرکت/تغییر حالت sein."
+        ),
     },
     "sentence_order": {
-        "en": "Build meaning first, then notice verb position. With modal verbs such as können, the infinitive commonly moves to the end.",
-        "fa": "اول معنی جمله را بساز و بعد جای فعل را ببین. با افعال مدال مثل können، مصدر معمولاً به انتهای جمله می‌رود.",
+        "en": (
+            "Build meaning first, then notice verb position. With modal verbs such "
+            "as können, the infinitive commonly moves to the end."
+        ),
+        "fa": (
+            "اول معنی جمله را بساز و بعد جای فعل را ببین. با افعال مدال مثل "
+            "können، مصدر معمولاً به انتهای جمله می‌رود."
+        ),
     },
     "meaning_matching": {
-        "en": "Match quickly, then read each German verb once more without the translation. The second pass is the memory step.",
-        "fa": "سریع وصل کن، بعد هر فعل آلمانی را یک بار دیگر بدون نگاه به ترجمه بخوان. مرور دوم بخش حافظه‌سازی است.",
+        "en": (
+            "Match quickly, then read each German verb once more without the "
+            "translation. The second pass is the memory step."
+        ),
+        "fa": (
+            "سریع وصل کن، بعد هر فعل آلمانی را یک بار دیگر بدون نگاه به ترجمه "
+            "بخوان. مرور دوم بخش حافظه‌سازی است."
+        ),
     },
     "example_cloze": {
-        "en": "Use the whole sentence as a retrieval cue. Ask yourself what action makes the sentence logical before recalling the exact German word.",
-        "fa": "از کل جمله به‌عنوان سرنخ استفاده کن. اول ببین چه عملی جمله را منطقی می‌کند، بعد کلمه‌ی دقیق آلمانی را به یاد بیاور.",
+        "en": (
+            "Use the whole sentence as a retrieval cue. Ask yourself what action "
+            "makes the sentence logical before recalling the exact German word."
+        ),
+        "fa": (
+            "از کل جمله به‌عنوان سرنخ استفاده کن. اول ببین چه عملی جمله را منطقی "
+            "می‌کند، بعد کلمه‌ی دقیق آلمانی را به یاد بیاور."
+        ),
     },
     "usage_error_spotting": {
-        "en": "Compare structure, not just vocabulary. Look at where the infinitive or participle belongs and whether an extra zu changes the construction.",
-        "fa": "ساختار را مقایسه کن، نه فقط لغت را. جای مصدر یا Partizip را ببین و دقت کن اضافه‌شدن zu ساختار را عوض می‌کند یا نه.",
+        "en": (
+            "Compare structure, not just vocabulary. Look at where the infinitive "
+            "or participle belongs and whether an extra zu changes the construction."
+        ),
+        "fa": (
+            "ساختار را مقایسه کن، نه فقط لغت را. جای مصدر یا Partizip را ببین و "
+            "دقت کن اضافه‌شدن zu ساختار را عوض می‌کند یا نه."
+        ),
     },
     "perfect_form_typing": {
-        "en": "Produce both pieces together. This makes the form easier to retrieve later when you describe completed work in an interview.",
-        "fa": "هر دو بخش را با هم تولید کن. این کار کمک می‌کند بعداً هنگام توضیح کارهای انجام‌شده در مصاحبه فرم را سریع‌تر به یاد بیاوری.",
+        "en": (
+            "Produce both pieces together. This makes the form easier to retrieve "
+            "later when you describe completed work in an interview."
+        ),
+        "fa": (
+            "هر دو بخش را با هم تولید کن. این کار کمک می‌کند بعداً هنگام توضیح "
+            "کارهای انجام‌شده در مصاحبه فرم را سریع‌تر به یاد بیاوری."
+        ),
     },
     "phrase_builder": {
-        "en": "Think in chunks such as subject + modal, object, and action. Chunking is closer to fluent speech than translating each word separately.",
-        "fa": "جمله را به تکه‌هایی مثل فاعل + فعل مدال، مفعول و عمل تقسیم کن. یادگیری تکه‌ای به گفتار روان نزدیک‌تر از ترجمه‌ی تک‌تک کلمات است.",
+        "en": (
+            "Think in chunks such as subject + modal, object, and action. Chunking "
+            "is closer to fluent speech than translating each word separately."
+        ),
+        "fa": (
+            "جمله را به تکه‌هایی مثل فاعل + فعل مدال، مفعول و عمل تقسیم کن. "
+            "یادگیری تکه‌ای به گفتار روان نزدیک‌تر از ترجمه‌ی تک‌تک کلمات است."
+        ),
     },
 }
 
@@ -155,8 +215,7 @@ async def enrich_learning_instance(
         return instance
 
     version = await session.get(ContentVersion, activity.content_version_id)
-    verb = await session.get(VerbVersion, activity.content_version_id)
-    if version is None or verb is None:
+    if version is None:
         return instance
 
     example = await session.scalar(
@@ -193,8 +252,6 @@ async def enrich_learning_instance(
         },
         "grammar": {
             "cefr": version.cefr,
-            "auxiliary": verb.perfect_auxiliary,
-            "participle_ii": verb.participle_ii,
         },
     }
 
@@ -341,8 +398,12 @@ def _placeholder_i18n(exercise_type: str) -> dict[str, str] | None:
 def _tap_hint_i18n(exercise_type: str) -> dict[str, str] | None:
     if exercise_type in {"sentence_order", "phrase_builder"}:
         return {
-            "en": "Tap the chunks in order. Tap an answer chunk again to remove it.",
-            "fa": "تکه‌ها را به‌ترتیب لمس کن؛ برای حذف، دوباره روی تکه‌ی انتخاب‌شده بزن.",
+            "en": (
+                "Tap the chunks in order. Tap an answer chunk again to remove it."
+            ),
+            "fa": (
+                "تکه‌ها را به‌ترتیب لمس کن؛ برای حذف، دوباره روی تکه‌ی انتخاب‌شده بزن."
+            ),
         }
     if exercise_type == "meaning_matching":
         return {
