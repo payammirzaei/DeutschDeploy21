@@ -1,0 +1,178 @@
+.journey {
+  width: min(100%, 820px);
+  margin: 0 auto 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 94%, var(--paper));
+  padding: 16px;
+}
+
+.summary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 2px 14px;
+}
+
+.summary > div {
+  display: grid;
+  gap: 3px;
+}
+
+.kicker {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .14em;
+}
+
+.summary strong {
+  font-size: 20px;
+  letter-spacing: -.035em;
+}
+
+.summary small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.counter {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--paper-2);
+  padding: 7px 10px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.step {
+  position: relative;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 9px 8px;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 7px;
+  align-items: center;
+  color: var(--muted);
+}
+
+.marker {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--paper-2);
+  font: 800 9px/1 monospace;
+}
+
+.stepCopy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.stepCopy strong {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stepCopy small {
+  display: none;
+}
+
+.done {
+  color: var(--success);
+}
+
+.done .marker {
+  background: color-mix(in srgb, var(--success) 12%, var(--surface));
+  color: var(--success);
+}
+
+.active {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.active .marker {
+  background: var(--accent);
+  color: white;
+}
+
+.upcoming {
+  opacity: .62;
+}
+
+@media (min-width: 1100px) {
+  .stepCopy small {
+    overflow: hidden;
+    display: block;
+    color: var(--muted);
+    font-size: 8px;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 760px) {
+  .journey {
+    margin-bottom: 14px;
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    padding: 14px;
+  }
+
+  .summary {
+    align-items: center;
+  }
+
+  .summary small {
+    font-size: 11px;
+  }
+
+  .steps {
+    overflow-x: auto;
+    grid-template-columns: repeat(6, 94px);
+    padding-bottom: 3px;
+    scrollbar-width: none;
+  }
+
+  .steps::-webkit-scrollbar {
+    display: none;
+  }
+
+  .step {
+    grid-template-columns: 24px 1fr;
+    padding: 8px 7px;
+  }
+
+  .marker {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  .counter {
+    display: none;
+  }
+}
