@@ -9,6 +9,7 @@ import {
   ExercisePlayer,
   ExercisePrompt,
 } from "@/src/components/exercise-player";
+import { LearningFeedback } from "@/src/components/learning-feedback";
 import { api } from "@/src/lib/api";
 import {
   ATTEMPT_SYNCED_EVENT,
@@ -96,6 +97,7 @@ export default function LearnPage() {
   const [activeDay, setActiveDay] = useState(1);
   const [activity, setActivity] = useState<Activity | null>(null);
   const [result, setResult] = useState<AttemptResult | null>(null);
+  const [lastAnswer, setLastAnswer] = useState<ExerciseAnswer | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
@@ -231,6 +233,7 @@ export default function LearnPage() {
     setError(null);
     setActivity(null);
     setResult(null);
+    setLastAnswer(null);
     setQueued(false);
 
     const { data, response } = await api.POST(
@@ -257,6 +260,7 @@ export default function LearnPage() {
     setActiveDay(dayNumber);
     setActivity(null);
     setResult(null);
+    setLastAnswer(null);
     setQueued(false);
     setError(null);
 
@@ -287,6 +291,7 @@ export default function LearnPage() {
   async function submitAnswer(answer: ExerciseAnswer) {
     if (!activity || submitting || queued) return;
     setSubmitting(true);
+    setLastAnswer(answer);
     setError(null);
 
     const durationMs = startedAt
@@ -321,6 +326,7 @@ export default function LearnPage() {
       : activeDay;
     setActivity(null);
     setResult(null);
+    setLastAnswer(null);
     setQueued(false);
 
     if (nextDay > home.available_through_day) {
@@ -457,6 +463,7 @@ export default function LearnPage() {
                     setActiveDay(day.day_number);
                     setActivity(null);
                     setResult(null);
+                    setLastAnswer(null);
                     setQueued(false);
                   }}
                 >
@@ -567,42 +574,20 @@ export default function LearnPage() {
               </section>
             ) : null}
 
-            {result ? (
-              <section
-                className={`${styles.feedback} ${
-                  result.correct ? styles.correct : styles.incorrect
-                }`}
-                aria-live="polite"
-              >
-                <span className="card-kicker">
-                  {result.correct ? "CORRECT" : "REVIEW LATER"}
-                </span>
-                <h2>
-                  {result.correct
-                    ? "Genau. Keep the structure."
-                    : "Not this time — keep moving."}
-                </h2>
-                <p>
-                  {result.correct
-                    ? "This attempt is stored as positive evidence for the exact learning target you practiced."
-                    : "The attempt is preserved instead of overwritten and will influence your focused review schedule."}
-                </p>
-                <div className={styles.scoreRow}>
-                  <strong>{result.score}</strong>
-                  <span>deterministic score</span>
-                  <code>{result.feedback_code}</code>
-                </div>
-                <button
-                  className="button button-accent"
-                  onClick={continueLearning}
-                >
-                  {result.day_complete
-                    ? result.next_day > home.available_through_day
-                      ? "Finish course"
-                      : "Continue to next day"
-                    : "Next activity"}
-                </button>
-              </section>
+            {result && activity ? (
+              <LearningFeedback
+                exerciseType={activity.exercise_type}
+                prompt={activity.prompt}
+                fallbackLemma={activity.lemma}
+                answer={lastAnswer}
+                correct={result.correct}
+                score={result.score}
+                feedbackCode={result.feedback_code}
+                dayComplete={result.day_complete}
+                nextDay={result.next_day}
+                availableThroughDay={home.available_through_day}
+                onContinue={continueLearning}
+              />
             ) : null}
           </div>
         </section>
