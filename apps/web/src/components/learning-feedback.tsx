@@ -23,6 +23,7 @@ type Props = {
   dayComplete: boolean;
   nextDay: number;
   availableThroughDay: number;
+  continueLabelI18n?: LocalizedText;
   onContinue: () => void | Promise<void>;
 };
 
@@ -168,6 +169,7 @@ export function LearningFeedback({
   dayComplete,
   nextDay,
   availableThroughDay,
+  continueLabelI18n,
   onContinue,
 }: Props) {
   const [locale, setLocale] = useState<Locale>("en");
@@ -180,11 +182,14 @@ export function LearningFeedback({
     [answer, locale, prompt],
   );
   const reveal = correctReveal(exerciseType, prompt, fallbackLemma, locale);
-  const nextLabel = dayComplete
-    ? nextDay > availableThroughDay
-      ? copy.finish
-      : copy.nextDay
-    : copy.nextActivity;
+  const customNextLabel = localize(continueLabelI18n, locale);
+  const nextLabel = customNextLabel ?? (
+    dayComplete
+      ? nextDay > availableThroughDay
+        ? copy.finish
+        : copy.nextDay
+      : copy.nextActivity
+  );
 
   return (
     <section
