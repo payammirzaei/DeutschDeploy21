@@ -102,6 +102,10 @@ def test_silent_practice_rotates_types_without_completing_course_days() -> None:
             activity = body["activity"]
             seen_types.append(activity["exercise_type"])
             assert set(body["available_types"]) == EXPECTED_TYPES
+            assert body["strategy"] == "explore_mix"
+            assert body["selection_reason_code"] == "fresh_family"
+            assert body["interaction_mode"] in {"tap", "keyboard"}
+            assert body["mastery_state"] == "new"
 
             attempt = client.post(
                 f"/api/v1/learning/instances/{activity['id']}/attempts",
@@ -112,6 +116,20 @@ def test_silent_practice_rotates_types_without_completing_course_days() -> None:
             assert attempt.json()["day_complete"] is False
 
         assert set(seen_types) == EXPECTED_TYPES
+
+        adaptive_response = client.post("/api/v1/practice/silent/next")
+        assert adaptive_response.status_code == 200
+        adaptive = adaptive_response.json()
+        assert adaptive["strategy"] == "adaptive_weakness"
+        assert adaptive["selection_reason_code"] in {
+            "recent_miss",
+            "weak_skill",
+            "build_evidence",
+            "maintain_strength",
+            "mastery_refresh",
+        }
+        assert adaptive["mastery_state"] == "review"
+        assert adaptive["interaction_mode"] in {"tap", "keyboard"}
 
         after_response = client.get("/api/v1/learning/home")
         assert after_response.status_code == 200

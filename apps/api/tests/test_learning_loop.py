@@ -102,14 +102,15 @@ def test_start_release_pins_133_activities_and_attempt_is_idempotent() -> None:
 
         start = client.post("/api/v1/learning/start")
         assert start.status_code == 200
-        assert start.json()["release_version"] == 2
+        assert start.json()["release_version"] == 3
         assert start.json()["pinned_activity_count"] == 133
 
         home = client.get("/api/v1/learning/home")
         assert home.status_code == 200
         body = home.json()
         assert body["enrolled"] is True
-        assert body["release_version"] == 2
+        assert body["release_version"] == 3
+        assert body["latest_release_version"] == 3
         assert body["available_through_day"] == 21
         assert len(body["days"]) == 21
         assert [day["total_count"] for day in body["days"]] == [
@@ -117,6 +118,7 @@ def test_start_release_pins_133_activities_and_attempt_is_idempotent() -> None:
             *([5] * 7),
         ]
         assert sum(day["total_count"] for day in body["days"]) == 133
+        assert len({activity["exercise_type"] for activity in body["days"][0]["activities"]}) > 1
 
         day_number, activity = _next_unfinished(client)
         assert activity["day_number"] == day_number
@@ -125,6 +127,11 @@ def test_start_release_pins_133_activities_and_attempt_is_idempotent() -> None:
             "release_activity",
             "interview_drill",
         }
+        if activity["source_kind"] == "release_activity":
+            assert activity["contract_version"] == 2
+            assert activity["prompt"]["question_i18n"]["en"]
+            assert activity["prompt"]["question_i18n"]["fa"]
+            assert activity["prompt"]["lesson"]["example_de"]
 
         key = f"learning-{uuid4()}"
         payload = _answer_for(activity)

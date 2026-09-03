@@ -9,6 +9,7 @@ import {
   ExercisePlayer,
   ExercisePrompt,
 } from "@/src/components/exercise-player";
+import { LearningFeedback } from "@/src/components/learning-feedback";
 import { api } from "@/src/lib/api";
 import {
   ATTEMPT_SYNCED_EVENT,
@@ -16,12 +17,20 @@ import {
   learningAttemptUrl,
   submitLearningAttemptSafely,
 } from "@/src/lib/offline-attempts";
+import {
+  relativeDueLabel,
+  reviewSessionProgress,
+  reviewUrgency,
+  sortDueQueue,
+  sortMasteryTargets,
+} from "@/src/lib/review-intelligence";
 
 import styles from "./review.module.css";
 
 type MasteryTarget = {
   target_id: string;
-  content_version_id: string;
+  target_kind: string;
+  content_version_id: string | null;
   lemma: string;
   skill_dimension: string;
   state: string;
@@ -34,18 +43,35 @@ type MasteryTarget = {
   next_review_at: string;
   explanation_code: string;
 };
+
+type ReviewQueueItem = {
+  target_id: string;
+  target_kind: string;
+  activity_instance_id: string;
+  content_version_id: string | null;
+  lemma: string;
+  due_at: string;
+  overdue: boolean;
+  priority: number;
+  reason_code: string;
+  state: string;
+};
+
 type ReviewHome = {
   due_count: number;
   scheduled_count: number;
   weak_count: number;
   mastered_count: number;
   next_due_at: string | null;
+  due: ReviewQueueItem[];
   mastery: MasteryTarget[];
 };
+
 type ReviewActivity = {
   target_id: string;
+  target_kind: string;
   activity_instance_id: string;
-  content_version_id: string;
+  content_version_id: string | null;
   exercise_type: string;
   contract_version: number;
   prompt_checksum: string;
@@ -56,37 +82,62 @@ type ReviewActivity = {
   due_at: string;
   state: string;
 };
+
 type AttemptResult = {
+  attempt_id: string;
+  evaluation_id: string;
   correct: boolean;
   score: number;
   feedback_code: string;
 };
 
-const reasonCopy: Record<string, string> = {
-  recent_failure: "You missed this recently, so it gets priority.",
-  first_success: "First success. We will check whether it sticks.",
-  building_recall: "Recall is improving; the interval is expanding.",
-  stable_recall: "This looks stable, but still needs maintenance.",
-  mastery_maintenance: "Long-term maintenance review.",
+type MasteryFilter = "weak" | "all" | "mastered";
+
+const reasonCopy: Record<string, { title: string; body: string }> = {
+  recent_failure: {
+    title: "Fresh miss",
+    body: "You missed this recently, so the scheduler shortened the interval and moved it to the front.",
+  },
+  first_success: {
+    title: "Check the first memory",
+    body: "One correct answer is not mastery yet. This review checks whether the pattern survived the first gap.",
+  },
+  building_recall: {
+    title: "Build the interval",
+    body: "Recall is improving. Another clean retrieval lets the scheduler expand the gap again.",
+  },
+  stable_recall: {
+    title: "Maintenance check",
+    body: "This target looks stable. A quick retrieval protects it from fading without over-practicing it.",
+  },
+  mastery_maintenance: {
+    title: "Long-term maintenance",
+    body: "This is already strong. It only comes back occasionally to keep the memory durable.",
+  },
 };
 
-const stateRank: Record<string, number> = {
-  review: 0,
-  learning: 1,
-  stable: 2,
-  mastered: 3,
-};
+const urgencyCopy = {
+  critical: "Fix now",
+  high: "High priority",
+  due: "Due review",
+} as const;
 
 export default function ReviewPage() {
   const router = useRouter();
   const [home, setHome] = useState<ReviewHome | null>(null);
   const [activity, setActivity] = useState<ReviewActivity | null>(null);
   const [result, setResult] = useState<AttemptResult | null>(null);
+  const [lastAnswer, setLastAnswer] = useState<ExerciseAnswer | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [queued, setQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionStartDue, setSessionStartDue] = useState<number | null>(null);
+  const [sessionCorrect, setSessionCorrect] = useState(0);
+  const [sessionMissed, setSessionMissed] = useState(0);
+  const [masteryFilter, setMasteryFilter] = useState<MasteryFilter>("weak");
   const startedAt = useRef<number | null>(null);
+  const recordedEvaluations = useRef(new Set<string>());
 
   const loadHome = useCallback(async () => {
     const { data, response } = await api.GET("/api/v1/review/home");
@@ -114,18 +165,32 @@ export default function ReviewPage() {
       setError("The next review could not be prepared.");
       return;
     }
-    const body = data as { completed: boolean; activity: ReviewActivity | null };
+    const body = data as {
+      completed: boolean;
+      activity: ReviewActivity | null;
+    };
     setActivity(body.activity);
     setResult(null);
+    setLastAnswer(null);
     setQueued(false);
-    startedAt.current = Date.now();
+    startedAt.current = body.activity ? Date.now() : null;
   }, [router]);
+
+  const recordResult = useCallback((next: AttemptResult) => {
+    if (!recordedEvaluations.current.has(next.evaluation_id)) {
+      recordedEvaluations.current.add(next.evaluation_id);
+      if (next.correct) setSessionCorrect((value) => value + 1);
+      else setSessionMissed((value) => value + 1);
+    }
+    setResult(next);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       const nextHome = await loadHome();
       if (cancelled) return;
+      setSessionStartDue(nextHome?.due_count ?? 0);
       if (nextHome?.due_count) await loadNext();
       if (!cancelled) setLoading(false);
     }
@@ -141,7 +206,7 @@ export default function ReviewPage() {
     const onSynced = (event: Event) => {
       const detail = (event as CustomEvent<AttemptSyncDetail<AttemptResult>>).detail;
       if (detail.url !== expectedUrl) return;
-      setResult(detail.data);
+      recordResult(detail.data);
       setQueued(false);
       setSubmitting(false);
       setError(null);
@@ -149,21 +214,39 @@ export default function ReviewPage() {
     };
     window.addEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
     return () => window.removeEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
-  }, [activity, loadHome]);
+  }, [activity, loadHome, recordResult]);
 
+  const sortedDue = useMemo(() => sortDueQueue(home?.due ?? []), [home]);
   const sortedMastery = useMemo(
-    () =>
-      [...(home?.mastery ?? [])].sort(
-        (a, b) =>
-          (stateRank[a.state] ?? 4) - (stateRank[b.state] ?? 4) ||
-          a.lemma.localeCompare(b.lemma, "de"),
-      ),
+    () => sortMasteryTargets(home?.mastery ?? []),
     [home],
   );
+  const visibleMastery = useMemo(() => {
+    if (masteryFilter === "weak") {
+      return sortedMastery.filter((target) =>
+        ["review", "learning"].includes(target.state),
+      );
+    }
+    if (masteryFilter === "mastered") {
+      return sortedMastery.filter((target) => target.state === "mastered");
+    }
+    return sortedMastery;
+  }, [masteryFilter, sortedMastery]);
+  const sessionProgress = reviewSessionProgress(
+    sessionStartDue ?? home?.due_count ?? 0,
+    home?.due_count ?? 0,
+  );
+  const activeReason = activity
+    ? reasonCopy[activity.reason_code] ?? {
+        title: "Scheduled review",
+        body: "This target is due from your learning evidence and current memory interval.",
+      }
+    : null;
 
   async function submit(answer: ExerciseAnswer) {
     if (!activity || submitting || queued) return;
     setSubmitting(true);
+    setLastAnswer(answer);
     setError(null);
     const duration = startedAt.current === null
       ? 0
@@ -182,12 +265,13 @@ export default function ReviewPage() {
       setSubmitting(false);
       return;
     }
-    setResult(submission.data);
+    recordResult(submission.data);
     await loadHome();
     setSubmitting(false);
   }
 
   async function continueReview() {
+    if (submitting) return;
     setSubmitting(true);
     await loadNext();
     await loadHome();
@@ -197,7 +281,7 @@ export default function ReviewPage() {
   if (loading) {
     return (
       <main className={styles.shell}>
-        <p className={styles.loading}>Building your review queue…</p>
+        <p className={styles.loading}>Building your smart review queue…</p>
       </main>
     );
   }
@@ -216,33 +300,84 @@ export default function ReviewPage() {
 
       <section className={styles.hero}>
         <div>
-          <span className="eyebrow">PHASE 4 · MASTERY & SPACED REVIEW</span>
-          <h1>Remember it<br />when it matters.</h1>
+          <span className="eyebrow">SMART REVIEW · SPACED PRACTICE</span>
+          <h1>Practice what<br />is about to fade.</h1>
           <p>
-            Completion gets you forward. Mastery decides what comes back. Every review has a due
-            time, a reason, and a durable evidence trail.
+            Weak targets return sooner. Stable targets wait longer. Every card has a reason,
+            a due time, and evidence from your own answers.
           </p>
         </div>
         <div className={styles.stats}>
           <div><strong>{home?.due_count ?? 0}</strong><span>due now</span></div>
-          <div><strong>{home?.weak_count ?? 0}</strong><span>learning / review</span></div>
+          <div><strong>{home?.weak_count ?? 0}</strong><span>weak targets</span></div>
           <div><strong>{home?.mastered_count ?? 0}</strong><span>mastered</span></div>
         </div>
       </section>
 
-      {error ? <p className={styles.error}>{error}</p> : null}
+      {error ? <p className={styles.error} role="alert">{error}</p> : null}
+
+      <section className={styles.sessionBar} aria-label="Review session progress">
+        <div>
+          <span>THIS SESSION</span>
+          <strong>{sessionProgress.completed} reviewed</strong>
+          <small>{sessionCorrect} correct · {sessionMissed} missed</small>
+        </div>
+        <div className={styles.sessionTrack} aria-hidden="true">
+          <div style={{ width: `${sessionProgress.percent}%` }} />
+        </div>
+        <span>{sessionProgress.percent}%</span>
+      </section>
 
       <section className={styles.workspace}>
         <div className={styles.reviewStage}>
+          {sortedDue.length ? (
+            <section className={styles.queuePreview} aria-label="Due review queue">
+              <div className={styles.sectionTitle}>
+                <div>
+                  <span className="card-kicker">DUE QUEUE</span>
+                  <strong>{sortedDue.length} waiting</strong>
+                </div>
+                <small>Failures and overdue items rise to the front.</small>
+              </div>
+              <div className={styles.queueList}>
+                {sortedDue.slice(0, 5).map((item, index) => {
+                  const urgency = reviewUrgency(item);
+                  const isActive = item.target_id === activity?.target_id;
+                  return (
+                    <article
+                      key={item.target_id}
+                      className={`${styles.queueItem} ${isActive ? styles.queueActive : ""}`}
+                    >
+                      <span className={styles.queueIndex}>{String(index + 1).padStart(2, "0")}</span>
+                      <div>
+                        <strong>{item.lemma}</strong>
+                        <small>{reasonCopy[item.reason_code]?.title ?? "Scheduled review"}</small>
+                      </div>
+                      <div className={styles.queueMeta}>
+                        <span className={styles[urgency]}>{urgencyCopy[urgency]}</span>
+                        <small>{relativeDueLabel(item.due_at)}</small>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+
           {activity && !result ? (
             <article className={styles.exercise}>
               <div className={styles.exerciseMeta}>
                 <span>{activity.state.toUpperCase()}</span>
-                <code>{activity.reason_code}</code>
+                <code>{activity.lemma}</code>
               </div>
-              <p className={styles.reason}>
-                {reasonCopy[activity.reason_code] ?? "Scheduled from your learning evidence."}
-              </p>
+              {activeReason ? (
+                <div className={styles.whyCard}>
+                  <span>WHY NOW?</span>
+                  <strong>{activeReason.title}</strong>
+                  <p>{activeReason.body}</p>
+                  <small>{relativeDueLabel(activity.due_at)}</small>
+                </div>
+              ) : null}
               <ExercisePlayer
                 key={activity.activity_instance_id}
                 exerciseType={activity.exercise_type}
@@ -255,60 +390,97 @@ export default function ReviewPage() {
           ) : null}
 
           {activity && result ? (
-            <article className={`${styles.feedback} ${result.correct ? styles.correct : styles.wrong}`}>
-              <span className="card-kicker">EVIDENCE RECORDED</span>
-              <h2>{result.correct ? "Still there." : "Bring this one back sooner."}</h2>
-              <p>
-                {result.correct
-                  ? "The scheduler expanded this target’s interval based on another independent success."
-                  : "This target stays in review with a shorter interval and higher priority."}
-              </p>
-              <div className={styles.score}><strong>{result.score}</strong><span>/ 100</span></div>
-              <button
-                className="button button-accent"
-                onClick={continueReview}
-                disabled={submitting}
-              >
-                {submitting ? "Loading…" : "Next review"}
-              </button>
-            </article>
+            <LearningFeedback
+              exerciseType={activity.exercise_type}
+              prompt={activity.prompt}
+              fallbackLemma={activity.lemma}
+              answer={lastAnswer}
+              correct={result.correct}
+              score={result.score}
+              feedbackCode={result.feedback_code}
+              dayComplete={false}
+              nextDay={0}
+              availableThroughDay={21}
+              continueLabelI18n={{ en: "Next review", fa: "مرور بعدی" }}
+              onContinue={continueReview}
+            />
           ) : null}
 
           {!activity ? (
             <article className={styles.clear}>
-              <span className="card-kicker">QUEUE CLEAR</span>
-              <h2>Nothing is due right now.</h2>
+              <span className="card-kicker">
+                {sessionStartDue ? "SESSION CLEAR" : "QUEUE CLEAR"}
+              </span>
+              <h2>
+                {sessionStartDue
+                  ? "You cleared what was due."
+                  : "Nothing needs review right now."}
+              </h2>
               <p>
                 {home?.next_due_at
-                  ? `Next scheduled review: ${new Date(home.next_due_at).toLocaleString()}`
+                  ? `Next memory check is ${relativeDueLabel(home.next_due_at)}. The scheduler will wait instead of making you over-practice stable material.`
                   : "Complete learning activities and the scheduler will build your queue automatically."}
               </p>
-              <Link href="/practice" className="button button-accent">Do silent practice</Link>
+              {sessionStartDue ? (
+                <div className={styles.sessionSummary}>
+                  <div><strong>{sessionCorrect}</strong><span>correct</span></div>
+                  <div><strong>{sessionMissed}</strong><span>missed</span></div>
+                  <div><strong>{sessionProgress.completed}</strong><span>reviewed</span></div>
+                </div>
+              ) : null}
+              <div className={styles.clearActions}>
+                <Link href="/learn" className="button button-accent">Continue learning</Link>
+                <Link href="/practice" className="button">Free silent practice</Link>
+              </div>
             </article>
           ) : null}
         </div>
 
         <aside className={styles.masteryPanel}>
           <div className={styles.panelTitle}>
-            <span className="card-kicker">MASTERY MAP</span>
-            <strong>{home?.scheduled_count ?? 0} tracked</strong>
+            <div>
+              <span className="card-kicker">MASTERY MAP</span>
+              <strong>{home?.scheduled_count ?? 0} tracked targets</strong>
+            </div>
+            <div className={styles.filters} role="group" aria-label="Filter mastery targets">
+              {(["weak", "all", "mastered"] as MasteryFilter[]).map((filter) => (
+                <button
+                  key={filter}
+                  type="button"
+                  className={masteryFilter === filter ? styles.filterActive : ""}
+                  aria-pressed={masteryFilter === filter}
+                  onClick={() => setMasteryFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
           <div className={styles.masteryList}>
-            {sortedMastery.slice(0, 24).map((target) => (
+            {visibleMastery.slice(0, 28).map((target) => (
               <article key={target.target_id} className={styles.masteryRow}>
-                <div>
-                  <strong>{target.lemma}</strong>
-                  <span>{target.skill_dimension.replaceAll("_", " ")}</span>
+                <div className={styles.masteryMain}>
+                  <div>
+                    <strong>{target.lemma}</strong>
+                    <span>{target.skill_dimension.replaceAll("_", " ")}</span>
+                  </div>
+                  <span className={`${styles.statePill} ${styles[target.state] ?? ""}`}>
+                    {target.state}
+                  </span>
+                </div>
+                <div className={styles.confidenceTrack} aria-hidden="true">
+                  <div style={{ width: `${Math.round(target.confidence * 100)}%` }} />
                 </div>
                 <div className={styles.masteryNumbers}>
-                  <span>{target.state}</span>
-                  <small>{Math.round(target.confidence * 100)}% evidence confidence</small>
+                  <small>{Math.round(target.confidence * 100)}% confidence</small>
+                  <small>{target.success_streak} streak · {target.lapses} lapses</small>
+                  <small>{relativeDueLabel(target.next_review_at)}</small>
                 </div>
               </article>
             ))}
-            {!sortedMastery.length ? (
+            {!visibleMastery.length ? (
               <p className={styles.emptyMastery}>
-                Your first submitted answer will create the first mastery target.
+                No targets match this filter yet.
               </p>
             ) : null}
           </div>

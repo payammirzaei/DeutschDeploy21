@@ -1,0 +1,214 @@
+.feedback {
+  display: grid;
+  gap: 1.1rem;
+  max-width: 860px;
+  border-top: 6px solid var(--ink);
+  padding-top: 1.35rem;
+}
+
+.correct {
+  border-top-color: var(--success);
+}
+
+.incorrect {
+  border-top-color: var(--highlight);
+}
+
+.topRow,
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.kicker {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.languageSwitch {
+  display: inline-flex;
+  gap: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  padding: 0.2rem;
+}
+
+.languageSwitch button {
+  min-height: 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.35rem 0.7rem;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.languageSwitch .languageActive {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.feedback h2 {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.lead {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.teachingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.teachingCard {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+  padding: 1rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.teachingCard > span {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.teachingCard strong {
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.teachingCard p,
+.teachingCard blockquote {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.ruleCard,
+.anchorCard {
+  grid-column: 1 / -1;
+}
+
+.ruleCard {
+  background: var(--accent-soft);
+}
+
+.anchorCard blockquote {
+  border-inline-start: 3px solid var(--accent);
+  padding-inline-start: 0.85rem;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 750;
+}
+
+.revealCard {
+  border-color: color-mix(in srgb, var(--success) 42%, var(--line));
+  background: color-mix(in srgb, var(--success) 6%, var(--surface));
+}
+
+.bottomRow {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 0.85rem 0;
+}
+
+.scoreBlock {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.scoreBlock > strong {
+  font-size: 2rem;
+  letter-spacing: -0.05em;
+}
+
+.scoreBlock > span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.scoreBlock code {
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.evidence {
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-align: end;
+}
+
+.feedback > button {
+  justify-self: start;
+  min-width: 11rem;
+}
+
+@media (max-width: 620px) {
+  .feedback {
+    gap: 0.9rem;
+  }
+
+  .topRow {
+    align-items: flex-start;
+  }
+
+  .teachingGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ruleCard,
+  .anchorCard {
+    grid-column: auto;
+  }
+
+  .bottomRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .scoreBlock {
+    flex-wrap: wrap;
+  }
+
+  .scoreBlock code {
+    width: 100%;
+  }
+
+  .evidence {
+    text-align: start;
+  }
+
+  .feedback > button {
+    position: sticky;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    z-index: 4;
+    width: 100%;
+    box-shadow: 0 10px 28px rgba(20, 32, 51, 0.16);
+  }
+}

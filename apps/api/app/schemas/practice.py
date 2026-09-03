@@ -15,5 +15,12 @@ class PracticeActivityView(BaseModel):
 
 class PracticeNextResponse(BaseModel):
     mode: str = "silent"
+    strategy: str = "explore_mix"
+    selection_reason_code: str = "fresh_family"
+    selection_reason: str = "Building broad practice evidence."
+    interaction_mode: str = "tap"
+    mastery_state: str = "new"
+    confidence: float = 0.0
+    lapses: int = 0
     activity: PracticeActivityView
     available_types: list[str] = Field(default_factory=list)

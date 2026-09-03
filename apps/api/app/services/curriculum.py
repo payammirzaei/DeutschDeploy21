@@ -20,13 +20,10 @@ from app.services.exercise_registry import ALL_SILENT_EXERCISE_TYPES
 from app.services.interview_drills import INTERVIEW_DRILL_TYPES, load_interview_drills
 
 COURSE_SLUG = "software-interview-21d"
-LATEST_RELEASE_VERSION = 2
-CURRICULUM_PATH = (
-    Path(__file__).resolve().parents[4]
-    / "content"
-    / "curriculum"
-    / "software-interview-21d.v2.json"
-)
+LATEST_RELEASE_VERSION = 3
+CURRICULUM_ROOT = Path(__file__).resolve().parents[4] / "content" / "curriculum"
+V2_CURRICULUM_PATH = CURRICULUM_ROOT / "software-interview-21d.v2.json"
+CURRICULUM_PATH = CURRICULUM_ROOT / "software-interview-21d.v3.json"
 
 LEGACY_STARTER_DAYS = [
     {
@@ -80,13 +77,20 @@ LEGACY_STARTER_DAYS = [
 ]
 
 
-def load_curriculum_manifest() -> dict[str, Any]:
-    raw = json.loads(CURRICULUM_PATH.read_text(encoding="utf-8"))
+def _load_curriculum_manifest(
+    path: Path,
+    expected_release_version: int,
+) -> dict[str, Any]:
+    raw = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(raw, dict):
         raise RuntimeError("Curriculum manifest must be a JSON object")
     payload = _expand_manifest(raw)
-    _validate_manifest(payload)
+    _validate_manifest(payload, expected_release_version)
     return payload
+
+
+def load_curriculum_manifest() -> dict[str, Any]:
+    return _load_curriculum_manifest(CURRICULUM_PATH, LATEST_RELEASE_VERSION)
 
 
 def _expand_manifest(raw: dict[str, Any]) -> dict[str, Any]:
@@ -145,16 +149,17 @@ async def ensure_curriculum_releases(
     session: AsyncSession,
     user: User,
 ) -> tuple[Course, CourseRelease, CourseRelease]:
-    manifest = load_curriculum_manifest()
+    legacy_manifest = _load_curriculum_manifest(V2_CURRICULUM_PATH, 2)
+    latest_manifest = load_curriculum_manifest()
     await _ensure_all_starter_content(session, user)
 
     course = await session.scalar(select(Course).where(Course.slug == COURSE_SLUG))
     if course is None:
         course = Course(
             slug=COURSE_SLUG,
-            title=str(manifest["title"]),
+            title=str(latest_manifest["title"]),
             target_language="de",
-            target_cefr=str(manifest["target_cefr"]),
+            target_cefr=str(latest_manifest["target_cefr"]),
             duration_days=21,
         )
         session.add(course)
@@ -172,29 +177,35 @@ async def ensure_curriculum_releases(
         await session.flush()
         await _build_legacy_release(session, legacy)
 
-    latest = await _release_by_version(
-        session,
-        course.id,
-        LATEST_RELEASE_VERSION,
-    )
+    await _ensure_manifest_release(session, course.id, legacy_manifest)
+    latest = await _ensure_manifest_release(session, course.id, latest_manifest)
+    return course, legacy, latest
+
+
+async def _ensure_manifest_release(
+    session: AsyncSession,
+    course_id: UUID,
+    manifest: dict[str, Any],
+) -> CourseRelease:
+    version = int(manifest["release_version"])
     checksum = curriculum_manifest_checksum(manifest)
-    if latest is None:
-        latest = CourseRelease(
-            course_id=course.id,
-            version_number=LATEST_RELEASE_VERSION,
+    release = await _release_by_version(session, course_id, version)
+    if release is None:
+        release = CourseRelease(
+            course_id=course_id,
+            version_number=version,
             status="published",
             manifest_checksum=checksum,
         )
-        session.add(latest)
+        session.add(release)
         await session.flush()
-        await _build_manifest_release(session, latest, manifest)
-    elif latest.manifest_checksum != checksum:
+        await _build_manifest_release(session, release, manifest)
+    elif release.manifest_checksum != checksum:
         raise RuntimeError(
-            "Published curriculum release v2 differs from the checked-in manifest. "
-            "Create a new immutable release version instead of mutating v2."
+            f"Published curriculum release v{version} differs from the checked-in "
+            "manifest. Create a new immutable release version instead of mutating it."
         )
-
-    return course, legacy, latest
+    return release
 
 
 async def _ensure_all_starter_content(
@@ -354,7 +365,10 @@ async def _latest_content_version(
     )
 
 
-def _validate_manifest(manifest: dict[str, Any]) -> None:
+def _validate_manifest(
+    manifest: dict[str, Any],
+    expected_release_version: int,
+) -> None:
     required_top = {
         "schema_version",
         "course_slug",
@@ -367,12 +381,14 @@ def _validate_manifest(manifest: dict[str, Any]) -> None:
         raise RuntimeError("Curriculum manifest is missing required fields")
     if manifest["course_slug"] != COURSE_SLUG:
         raise RuntimeError("Curriculum manifest course slug is invalid")
-    if int(manifest["release_version"]) != LATEST_RELEASE_VERSION:
+    if int(manifest["release_version"]) != expected_release_version:
         raise RuntimeError("Curriculum manifest release version is invalid")
 
     days = manifest["days"]
     if not isinstance(days, list) or len(days) != 21:
-        raise RuntimeError("Curriculum release v2 must contain exactly 21 days")
+        raise RuntimeError(
+            f"Curriculum release v{expected_release_version} must contain exactly 21 days"
+        )
     day_numbers = [int(day.get("day", 0)) for day in days]
     if day_numbers != list(range(1, 22)):
         raise RuntimeError("Curriculum days must be ordered from 1 through 21")
@@ -466,5 +482,5 @@ def _validate_manifest(manifest: dict[str, Any]) -> None:
     total = sum(len(day["activities"]) for day in days)
     if total != 133:
         raise RuntimeError(
-            f"Curriculum v2 expected 133 activities, found {total}"
+            f"Curriculum v{expected_release_version} expected 133 activities, found {total}"
         )

@@ -34,6 +34,7 @@ from app.services.learning import (
 
 def test_full_curriculum_manifest_has_required_coverage() -> None:
     manifest = load_curriculum_manifest()
+    assert manifest["release_version"] == 3
     assert len(manifest["days"]) == 21
     assert manifest_activity_count(manifest) == 133
     assert [day["day"] for day in manifest["days"]] == list(
@@ -57,6 +58,12 @@ def test_full_curriculum_manifest_has_required_coverage() -> None:
     }
     assert content_types == set(ALL_SILENT_EXERCISE_TYPES)
 
+    first_three_types = [
+        {activity["exercise_type"] for activity in day["activities"]}
+        for day in manifest["days"][:3]
+    ]
+    assert all(len(exercise_types) >= 6 for exercise_types in first_three_types)
+
     covered_drills = {
         activity["external_id"]
         for day in manifest["days"]
@@ -75,7 +82,7 @@ def test_full_curriculum_manifest_has_required_coverage() -> None:
     reason="requires PostgreSQL integration service",
 )
 @pytest.mark.asyncio
-async def test_v1_upgrade_carries_exact_course_work_and_runs_course_drill() -> None:
+async def test_v1_upgrade_keeps_history_and_uses_v3_learning_contract() -> None:
     await ensure_bootstrap_user()
     settings = get_settings()
     assert settings.app_bootstrap_email is not None
@@ -157,14 +164,14 @@ async def test_v1_upgrade_carries_exact_course_work_and_runs_course_drill() -> N
 
         result = await upgrade_to_latest_release(session, user)
         assert result.from_release_version == 1
-        assert result.to_release_version == 2
+        assert result.to_release_version == 3
         assert result.created_enrollment is True
-        assert result.carried_completed_days == 1
-        assert result.current_day == 2
+        assert result.carried_completed_days == 0
+        assert result.current_day == 1
         assert result.pinned_activity_count == 133
 
         home = await get_learning_home(session, user)
-        assert home.release_version == 2
+        assert home.release_version == 3
         assert home.upgrade_available is False
         assert home.available_through_day == 21
         assert len(home.days) == 21
@@ -173,9 +180,8 @@ async def test_v1_upgrade_carries_exact_course_work_and_runs_course_drill() -> N
             *([5] * 7),
         ]
         assert sum(day.total_count for day in home.days) == 133
-        assert home.days[0].completed is True
-        assert home.days[0].submitted_count == 7
-        assert home.current_day == 2
+        assert home.days[0].completed is False
+        assert home.current_day == 1
 
         legacy_day_count = int(
             await session.scalar(
@@ -216,6 +222,13 @@ async def test_v1_upgrade_carries_exact_course_work_and_runs_course_drill() -> N
         )
         assert active is not None
         assert active.course_release_id == latest.id
+
+        first_course_activity = await get_next_activity(session, user, 1)
+        assert first_course_activity.activity is not None
+        assert first_course_activity.activity.contract_version == 2
+        assert first_course_activity.activity.prompt["question_i18n"]["en"]
+        assert first_course_activity.activity.prompt["question_i18n"]["fa"]
+        assert first_course_activity.activity.prompt["lesson"]["example_de"]
 
         first_day_fifteen = await get_next_activity(
             session,
@@ -279,7 +292,7 @@ async def test_v1_upgrade_carries_exact_course_work_and_runs_course_drill() -> N
         assert day_fifteen.submitted_count == 3
         assert day_fifteen.total_count == 5
         assert day_fifteen.completed is False
-        assert active.current_day == 2
+        assert active.current_day == 1
 
         await session.commit()
 

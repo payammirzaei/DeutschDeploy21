@@ -9,6 +9,8 @@ import {
   ExercisePlayer,
   ExercisePrompt,
 } from "@/src/components/exercise-player";
+import { LearningFeedback } from "@/src/components/learning-feedback";
+import { LessonJourney } from "@/src/components/lesson-journey";
 import { api } from "@/src/lib/api";
 import {
   ATTEMPT_SYNCED_EVENT,
@@ -82,7 +84,7 @@ const EMPTY_HOME: LearningHome = {
   enrollment_id: null,
   course_title: null,
   release_version: null,
-  latest_release_version: 2,
+  latest_release_version: 3,
   upgrade_available: false,
   current_day: 1,
   available_through_day: 21,
@@ -96,6 +98,7 @@ export default function LearnPage() {
   const [activeDay, setActiveDay] = useState(1);
   const [activity, setActivity] = useState<Activity | null>(null);
   const [result, setResult] = useState<AttemptResult | null>(null);
+  const [lastAnswer, setLastAnswer] = useState<ExerciseAnswer | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
@@ -188,6 +191,13 @@ export default function LearnPage() {
     [activeDay, home.days],
   );
 
+  const journeyDay = useMemo(() => {
+    const dayNumber = activity?.day_number ?? activeDay;
+    return (
+      home.days.find((day) => day.day_number === dayNumber) ?? currentDay
+    );
+  }, [activity?.day_number, activeDay, currentDay, home.days]);
+
   const totalSubmitted = home.days.reduce(
     (sum, day) => sum + day.submitted_count,
     0,
@@ -231,6 +241,7 @@ export default function LearnPage() {
     setError(null);
     setActivity(null);
     setResult(null);
+    setLastAnswer(null);
     setQueued(false);
 
     const { data, response } = await api.POST(
@@ -257,6 +268,7 @@ export default function LearnPage() {
     setActiveDay(dayNumber);
     setActivity(null);
     setResult(null);
+    setLastAnswer(null);
     setQueued(false);
     setError(null);
 
@@ -287,6 +299,7 @@ export default function LearnPage() {
   async function submitAnswer(answer: ExerciseAnswer) {
     if (!activity || submitting || queued) return;
     setSubmitting(true);
+    setLastAnswer(answer);
     setError(null);
 
     const durationMs = startedAt
@@ -321,6 +334,7 @@ export default function LearnPage() {
       : activeDay;
     setActivity(null);
     setResult(null);
+    setLastAnswer(null);
     setQueued(false);
 
     if (nextDay > home.available_through_day) {
@@ -355,12 +369,12 @@ export default function LearnPage() {
 
       <section className={styles.hero}>
         <div>
-          <div className="eyebrow">PHASE 5D · FULL 21-DAY PATH</div>
-          <h1>Build interview fluency.</h1>
+          <div className="eyebrow">LEARNING V3 · CONTEXT FIRST</div>
+          <h1>Learn it. Build it. Use it.</h1>
           <p>
-            One path now moves from vocabulary and grammar into technical
-            explanation, STAR structure, architecture reasoning and interview
-            recovery. Every interaction stays pinned, resumable and reviewable.
+            Start from real German interview sentences, notice the pattern, then
+            retrieve, rebuild and use it. Vocabulary is mixed with word order,
+            Perfekt, usage decisions and interview-ready chunks from day one.
           </p>
         </div>
         <div className={styles.progressCard}>
@@ -388,13 +402,14 @@ export default function LearnPage() {
       {!loading && !home.enrolled ? (
         <section className={styles.onboarding}>
           <div>
-            <span className="card-kicker">FULL RELEASE V2</span>
-            <h2>Start the complete 21-day interview path.</h2>
+            <span className="card-kicker">CONTEXT-FIRST RELEASE V3</span>
+            <h2>Start with usable German, not isolated translations.</h2>
             <p>
-              The release pins 100 software-interview verbs, ten deterministic
-              exercise families and structured interview drills into 133
-              required activities. Later content edits cannot rewrite what you
-              already practiced.
+              The 21-day release still contains 133 deterministic activities,
+              but the first days now mix context, recall, sentence building,
+              cloze, matching, usage and Perfekt practice. Exercise guidance can
+              switch between English and Persian while the target language stays
+              German.
             </p>
           </div>
           <button
@@ -413,11 +428,12 @@ export default function LearnPage() {
             <span className="card-kicker">
               RELEASE V{home.release_version} → V{home.latest_release_version}
             </span>
-            <h2>Your original 3-day release stays in history.</h2>
+            <h2>Your previous learning release stays in history.</h2>
             <p>
-              Upgrade explicitly to the full 21-day path. Exact compatible
-              course submissions carry forward as completion evidence; old
-              attempts and mastery history are never copied or rewritten.
+              Move to the context-first curriculum without rewriting old
+              attempts. Exact compatible submissions can still count as prior
+              evidence, while changed activities are learned again in their new
+              teaching format.
             </p>
           </div>
           <button
@@ -425,7 +441,7 @@ export default function LearnPage() {
             onClick={upgradeLearning}
             disabled={upgrading}
           >
-            {upgrading ? "Upgrading…" : "Upgrade to 21 days"}
+            {upgrading ? "Upgrading…" : "Upgrade to learning v3"}
           </button>
         </section>
       ) : null}
@@ -455,6 +471,7 @@ export default function LearnPage() {
                     setActiveDay(day.day_number);
                     setActivity(null);
                     setResult(null);
+                    setLastAnswer(null);
                     setQueued(false);
                   }}
                 >
@@ -478,6 +495,16 @@ export default function LearnPage() {
           </aside>
 
           <div className={styles.stage}>
+            {journeyDay ? (
+              <LessonJourney
+                activities={journeyDay.activities}
+                activityPosition={activity?.position ?? null}
+                dayComplete={
+                  journeyDay.completed || Boolean(result?.day_complete)
+                }
+              />
+            ) : null}
+
             {home.course_complete && !activity && !result ? (
               <section className={styles.dayIntro}>
                 <span className="card-kicker">21 / 21 COMPLETE</span>
@@ -557,49 +584,28 @@ export default function LearnPage() {
                 />
                 <div className={styles.exerciseFooter}>
                   <span>
-                    Wrong answers still move forward and become targeted review
-                    evidence. Completion and mastery stay separate.
+                    See the pattern, use it, get feedback, then meet it again in
+                    another form. Wrong answers become review evidence instead of
+                    blocking the lesson.
                   </span>
                 </div>
               </section>
             ) : null}
 
-            {result ? (
-              <section
-                className={`${styles.feedback} ${
-                  result.correct ? styles.correct : styles.incorrect
-                }`}
-                aria-live="polite"
-              >
-                <span className="card-kicker">
-                  {result.correct ? "CORRECT" : "REVIEW LATER"}
-                </span>
-                <h2>
-                  {result.correct
-                    ? "Genau. Keep the structure."
-                    : "Not this time — keep moving."}
-                </h2>
-                <p>
-                  {result.correct
-                    ? "This attempt is stored as positive evidence for the exact learning target you practiced."
-                    : "The attempt is preserved instead of overwritten and will influence your focused review schedule."}
-                </p>
-                <div className={styles.scoreRow}>
-                  <strong>{result.score}</strong>
-                  <span>deterministic score</span>
-                  <code>{result.feedback_code}</code>
-                </div>
-                <button
-                  className="button button-accent"
-                  onClick={continueLearning}
-                >
-                  {result.day_complete
-                    ? result.next_day > home.available_through_day
-                      ? "Finish course"
-                      : "Continue to next day"
-                    : "Next activity"}
-                </button>
-              </section>
+            {result && activity ? (
+              <LearningFeedback
+                exerciseType={activity.exercise_type}
+                prompt={activity.prompt}
+                fallbackLemma={activity.lemma}
+                answer={lastAnswer}
+                correct={result.correct}
+                score={result.score}
+                feedbackCode={result.feedback_code}
+                dayComplete={result.day_complete}
+                nextDay={result.next_day}
+                availableThroughDay={home.available_through_day}
+                onContinue={continueLearning}
+              />
             ) : null}
           </div>
         </section>
