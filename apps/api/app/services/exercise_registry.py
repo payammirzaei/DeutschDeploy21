@@ -28,10 +28,23 @@ from app.services.interview_drills import (
     UnsupportedInterviewDrillError,
     evaluate_interview_drill,
 )
-from app.services.learning_experience import enrich_learning_instance
+from app.services.learning_experience import (
+    PROMPT_CONTRACT_VERSION,
+    enrich_learning_instance,
+)
 
 ALL_SILENT_EXERCISE_TYPES = (*SILENT_EXERCISE_TYPES, *ADVANCED_EXERCISE_TYPES)
 TARGET_BY_EXERCISE.update(ADVANCED_TARGETS)
+
+
+async def _enrich_once(
+    session: AsyncSession,
+    instance: ActivityInstance,
+    activity: ReleaseActivity,
+) -> ActivityInstance:
+    if instance.contract_version >= PROMPT_CONTRACT_VERSION:
+        return instance
+    return await enrich_learning_instance(session, instance, activity)
 
 
 async def materialize_registered_exercise(
@@ -49,7 +62,7 @@ async def materialize_registered_exercise(
             exercise_type,
             instance_key,
         )
-        return await enrich_learning_instance(session, instance, activity)
+        return await _enrich_once(session, instance, activity)
 
     existing = await session.scalar(
         select(ActivityInstance).where(
@@ -59,7 +72,7 @@ async def materialize_registered_exercise(
         )
     )
     if existing is not None:
-        return await enrich_learning_instance(session, existing, activity)
+        return await _enrich_once(session, existing, activity)
 
     version = await session.get(ContentVersion, activity.content_version_id)
     verb = await session.get(VerbVersion, activity.content_version_id)
@@ -97,7 +110,7 @@ async def materialize_registered_exercise(
     )
     session.add(instance)
     await session.flush()
-    return await enrich_learning_instance(session, instance, activity)
+    return await _enrich_once(session, instance, activity)
 
 
 def evaluate_registered_exercise(
