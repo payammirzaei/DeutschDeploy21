@@ -43,7 +43,7 @@
 }
 
 .progressCard {
-  border-top: 4px solid var(--ink);
+  border-top: 4px solid var(--accent);
   padding-top: 17px;
   display: grid;
   gap: 10px;
@@ -69,11 +69,12 @@
   height: 8px;
   background: var(--paper-2);
   overflow: hidden;
+  border-radius: 999px;
 }
 
 .progressTrack div {
   height: 100%;
-  background: var(--ink);
+  background: var(--accent);
   transition: width .25s ease;
 }
 
@@ -92,27 +93,30 @@
   border: 1px solid var(--danger);
   padding: 13px 16px;
   color: var(--danger);
-  background: rgba(159, 45, 32, .05);
+  background: color-mix(in srgb, var(--danger) 6%, var(--surface));
+  border-radius: 10px;
 }
 
 .onboarding,
 .upgradeCard {
   max-width: 1180px;
   margin: 52px auto 0;
-  border: 1px solid var(--ink);
-  background: #faf7f0;
+  border: 1px solid var(--line);
+  background: var(--surface);
   padding: clamp(26px, 5vw, 48px);
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 36px;
   align-items: end;
+  border-radius: 18px;
+  box-shadow: 0 14px 36px rgba(20, 32, 51, .07);
 }
 
 .upgradeCard {
   max-width: 1440px;
   margin-top: 24px;
-  border-top: 6px solid var(--ink);
-  background: rgba(216, 255, 99, .18);
+  border-top: 5px solid var(--accent);
+  background: var(--accent-soft);
 }
 
 .onboarding h2,
@@ -138,7 +142,11 @@
   display: grid;
   grid-template-columns: 320px minmax(0, 1fr);
   min-height: 610px;
-  border-top: 1px solid var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  overflow: clip;
+  box-shadow: 0 14px 38px rgba(20, 32, 51, .06);
 }
 
 .dayRail {
@@ -148,8 +156,9 @@
   max-height: calc(100dvh - 36px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 24px 26px 0 0;
+  padding: 24px 26px 24px 22px;
   border-right: 1px solid var(--line);
+  background: var(--paper);
 }
 
 .courseMeta {
@@ -177,9 +186,10 @@
   width: 100%;
   border: 0;
   border-bottom: 1px solid var(--line);
+  border-radius: 10px;
   background: transparent;
   color: var(--muted);
-  padding: 17px 0;
+  padding: 17px 10px;
   display: grid;
   grid-template-columns: 34px 1fr 20px;
   gap: 10px;
@@ -193,8 +203,13 @@
   color: var(--ink);
 }
 
+.dayButton:hover {
+  background: var(--paper-2);
+}
+
 .dayButton.active {
-  background: linear-gradient(90deg, rgba(216, 255, 99, .45), transparent 78%);
+  background: var(--accent-soft);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .dayNumber {
@@ -272,9 +287,10 @@
 
 .completeNote {
   display: inline-block;
-  background: var(--acid);
-  color: var(--ink) !important;
+  background: var(--accent-soft);
+  color: var(--accent) !important;
   padding: 10px 12px;
+  border-radius: 9px;
   font-weight: 700;
   font-size: 13px !important;
 }
@@ -303,8 +319,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   background: var(--ink);
-  color: var(--acid);
+  color: var(--paper);
   padding: 6px 8px;
+  border-radius: 7px;
   letter-spacing: 0;
 }
 
@@ -322,16 +339,16 @@
 }
 
 .feedback {
-  border-top: 8px solid var(--ink);
+  border-top: 7px solid var(--ink);
   padding-top: 28px;
 }
 
 .feedback.correct {
-  border-top-color: #668600;
+  border-top-color: var(--success);
 }
 
 .feedback.incorrect {
-  border-top-color: #a56d00;
+  border-top-color: var(--highlight);
 }
 
 .scoreRow {
@@ -370,6 +387,7 @@
 
   .workspace {
     grid-template-columns: 1fr;
+    overflow: visible;
   }
 
   .dayRail {
@@ -377,7 +395,8 @@
     max-height: none;
     overflow: visible;
     border-right: 0;
-    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    padding: 18px;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
@@ -403,8 +422,8 @@
   }
 
   .stage {
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 22px;
+    padding-right: 22px;
   }
 }
 
