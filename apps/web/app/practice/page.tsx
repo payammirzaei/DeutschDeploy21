@@ -17,10 +17,16 @@ import {
   learningAttemptUrl,
   submitLearningAttemptSafely,
 } from "@/src/lib/offline-attempts";
+import {
+  EMPTY_PRACTICE_SET,
+  PracticeSetStats,
+  QUICK_SET_SIZE,
+  practiceSetAccuracy,
+  practiceSetProgress,
+  recordPracticeResult,
+} from "@/src/lib/practice-session";
 
 import styles from "./practice.module.css";
-
-const QUICK_SET_SIZE = 8;
 
 type PracticeActivity = {
   id: string;
@@ -51,14 +57,6 @@ type AttemptResult = {
   feedback_code: string;
 };
 
-type SetStats = {
-  completed: number;
-  correct: number;
-  missed: number;
-};
-
-const EMPTY_STATS: SetStats = { completed: 0, correct: 0, missed: 0 };
-
 const typeMeta: Record<string, { label: string; icon: string; tapFirst: boolean }> = {
   meaning_multiple_choice: { label: "Meaning", icon: "Aa", tapFirst: true },
   reverse_typing: { label: "Recall", icon: "⌨", tapFirst: false },
@@ -84,7 +82,7 @@ export default function PracticePage() {
   const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [lastAnswer, setLastAnswer] = useState<ExerciseAnswer | null>(null);
-  const [stats, setStats] = useState<SetStats>(EMPTY_STATS);
+  const [stats, setStats] = useState<PracticeSetStats>(EMPTY_PRACTICE_SET);
   const [setComplete, setSetComplete] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -125,11 +123,7 @@ export default function PracticePage() {
 
   const recordResult = useCallback((nextResult: AttemptResult) => {
     setResult(nextResult);
-    setStats((current) => ({
-      completed: current.completed + 1,
-      correct: current.correct + (nextResult.correct ? 1 : 0),
-      missed: current.missed + (nextResult.correct ? 0 : 1),
-    }));
+    setStats((current) => recordPracticeResult(current, nextResult.correct));
   }, []);
 
   useEffect(() => {
@@ -174,7 +168,7 @@ export default function PracticePage() {
   }
 
   async function continuePractice() {
-    if (stats.completed >= QUICK_SET_SIZE) {
+    if (practiceSetProgress(stats).complete) {
       setSetComplete(true);
       setActivity(null);
       setResult(null);
@@ -184,7 +178,7 @@ export default function PracticePage() {
   }
 
   async function startAnotherSet() {
-    setStats(EMPTY_STATS);
+    setStats(EMPTY_PRACTICE_SET);
     setSetComplete(false);
     setResult(null);
     setLastAnswer(null);
@@ -192,11 +186,8 @@ export default function PracticePage() {
   }
 
   const currentMeta = activity ? typeMeta[activity.exercise_type] : null;
-  const accuracy = stats.completed
-    ? Math.round((stats.correct / stats.completed) * 100)
-    : 0;
-  const progress = Math.min(100, Math.round((stats.completed / QUICK_SET_SIZE) * 100));
-  const isLastFeedback = stats.completed >= QUICK_SET_SIZE;
+  const accuracy = practiceSetAccuracy(stats);
+  const setProgress = practiceSetProgress(stats);
   const selectionLead = useMemo(() => {
     if (!selection) return null;
     return selection.selection_reason || strategyCopy[selection.strategy] || null;
@@ -226,10 +217,13 @@ export default function PracticePage() {
         <div className={styles.sessionCard}>
           <div className={styles.sessionTop}>
             <span>QUICK SET</span>
-            <strong>{stats.completed}<small> / {QUICK_SET_SIZE}</small></strong>
+            <strong>{setProgress.completed}<small> / {QUICK_SET_SIZE}</small></strong>
           </div>
-          <div className={styles.progressTrack} aria-label={`${stats.completed} of ${QUICK_SET_SIZE} completed`}>
-            <span style={{ width: `${progress}%` }} />
+          <div
+            className={styles.progressTrack}
+            aria-label={`${setProgress.completed} of ${QUICK_SET_SIZE} completed`}
+          >
+            <span style={{ width: `${setProgress.percent}%` }} />
           </div>
           <div className={styles.sessionSplit}>
             <span><b>{stats.correct}</b> correct</span>
@@ -362,7 +356,7 @@ export default function PracticePage() {
               dayComplete={false}
               nextDay={1}
               availableThroughDay={1}
-              continueLabelI18n={isLastFeedback
+              continueLabelI18n={setProgress.complete
                 ? { en: "Finish quick set", fa: "پایان مجموعه" }
                 : { en: "Next drill", fa: "تمرین بعدی" }}
               onContinue={continuePractice}
