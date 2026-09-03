@@ -10,6 +10,7 @@ import {
   ExercisePrompt,
 } from "@/src/components/exercise-player";
 import { LearningFeedback } from "@/src/components/learning-feedback";
+import { LessonJourney } from "@/src/components/lesson-journey";
 import { api } from "@/src/lib/api";
 import {
   ATTEMPT_SYNCED_EVENT,
@@ -189,6 +190,13 @@ export default function LearnPage() {
       home.days.find((day) => day.day_number === activeDay) ?? null,
     [activeDay, home.days],
   );
+
+  const journeyDay = useMemo(() => {
+    const dayNumber = activity?.day_number ?? activeDay;
+    return (
+      home.days.find((day) => day.day_number === dayNumber) ?? currentDay
+    );
+  }, [activity?.day_number, activeDay, currentDay, home.days]);
 
   const totalSubmitted = home.days.reduce(
     (sum, day) => sum + day.submitted_count,
@@ -487,6 +495,16 @@ export default function LearnPage() {
           </aside>
 
           <div className={styles.stage}>
+            {journeyDay ? (
+              <LessonJourney
+                activities={journeyDay.activities}
+                activityPosition={activity?.position ?? null}
+                dayComplete={
+                  journeyDay.completed || Boolean(result?.day_complete)
+                }
+              />
+            ) : null}
+
             {home.course_complete && !activity && !result ? (
               <section className={styles.dayIntro}>
                 <span className="card-kicker">21 / 21 COMPLETE</span>
