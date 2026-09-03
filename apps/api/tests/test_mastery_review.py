@@ -77,7 +77,7 @@ def test_attempt_projects_mastery_and_duplicate_is_idempotent() -> None:
         _login(client)
         activity = _next_available_activity(client)
         key = f"mastery-{uuid4()}"
-        payload = {"choice_id": activity["choices"][0]["id"], "duration_ms": 3200}
+        payload = {**_answer_for_review(activity), "duration_ms": 3200}
         first = client.post(
             f"/api/v1/learning/instances/{activity['id']}/attempts",
             headers={"Idempotency-Key": key},
@@ -112,7 +112,7 @@ def test_due_review_reuses_frozen_prompt_and_updates_projection(
         first_attempt = client.post(
             f"/api/v1/learning/instances/{activity['id']}/attempts",
             headers={"Idempotency-Key": f"seed-review-{uuid4()}"},
-            json={"choice_id": activity["choices"][0]["id"]},
+            json=_answer_for_review(activity),
         )
         assert first_attempt.status_code == 200
 
@@ -168,7 +168,7 @@ def test_mastery_projection_rebuild_is_replayable() -> None:
         response = client.post(
             f"/api/v1/learning/instances/{activity['id']}/attempts",
             headers={"Idempotency-Key": f"rebuild-{uuid4()}"},
-            json={"choice_id": activity["choices"][0]["id"]},
+            json=_answer_for_review(activity),
         )
         assert response.status_code == 200
 
