@@ -3,6 +3,34 @@
   gap: 1rem;
 }
 
+.languageSwitch {
+  justify-self: end;
+  display: inline-flex;
+  gap: 0.2rem;
+  border: 1px solid var(--line, rgba(20, 32, 51, 0.14));
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.2rem;
+}
+
+.languageSwitch button {
+  min-height: 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.35rem 0.7rem;
+  color: var(--muted, #667085);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.languageSwitch .languageActive {
+  background: var(--ink, #142033);
+  color: var(--paper, #f6f8fb);
+}
+
 .lessonCard {
   display: grid;
   gap: 0.8rem;
