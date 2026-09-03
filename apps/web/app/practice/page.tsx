@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ExerciseAnswer,
   ExercisePlayer,
   ExercisePrompt,
 } from "@/src/components/exercise-player";
+import { LearningFeedback } from "@/src/components/learning-feedback";
 import { api } from "@/src/lib/api";
 import {
   ATTEMPT_SYNCED_EVENT,
@@ -18,6 +19,8 @@ import {
 } from "@/src/lib/offline-attempts";
 
 import styles from "./practice.module.css";
+
+const QUICK_SET_SIZE = 8;
 
 type PracticeActivity = {
   id: string;
@@ -31,6 +34,13 @@ type PracticeActivity = {
 
 type PracticeNext = {
   mode: string;
+  strategy: string;
+  selection_reason_code: string;
+  selection_reason: string;
+  interaction_mode: "tap" | "keyboard" | string;
+  mastery_state: string;
+  confidence: number;
+  lapses: number;
   activity: PracticeActivity;
   available_types: string[];
 };
@@ -41,29 +51,45 @@ type AttemptResult = {
   feedback_code: string;
 };
 
-const typeMeta: Record<string, { label: string; icon: string }> = {
-  meaning_multiple_choice: { label: "Meaning", icon: "Aa" },
-  reverse_typing: { label: "Type", icon: "⌨" },
-  perfect_participle_choice: { label: "Partizip", icon: "II" },
-  auxiliary_choice: { label: "haben / sein", icon: "±" },
-  sentence_order: { label: "Sentence", icon: "↔" },
-  meaning_matching: { label: "Match", icon: "⇄" },
-  example_cloze: { label: "Fill gap", icon: "__" },
-  usage_error_spotting: { label: "Spot error", icon: "!" },
-  perfect_form_typing: { label: "Perfekt type", icon: "⌨II" },
-  phrase_builder: { label: "Phrase", icon: "▦" },
+type SetStats = {
+  completed: number;
+  correct: number;
+  missed: number;
+};
+
+const EMPTY_STATS: SetStats = { completed: 0, correct: 0, missed: 0 };
+
+const typeMeta: Record<string, { label: string; icon: string; tapFirst: boolean }> = {
+  meaning_multiple_choice: { label: "Meaning", icon: "Aa", tapFirst: true },
+  reverse_typing: { label: "Recall", icon: "⌨", tapFirst: false },
+  perfect_participle_choice: { label: "Partizip", icon: "II", tapFirst: true },
+  auxiliary_choice: { label: "haben / sein", icon: "±", tapFirst: true },
+  sentence_order: { label: "Sentence", icon: "↔", tapFirst: true },
+  meaning_matching: { label: "Match", icon: "⇄", tapFirst: true },
+  example_cloze: { label: "Fill gap", icon: "__", tapFirst: false },
+  usage_error_spotting: { label: "Spot error", icon: "!", tapFirst: true },
+  perfect_form_typing: { label: "Perfekt", icon: "⌨II", tapFirst: false },
+  phrase_builder: { label: "Phrase", icon: "▦", tapFirst: true },
+};
+
+const strategyCopy: Record<string, string> = {
+  explore_mix: "Building broad evidence across different exercise families.",
+  adaptive_weakness: "Choosing from your weaker skills before spending time on stable ones.",
 };
 
 export default function PracticePage() {
   const router = useRouter();
   const [activity, setActivity] = useState<PracticeActivity | null>(null);
+  const [selection, setSelection] = useState<PracticeNext | null>(null);
   const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [result, setResult] = useState<AttemptResult | null>(null);
+  const [lastAnswer, setLastAnswer] = useState<ExerciseAnswer | null>(null);
+  const [stats, setStats] = useState<SetStats>(EMPTY_STATS);
+  const [setComplete, setSetComplete] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [queued, setQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sessionCount, setSessionCount] = useState(0);
   const startedAt = useRef(0);
 
   const loadNext = useCallback(async () => {
@@ -81,9 +107,11 @@ export default function PracticePage() {
       return;
     }
     const next = data as PracticeNext;
+    setSelection(next);
     setActivity(next.activity);
     setAvailableTypes(next.available_types);
     setResult(null);
+    setLastAnswer(null);
     startedAt.current = Date.now();
     setLoading(false);
   }, [router]);
@@ -95,24 +123,33 @@ export default function PracticePage() {
     return () => window.clearTimeout(timer);
   }, [loadNext]);
 
+  const recordResult = useCallback((nextResult: AttemptResult) => {
+    setResult(nextResult);
+    setStats((current) => ({
+      completed: current.completed + 1,
+      correct: current.correct + (nextResult.correct ? 1 : 0),
+      missed: current.missed + (nextResult.correct ? 0 : 1),
+    }));
+  }, []);
+
   useEffect(() => {
     if (!activity) return;
     const expectedUrl = learningAttemptUrl(activity.id);
     const onSynced = (event: Event) => {
       const detail = (event as CustomEvent<AttemptSyncDetail<AttemptResult>>).detail;
       if (detail.url !== expectedUrl) return;
-      setResult(detail.data);
+      recordResult(detail.data);
       setQueued(false);
       setSubmitting(false);
       setError(null);
-      setSessionCount((count) => count + 1);
     };
     window.addEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
     return () => window.removeEventListener(ATTEMPT_SYNCED_EVENT, onSynced);
-  }, [activity]);
+  }, [activity, recordResult]);
 
   async function submit(answer: ExerciseAnswer) {
-    if (!activity || submitting || queued) return;
+    if (!activity || submitting || queued || result) return;
+    setLastAnswer(answer);
     setSubmitting(true);
     setError(null);
     const durationMs = startedAt.current
@@ -132,16 +169,38 @@ export default function PracticePage() {
       setSubmitting(false);
       return;
     }
-    setResult(submission.data);
-    setSessionCount((count) => count + 1);
+    recordResult(submission.data);
     setSubmitting(false);
   }
 
   async function continuePractice() {
+    if (stats.completed >= QUICK_SET_SIZE) {
+      setSetComplete(true);
+      setActivity(null);
+      setResult(null);
+      return;
+    }
+    await loadNext();
+  }
+
+  async function startAnotherSet() {
+    setStats(EMPTY_STATS);
+    setSetComplete(false);
+    setResult(null);
+    setLastAnswer(null);
     await loadNext();
   }
 
   const currentMeta = activity ? typeMeta[activity.exercise_type] : null;
+  const accuracy = stats.completed
+    ? Math.round((stats.correct / stats.completed) * 100)
+    : 0;
+  const progress = Math.min(100, Math.round((stats.completed / QUICK_SET_SIZE) * 100));
+  const isLastFeedback = stats.completed >= QUICK_SET_SIZE;
+  const selectionLead = useMemo(() => {
+    if (!selection) return null;
+    return selection.selection_reason || strategyCopy[selection.strategy] || null;
+  }, [selection]);
 
   return (
     <main className={styles.shell}>
@@ -157,28 +216,37 @@ export default function PracticePage() {
 
       <section className={styles.hero}>
         <div>
-          <span className="eyebrow">🤫 SILENT MODE · 10 EXERCISE FAMILIES</span>
-          <h1>Practice anywhere.<br />No microphone needed.</h1>
+          <span className="eyebrow">🤫 ADAPTIVE SILENT PRACTICE · QUICK SET</span>
+          <h1>Eight drills.<br />Zero awkwardness.</h1>
           <p>
-            Tap, type, match, fill gaps and rebuild interview language on the bus, train or in the
-            office while one mastery engine learns what you can actually recall.
+            A short, bus-friendly mix of tap puzzles and recall. The first cycle explores every
+            exercise family; after that, weaker skills move to the front automatically.
           </p>
         </div>
         <div className={styles.sessionCard}>
-          <span>THIS SESSION</span>
-          <strong>{sessionCount}</strong>
-          <small>exercises completed</small>
+          <div className={styles.sessionTop}>
+            <span>QUICK SET</span>
+            <strong>{stats.completed}<small> / {QUICK_SET_SIZE}</small></strong>
+          </div>
+          <div className={styles.progressTrack} aria-label={`${stats.completed} of ${QUICK_SET_SIZE} completed`}>
+            <span style={{ width: `${progress}%` }} />
+          </div>
+          <div className={styles.sessionSplit}>
+            <span><b>{stats.correct}</b> correct</span>
+            <span><b>{stats.missed}</b> missed</span>
+          </div>
         </div>
       </section>
 
       <section className={styles.modeStrip} aria-label="Silent exercise mix">
         {(availableTypes.length ? availableTypes : Object.keys(typeMeta)).map((type) => {
-          const meta = typeMeta[type] ?? { label: type, icon: "•" };
+          const meta = typeMeta[type] ?? { label: type, icon: "•", tapFirst: true };
           const active = activity?.exercise_type === type;
           return (
             <div key={type} className={`${styles.modeChip} ${active ? styles.activeChip : ""}`}>
               <span>{meta.icon}</span>
               <strong>{meta.label}</strong>
+              {meta.tapFirst ? <small>TAP</small> : null}
             </div>
           );
         })}
@@ -188,29 +256,73 @@ export default function PracticePage() {
 
       <section className={styles.workspace}>
         <aside className={styles.contextPanel}>
-          <span className="card-kicker">WHY THIS MODE</span>
-          <h2>Repetition without boredom.</h2>
-          <p>
-            The same interview vocabulary comes back through recognition, active recall, grammar,
-            matching, context and sentence construction instead of one repeated card shape.
-          </p>
-          <div className={styles.contextFacts}>
-            <div><strong>10</strong><span>exercise types</span></div>
-            <div><strong>30–90s</strong><span>per drill</span></div>
-            <div><strong>1</strong><span>mastery graph</span></div>
-          </div>
+          <span className="card-kicker">WHY THIS DRILL?</span>
+          {selection && !setComplete ? (
+            <>
+              <div className={styles.strategyBadge}>
+                <strong>{selection.strategy === "adaptive_weakness" ? "ADAPTIVE" : "EXPLORE"}</strong>
+                <span>{selection.interaction_mode === "tap" ? "tap-first" : "keyboard recall"}</span>
+              </div>
+              <h2>{selectionLead ?? "Building useful practice evidence."}</h2>
+              <p>
+                {strategyCopy[selection.strategy] ?? "The practice engine is balancing variety and mastery evidence."}
+              </p>
+              <div className={styles.masteryFacts}>
+                <div><span>state</span><strong>{selection.mastery_state}</strong></div>
+                <div><span>confidence</span><strong>{Math.round(selection.confidence * 100)}%</strong></div>
+                <div><span>lapses</span><strong>{selection.lapses}</strong></div>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>Short sets beat endless scrolling.</h2>
+              <p>
+                Finish eight focused drills, read the summary, then decide whether to do another set
+                or return to learning and review.
+              </p>
+            </>
+          )}
           <Link href="/review" className="text-link">Open due reviews →</Link>
         </aside>
 
         <div className={styles.stage}>
-          {loading ? (
+          {setComplete ? (
+            <article className={styles.summaryCard} aria-live="polite">
+              <span className="card-kicker">QUICK SET COMPLETE</span>
+              <h2>{stats.missed ? "Good set. Now you know what needs another pass." : "Clean set. Nice retrieval."}</h2>
+              <div className={styles.summaryScore}>
+                <strong>{accuracy}%</strong>
+                <span>accuracy</span>
+              </div>
+              <div className={styles.summaryGrid}>
+                <div><strong>{stats.correct}</strong><span>correct</span></div>
+                <div><strong>{stats.missed}</strong><span>missed</span></div>
+                <div><strong>{QUICK_SET_SIZE}</strong><span>drills</span></div>
+              </div>
+              <p>
+                {stats.missed
+                  ? "Misses are already stored as mastery evidence, so weak skills can return sooner in adaptive practice and review."
+                  : "Your successful evidence can widen review intervals while the next set keeps exercise shapes varied."}
+              </p>
+              <div className={styles.summaryActions}>
+                <button className="button button-accent" type="button" onClick={startAnotherSet}>
+                  Start another set
+                </button>
+                <Link href={stats.missed ? "/review" : "/learn"} className="button">
+                  {stats.missed ? "Review weak skills" : "Back to learning"}
+                </Link>
+              </div>
+            </article>
+          ) : null}
+
+          {!setComplete && loading ? (
             <div className={styles.loadingCard}>
               <span className="card-kicker">BUILDING NEXT DRILL</span>
-              <h2>Picking a different kind of challenge…</h2>
+              <h2>Balancing weakness, variety and tap-first practice…</h2>
             </div>
           ) : null}
 
-          {!loading && activity && !result ? (
+          {!setComplete && !loading && activity && !result ? (
             <article className={styles.exerciseCard}>
               <div className={styles.exerciseMeta}>
                 <span>{currentMeta?.icon ?? "•"}</span>
@@ -222,41 +334,39 @@ export default function PracticePage() {
                       : "Fresh variation"}
                   </small>
                 </div>
-                <code>v{activity.contract_version}</code>
+                <div className={styles.metaBadges}>
+                  <span>{selection?.interaction_mode === "tap" ? "TAP" : "RECALL"}</span>
+                  <code>v{activity.contract_version}</code>
+                </div>
               </div>
               <ExercisePlayer
                 key={activity.id}
                 exerciseType={activity.exercise_type}
                 prompt={activity.prompt}
                 submitting={submitting || queued}
+                submitLabel={queued ? "Saved offline" : "Check"}
                 onSubmit={submit}
               />
             </article>
           ) : null}
 
-          {!loading && activity && result ? (
-            <article
-              className={`${styles.feedbackCard} ${result.correct ? styles.correct : styles.review}`}
-              aria-live="polite"
-            >
-              <span className="card-kicker">
-                {result.correct ? "LOCKED IN" : "SCHEDULED FOR REVIEW"}
-              </span>
-              <h2>{result.correct ? "Sauber." : "Good miss. Keep moving."}</h2>
-              <p>
-                {result.correct
-                  ? "That skill got positive evidence. The scheduler can now widen its interval."
-                  : "No retry wall. The miss becomes targeted evidence and comes back at the right time."}
-              </p>
-              <div className={styles.scoreRow}>
-                <strong>{result.score}</strong>
-                <span>/ 100</span>
-                <code>{result.feedback_code}</code>
-              </div>
-              <button className="button button-accent" onClick={continuePractice}>
-                Next drill
-              </button>
-            </article>
+          {!setComplete && !loading && activity && result ? (
+            <LearningFeedback
+              exerciseType={activity.exercise_type}
+              prompt={activity.prompt}
+              fallbackLemma={activity.prompt.lemma ?? "Practice"}
+              answer={lastAnswer}
+              correct={result.correct}
+              score={result.score}
+              feedbackCode={result.feedback_code}
+              dayComplete={false}
+              nextDay={1}
+              availableThroughDay={1}
+              continueLabelI18n={isLastFeedback
+                ? { en: "Finish quick set", fa: "پایان مجموعه" }
+                : { en: "Next drill", fa: "تمرین بعدی" }}
+              onContinue={continuePractice}
+            />
           ) : null}
         </div>
       </section>
