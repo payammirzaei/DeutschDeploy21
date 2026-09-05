@@ -68,8 +68,11 @@ async def _enrich_once(
     ):
         return instance
 
+    # Graded prompt overrides belong to the course day path. Silent remixes
+    # must keep the requested exercise_type or explore_mix never clears families.
     needs_overlay_pin = (
-        day is not None
+        not instance.instance_key.startswith("silent:")
+        and day is not None
         and release is not None
         and release.version_number >= 4
         and prompt_override_for_position(

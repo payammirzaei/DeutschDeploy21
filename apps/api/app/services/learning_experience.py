@@ -404,10 +404,14 @@ async def enrich_learning_instance(
 
     prompt["lesson"] = lesson
 
+    # Course (and course-like) keys may pin a graded overlay. Silent remix keys
+    # must keep the exercise_type they were materialized for, or explore_mix
+    # never clears missing families.
+    apply_course_overlay = not instance.instance_key.startswith("silent:")
     existing_contract = overlay_contract_from_instance(
         instance.prompt if isinstance(instance.prompt, dict) else None
     )
-    if existing_contract is not None:
+    if apply_course_overlay and existing_contract is not None:
         # Historical graded contract is frozen on the instance. Never silently
         # re-bind to a newer teaching overlay for answer keys. Teaching metadata
         # above may refresh; token order / answer_key must not.
@@ -419,7 +423,7 @@ async def enrich_learning_instance(
             key = dict(instance.answer_key)
             key["overlay_contract"] = dict(existing_contract)
             instance.answer_key = key
-    elif release.version_number >= 4:
+    elif apply_course_overlay and release.version_number >= 4:
         identity = overlay_identity_for_release(release.version_number)
         override = prompt_override_for_position(
             day.day_number,
