@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { api } from "@/src/lib/api";
+import { createIdempotencyKey } from "@/src/lib/offline-attempts";
 
 import styles from "./mock.module.css";
 
@@ -282,7 +283,7 @@ export default function MockInterviewPage() {
         `/api/v1/mock-interviews/sessions/${session.id}/turns/${activeTurn.id}/text`,
         {
           method: "POST",
-          headers: { "Idempotency-Key": crypto.randomUUID() },
+          headers: { "Idempotency-Key": createIdempotencyKey() },
           body: JSON.stringify({ text: answer }),
         },
       );

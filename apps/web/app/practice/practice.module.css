@@ -413,53 +413,182 @@
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 820px) {
   .shell {
-    padding-inline: 14px;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      calc(28px + env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    margin-inline: -4px;
+    padding: 8px 4px 12px;
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(14px);
   }
 
   .header nav {
-    gap: 10px;
+    gap: 12px;
+  }
+
+  .header nav :global(.text-link) {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding-inline: 2px;
   }
 
   .hero {
-    padding-top: 24px;
+    gap: 14px;
+    padding: 16px 0 12px;
   }
 
   .hero h1 {
-    font-size: clamp(40px, 13vw, 58px);
+    max-width: none;
+    font-size: clamp(32px, 10vw, 44px);
+    line-height: 1.02;
+    letter-spacing: -.045em;
+  }
+
+  .hero p {
+    font-size: 14px;
+    line-height: 1.45;
   }
 
   .sessionCard {
-    min-height: 132px;
+    min-height: 0;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 8px 22px rgba(20, 32, 51, .05);
+  }
+
+  .sessionTop {
+    align-items: center;
+  }
+
+  .sessionTop strong {
+    font-size: 30px;
+  }
+
+  .sessionTop small {
+    font-size: 14px;
+  }
+
+  .modeStrip {
+    margin-bottom: 12px;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+
+  .modeChip {
+    min-height: 40px;
+    padding: 4px 8px 4px 4px;
+  }
+
+  .modeChip > span {
+    width: 26px;
+    height: 26px;
+  }
+
+  .modeChip strong {
+    font-size: 11px;
+  }
+
+  .workspace {
+    gap: 12px;
   }
 
   .contextPanel {
     order: 2;
+    gap: 10px;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: none;
   }
 
   .stage {
     order: 1;
+    min-width: 0;
+  }
+
+  .contextPanel h2,
+  .loadingCard h2,
+  .summaryCard h2 {
+    font-size: clamp(18px, 5.4vw, 26px);
+    line-height: 1.2;
+    letter-spacing: -.02em;
+  }
+
+  .contextPanel > p {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .strategyBadge {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    padding: 8px 10px;
+  }
+
+  .masteryFacts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .masteryFacts div {
+    padding: 8px;
+  }
+
+  .masteryFacts strong {
+    font-size: 11px;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .exerciseCard,
   .summaryCard,
   .loadingCard {
     min-height: 0;
-    padding: 16px;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 8px 22px rgba(20, 32, 51, .05);
   }
 
   .exerciseMeta {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+
+  .exerciseMeta > span {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
   }
 
   .metaBadges {
     grid-column: 1 / -1;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
-  .masteryFacts {
-    grid-template-columns: 1fr 1fr 1fr;
+  .summaryGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .summaryGrid div {
+    padding: 12px 10px;
+  }
+
+  .summaryGrid strong {
+    font-size: 20px;
   }
 
   .summaryActions {
@@ -468,6 +597,43 @@
 
   .summaryActions > * {
     width: 100%;
+    min-height: 48px;
+  }
+
+  /* Once a drill is live, keep marketing out of the way on phones. */
+  .shellActive .heroCopy {
+    display: none;
+  }
+
+  .shellActive .hero {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .shellActive .contextPanel h2 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .shellActive .contextPanel > p,
+  .shellActive .contextPanel > :global(.text-link) {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .masteryFacts {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sessionSplit {
+    flex-wrap: wrap;
   }
 }
 

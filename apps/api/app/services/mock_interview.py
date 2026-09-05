@@ -429,7 +429,10 @@ def _score_answer(
     elif overall >= 65:
         summary = "Usable answer with one or two areas to sharpen before a realistic interview."
     else:
-        summary = "The answer needs clearer relevance, structure or concrete evidence before the next rep."
+        summary = (
+            "The answer needs clearer relevance, structure or concrete evidence "
+            "before the next rep."
+        )
     weakest = min(dimensions, key=dimensions.get)  # type: ignore[arg-type]
     next_actions = {
         "relevance": "Answer the exact question earlier and include the missing required signal.",
@@ -520,7 +523,13 @@ async def _build_report(
     mode_factor = {"guided": 0.72, "practice": 0.86, "realistic": 1.0}[interview.mode]
     independence_ratio = dimensions["independence"] / 100
     confidence = round(
-        min(1.0, coverage * mode_factor * (0.85 + 0.15 * speech_ratio) * (0.9 + 0.1 * independence_ratio)),
+        min(
+            1.0,
+            coverage
+            * mode_factor
+            * (0.85 + 0.15 * speech_ratio)
+            * (0.9 + 0.1 * independence_ratio),
+        ),
         3,
     )
     ranked = sorted(dimensions.items(), key=lambda item: item[1], reverse=True)

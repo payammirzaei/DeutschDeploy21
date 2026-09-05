@@ -54,6 +54,16 @@ type Day = {
   submitted_count: number;
   total_count: number;
   activities: ActivitySummary[];
+  context_de?: string | null;
+  context_i18n?: { en?: string | null; fa?: string | null } | null;
+  activity_stages?: string[];
+  teaching_blocks?: Array<{
+    id: string;
+    type: string;
+    title_i18n?: { en?: string | null; fa?: string | null };
+    explanation_i18n?: { en?: string | null; fa?: string | null };
+    example_de?: string;
+  }>;
 };
 
 type LearningHome = {
@@ -77,6 +87,11 @@ type AttemptResult = {
   feedback_code: string;
   day_complete: boolean;
   next_day: number;
+  teaching?: {
+    why_i18n?: { en?: string | null; fa?: string | null } | null;
+    rule_i18n?: { en?: string | null; fa?: string | null } | null;
+    correct_example_de?: string | null;
+  } | null;
 };
 
 const EMPTY_HOME: LearningHome = {
@@ -84,7 +99,7 @@ const EMPTY_HOME: LearningHome = {
   enrollment_id: null,
   course_title: null,
   release_version: null,
-  latest_release_version: 3,
+  latest_release_version: 4,
   upgrade_available: false,
   current_day: 1,
   available_through_day: 21,
@@ -297,35 +312,48 @@ export default function LearnPage() {
   }
 
   async function submitAnswer(answer: ExerciseAnswer) {
-    if (!activity || submitting || queued) return;
+    if (!activity || submitting) return;
     setSubmitting(true);
+    setQueued(false);
     setLastAnswer(answer);
     setError(null);
 
-    const durationMs = startedAt
-      ? Math.max(0, Date.now() - startedAt)
-      : null;
-    const submission = await submitLearningAttemptSafely<AttemptResult>(activity.id, {
-      ...answer,
-      duration_ms: durationMs,
-    });
-
-    if (submission.status === "queued") {
-      setQueued(true);
-      setSubmitting(false);
-      return;
-    }
-    if (submission.status === "error") {
-      setError(
-        "Your answer could not be saved. Nothing was marked complete.",
+    try {
+      const durationMs = startedAt
+        ? Math.max(0, Date.now() - startedAt)
+        : null;
+      const submission = await submitLearningAttemptSafely<AttemptResult>(
+        activity.id,
+        {
+          ...answer,
+          duration_ms: durationMs,
+        },
       );
-      setSubmitting(false);
-      return;
-    }
 
-    setResult(submission.data);
-    await loadHome();
-    setSubmitting(false);
+      if (submission.status === "queued") {
+        setQueued(true);
+        setError(
+          "Answer saved on this device. It will sync when the connection is ready — tap Check again to retry now.",
+        );
+        return;
+      }
+      if (submission.status === "error") {
+        setError(
+          submission.httpStatus === 401
+            ? "Your session expired. Sign in again, then resubmit."
+            : "Your answer could not be saved. Nothing was marked complete.",
+        );
+        return;
+      }
+
+      setResult(submission.data);
+      setQueued(false);
+      void loadHome();
+    } catch {
+      setError("Your answer could not be saved. Try once more.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function continueLearning() {
@@ -344,8 +372,15 @@ export default function LearnPage() {
     await openNextActivity(nextDay);
   }
 
+  const inWorkspace = home.enrolled;
+  const inSession = Boolean(activity || result);
+
   return (
-    <main className={styles.shell}>
+    <main
+      className={`${styles.shell} ${inWorkspace ? styles.shellReady : ""} ${
+        inSession ? styles.shellActive : ""
+      }`}
+    >
       <header className={styles.header}>
         <Link
           href="/dashboard"
@@ -359,17 +394,19 @@ export default function LearnPage() {
             Practice
           </Link>
           <Link href="/drills" className="text-link">
-            Interview Lab
+            <span className={styles.navFull}>Interview Lab</span>
+            <span className={styles.navShort}>Drills</span>
           </Link>
           <Link href="/dashboard" className="text-link">
-            Dashboard
+            <span className={styles.navFull}>Dashboard</span>
+            <span className={styles.navShort}>Home</span>
           </Link>
         </nav>
       </header>
 
       <section className={styles.hero}>
-        <div>
-          <div className="eyebrow">LEARNING V3 · CONTEXT FIRST</div>
+        <div className={styles.heroCopy}>
+          <div className="eyebrow">LEARNING · CONTEXT FIRST</div>
           <h1>Learn it. Build it. Use it.</h1>
           <p>
             Start from real German interview sentences, notice the pattern, then
@@ -502,6 +539,7 @@ export default function LearnPage() {
                 dayComplete={
                   journeyDay.completed || Boolean(result?.day_complete)
                 }
+                authoredStages={journeyDay.activity_stages}
               />
             ) : null}
 
@@ -532,6 +570,14 @@ export default function LearnPage() {
                 </span>
                 <h2>{currentDay.title}</h2>
                 <p>{currentDay.objective}</p>
+                {currentDay.context_de ? (
+                  <blockquote lang="de" dir="ltr" className={styles.dayContext}>
+                    {currentDay.context_de}
+                  </blockquote>
+                ) : null}
+                {currentDay.context_i18n?.en ? (
+                  <p className={styles.contextEn}>{currentDay.context_i18n.en}</p>
+                ) : null}
                 <div className={styles.dayStats}>
                   <div>
                     <strong>{currentDay.total_count}</strong>
@@ -554,7 +600,7 @@ export default function LearnPage() {
                   </p>
                 ) : (
                   <button
-                    className="button button-accent"
+                    className={`button button-accent ${styles.primaryCta}`}
                     onClick={() =>
                       openNextActivity(currentDay.day_number)
                     }
@@ -579,7 +625,8 @@ export default function LearnPage() {
                   key={activity.id}
                   exerciseType={activity.exercise_type}
                   prompt={activity.prompt}
-                  submitting={submitting || queued}
+                  submitting={submitting}
+                  submitLabel={queued ? "Retry sync" : "Check"}
                   onSubmit={submitAnswer}
                 />
                 <div className={styles.exerciseFooter}>

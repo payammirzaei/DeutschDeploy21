@@ -24,6 +24,8 @@ from app.schemas.learning import (
     LearningHome,
     NextActivityResponse,
     StartLearningResult,
+    TeachingFeedback,
+    TeachingOverlayIdentity,
     UpgradeLearningResult,
 )
 from app.services.curriculum import (
@@ -39,6 +41,8 @@ from app.services.interview_drills import (
     load_interview_drills,
     materialize_interview_drill,
 )
+from app.services.learning_experience import teaching_feedback_from_prompt
+from app.services.lesson_overlay import day_overlay_as_view, overlay_identity_for_release
 
 
 async def ensure_starter_learning(
@@ -184,6 +188,10 @@ async def get_learning_home(
         raise RuntimeError("Course release references a missing course")
 
     days = await _day_views(session, enrollment)
+    teaching_overlay = None
+    identity = overlay_identity_for_release(release.version_number)
+    if identity is not None:
+        teaching_overlay = TeachingOverlayIdentity.model_validate(identity)
     return LearningHome(
         enrolled=True,
         enrollment_id=enrollment.id,
@@ -197,6 +205,7 @@ async def get_learning_home(
             default=0,
         ),
         course_complete=bool(days) and all(day.completed for day in days),
+        teaching_overlay=teaching_overlay,
         days=days,
     )
 
@@ -309,6 +318,8 @@ async def submit_attempt(
             evaluation,
             day_complete,
             next_day,
+            instance.prompt if isinstance(instance.prompt, dict) else None,
+            instance.answer_key if isinstance(instance.answer_key, dict) else None,
         )
 
     instance = await session.get(ActivityInstance, instance_id)
@@ -363,6 +374,8 @@ async def submit_attempt(
         evaluation,
         day_complete,
         next_day,
+        instance.prompt if isinstance(instance.prompt, dict) else None,
+        instance.answer_key if isinstance(instance.answer_key, dict) else None,
     )
 
 
@@ -444,6 +457,10 @@ async def _day_views(
                     submitted=submitted,
                 )
             )
+        overlay = None
+        release = await session.get(CourseRelease, enrollment.course_release_id)
+        if release is not None and release.version_number >= 4:
+            overlay = day_overlay_as_view(day.day_number, release.version_number)
         result.append(
             DayView(
                 day_number=day.day_number,
@@ -456,6 +473,12 @@ async def _day_views(
                 submitted_count=submitted_count,
                 total_count=len(activity_views),
                 activities=activity_views,
+                context_de=overlay.get("context_de") if overlay else None,
+                context_i18n=overlay.get("context_i18n") if overlay else None,
+                activity_stages=overlay.get("activity_stages") if overlay else [],
+                teaching_blocks=overlay.get("teaching_blocks") if overlay else [],
+                spiral=overlay.get("spiral") if overlay else [],
+                planned_future=overlay.get("planned_future") if overlay else [],
             )
         )
     return result
@@ -684,12 +707,60 @@ def _instance_view(
     )
 
 
+def _answer_preview(payload: dict | None, prompt: dict | None) -> str | None:
+    if not isinstance(payload, dict):
+        return None
+    if payload.get("text"):
+        return str(payload["text"])
+    if payload.get("choice_id") and isinstance(prompt, dict):
+        for choice in prompt.get("choices") or []:
+            if str(choice.get("id")) == str(payload["choice_id"]):
+                return str(choice.get("text") or choice.get("id"))
+        return str(payload["choice_id"])
+    if payload.get("token_ids") and isinstance(prompt, dict):
+        by_id = {
+            str(token.get("id")): str(token.get("text"))
+            for token in prompt.get("tokens") or []
+            if token.get("id") is not None
+        }
+        values = [
+            by_id[str(token_id)]
+            for token_id in payload["token_ids"]
+            if str(token_id) in by_id
+        ]
+        return " ".join(values) if values else None
+    if payload.get("pair_ids"):
+        return " · ".join(str(item) for item in payload["pair_ids"])
+    return None
+
+
 def _attempt_result(
     attempt: Attempt,
     evaluation: Evaluation,
     day_complete: bool,
     next_day: int,
+    prompt: dict | None = None,
+    answer_key: dict | None = None,
 ) -> AttemptResult:
+    teaching = None
+    submitted = _answer_preview(
+        attempt.normalized_answer if isinstance(attempt.normalized_answer, dict) else None,
+        prompt,
+    )
+    expected = _answer_preview(answer_key if isinstance(answer_key, dict) else None, prompt)
+    if prompt is not None:
+        raw = teaching_feedback_from_prompt(prompt, correct=evaluation.correct)
+        why = raw.get("why_i18n") if raw else None
+        rule = raw.get("rule_i18n") if raw else None
+        example = raw.get("correct_example_de") if raw else None
+        if raw or submitted or expected:
+            teaching = TeachingFeedback(
+                why_i18n=why if isinstance(why, dict) else None,
+                rule_i18n=rule if isinstance(rule, dict) else None,
+                correct_example_de=str(example) if example else None,
+                submitted_answer=submitted,
+                correct_answer=expected or (str(example) if example else None),
+            )
     return AttemptResult(
         attempt_id=attempt.id,
         evaluation_id=evaluation.id,
@@ -698,4 +769,6 @@ def _attempt_result(
         feedback_code=evaluation.feedback_code,
         day_complete=day_complete,
         next_day=next_day,
+        teaching=teaching,
+        review_scheduled=not evaluation.correct,
     )

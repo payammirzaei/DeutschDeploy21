@@ -244,30 +244,38 @@ export default function ReviewPage() {
     : null;
 
   async function submit(answer: ExerciseAnswer) {
-    if (!activity || submitting || queued) return;
+    if (!activity || submitting) return;
     setSubmitting(true);
+    setQueued(false);
     setLastAnswer(answer);
     setError(null);
-    const duration = startedAt.current === null
-      ? 0
-      : Math.max(0, Date.now() - startedAt.current);
-    const submission = await submitLearningAttemptSafely<AttemptResult>(
-      activity.activity_instance_id,
-      { ...answer, duration_ms: duration },
-    );
-    if (submission.status === "queued") {
-      setQueued(true);
-      setSubmitting(false);
-      return;
-    }
-    if (submission.status === "error") {
+    try {
+      const duration = startedAt.current === null
+        ? 0
+        : Math.max(0, Date.now() - startedAt.current);
+      const submission = await submitLearningAttemptSafely<AttemptResult>(
+        activity.activity_instance_id,
+        { ...answer, duration_ms: duration },
+      );
+      if (submission.status === "queued") {
+        setQueued(true);
+        setError(
+          "Answer saved on this device. Tap Check again to retry sync.",
+        );
+        return;
+      }
+      if (submission.status === "error") {
+        setError("Your review answer was not saved. Please try again.");
+        return;
+      }
+      recordResult(submission.data);
+      setQueued(false);
+      void loadHome();
+    } catch {
       setError("Your review answer was not saved. Please try again.");
+    } finally {
       setSubmitting(false);
-      return;
     }
-    recordResult(submission.data);
-    await loadHome();
-    setSubmitting(false);
   }
 
   async function continueReview() {
@@ -382,8 +390,8 @@ export default function ReviewPage() {
                 key={activity.activity_instance_id}
                 exerciseType={activity.exercise_type}
                 prompt={activity.prompt}
-                submitting={submitting || queued}
-                submitLabel="Check review"
+                submitting={submitting}
+                submitLabel={queued ? "Retry sync" : "Check review"}
                 onSubmit={submit}
               />
             </article>

@@ -31,10 +31,47 @@ type Lesson = {
   title_i18n?: LocalizedText;
   goal_i18n?: LocalizedText;
   explanation_i18n?: LocalizedText;
+  usage_notes_i18n?: LocalizedText;
   example_de?: string | null;
   example_i18n?: LocalizedText;
+  software_example_de?: string | null;
   meaning_i18n?: LocalizedText;
-  grammar?: { cefr?: string | null };
+  pronunciation_hint?: string | null;
+  grammar?: {
+    cefr?: string | null;
+    perfect_auxiliary?: string | null;
+    participle_ii?: string | null;
+    separable?: boolean | null;
+    separable_prefix?: string | null;
+    regularity?: string | null;
+    governed_case?: string | null;
+    governed_preposition?: string | null;
+  };
+  structures?: Array<{ pattern_de: string; note_i18n?: LocalizedText }>;
+  mistakes?: Array<{
+    wrong_de: string;
+    correct_de: string;
+    why_i18n?: LocalizedText;
+  }>;
+  contrasts?: Array<{ lemma: string; difference_i18n?: LocalizedText }>;
+  collocations?: string[];
+  interview_uses?: Array<{ model_answer_de: string; note_i18n?: LocalizedText }>;
+  teaching_block?: {
+    id?: string;
+    type?: string;
+    title_i18n?: LocalizedText;
+    explanation_i18n?: LocalizedText;
+    rule_i18n?: LocalizedText;
+    example_de?: string | null;
+    example_i18n?: LocalizedText;
+    common_mistake_de?: string | null;
+    corrected_example_de?: string | null;
+  };
+  teaching_feedback?: {
+    why_i18n?: LocalizedText;
+    rule_i18n?: LocalizedText;
+    correct_example_de?: string | null;
+  };
 };
 
 export type ExercisePrompt = {
@@ -428,12 +465,22 @@ function LearningContext({
   const lesson = prompt.lesson;
   if (!lesson) return null;
 
-  const title = localize(lesson.title_i18n, locale) ?? COPY[locale].context;
-  const goal = localize(lesson.goal_i18n, locale);
-  const explanation = localize(lesson.explanation_i18n, locale);
-  const exampleTranslation = localize(lesson.example_i18n, locale);
+  const block = lesson.teaching_block;
+  const title =
+    localize(block?.title_i18n, locale) ??
+    localize(lesson.title_i18n, locale) ??
+    COPY[locale].context;
+  const explanation =
+    localize(block?.explanation_i18n, locale) ??
+    localize(lesson.usage_notes_i18n, locale);
+  const rule = localize(block?.rule_i18n, locale);
+  const exampleDe = block?.example_de ?? lesson.example_de;
+  const exampleTranslation =
+    localize(block?.example_i18n, locale) ?? localize(lesson.example_i18n, locale);
   const meaning = localize(lesson.meaning_i18n, locale);
-  const canShowMeaning = !new Set(["meaning_multiple_choice", "meaning_matching"]).has(exerciseType);
+  const canShowMeaning = !new Set(["meaning_multiple_choice", "meaning_matching"]).has(
+    exerciseType,
+  );
 
   return (
     <section className={styles.lessonCard} dir={locale === "fa" ? "rtl" : "ltr"}>
@@ -441,13 +488,16 @@ function LearningContext({
         <span>{title}</span>
         {lesson.grammar?.cefr ? <code>{lesson.grammar.cefr}</code> : null}
       </div>
-      {goal ? <strong className={styles.lessonGoal}>{goal}</strong> : null}
-      {lesson.example_de ? (
-        <blockquote lang="de" dir="ltr">{lesson.example_de}</blockquote>
-      ) : null}
+      {exampleDe ? <blockquote lang="de" dir="ltr">{exampleDe}</blockquote> : null}
       {exampleTranslation ? <p className={styles.exampleTranslation}>{exampleTranslation}</p> : null}
       {explanation ? <p>{explanation}</p> : null}
-      {canShowMeaning && meaning ? (
+      {rule ? (
+        <div className={styles.meaningLine}>
+          <span>{locale === "fa" ? "قانون" : "Rule"}</span>
+          <strong>{rule}</strong>
+        </div>
+      ) : null}
+      {canShowMeaning && meaning && !block ? (
         <div className={styles.meaningLine}>
           <span>{COPY[locale].meaning}</span>
           <strong>{meaning}</strong>

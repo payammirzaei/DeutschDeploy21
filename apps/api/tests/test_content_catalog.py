@@ -116,7 +116,7 @@ def test_starter_catalog_is_100_verbs_and_idempotent() -> None:
         first = client.post("/api/v1/content/starter-catalog")
         assert first.status_code == 200
         assert first.json()["catalog_size"] == 100
-        assert first.json()["published"] == 100
+        assert first.json()["imported"] + first.json()["unchanged"] == 100
 
         second = client.post("/api/v1/content/starter-catalog")
         assert second.status_code == 200
@@ -132,3 +132,6 @@ def test_starter_catalog_is_100_verbs_and_idempotent() -> None:
         entwickeln = next(row for row in starter_rows if row["external_id"] == "verb.entwickeln")
         assert entwickeln["participle_ii"] == "entwickelt"
         assert entwickeln["translations"]["fa"] == ["توسعه دادن"]
+        assert entwickeln["pedagogy"] is not None
+        assert entwickeln["pedagogy"]["mistakes"]
+        assert len(entwickeln["examples"]) >= 2

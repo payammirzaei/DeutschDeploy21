@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "21 focused days to stronger German software interviews.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f4efe4",
-    theme_color: "#f4efe4",
+    background_color: "#f6f8fb",
+    theme_color: "#f6f8fb",
     orientation: "portrait-primary",
     icons: [
       {

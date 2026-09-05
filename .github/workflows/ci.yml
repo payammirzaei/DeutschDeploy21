@@ -71,7 +71,7 @@ jobs:
         run: uv run python -m app.scripts.export_openapi
       - name: Install web dependencies and generate API types
         run: |
-          npm install
+          npm ci
           npm run api:generate
       - name: Web lint, types, offline tests and build
         run: |

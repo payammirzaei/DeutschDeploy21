@@ -5,10 +5,26 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.content import ContentVersion, VersionExample, VersionLocalization
+from app.models.content import (
+    ContentVersion,
+    VerbVersion,
+    VersionExample,
+    VersionLocalization,
+)
 from app.models.learning import ActivityInstance, CourseDay, CourseRelease, ReleaseActivity
+from app.schemas.content import VerbPedagogyIn
+from app.services.content import PEDAGOGY_FIELD, PEDAGOGY_LOCALE
+from app.services.lesson_overlay import (
+    apply_prompt_override,
+    overlay_contract_from_instance,
+    overlay_identity_for_release,
+    prompt_override_for_position,
+    teaching_block_as_prompt,
+    teaching_block_for_position,
+)
 
 PROMPT_CONTRACT_VERSION = 2
+PROMPT_CONTRACT_VERSION_V4 = 3
 
 QUESTION_I18N: dict[str, dict[str, str]] = {
     "meaning_multiple_choice": {
@@ -218,15 +234,22 @@ async def enrich_learning_instance(
     if version is None:
         return instance
 
-    example = await session.scalar(
-        select(VersionExample)
-        .where(VersionExample.version_id == version.id)
-        .order_by(VersionExample.sort_order, VersionExample.external_id)
-        .limit(1)
+    examples = list(
+        (
+            await session.execute(
+                select(VersionExample)
+                .where(VersionExample.version_id == version.id)
+                .order_by(VersionExample.sort_order, VersionExample.external_id)
+            )
+        ).scalars()
     )
+    example = examples[0] if examples else None
     translations = await _translations(session, version.id)
+    verb = await session.get(VerbVersion, version.id)
+    pedagogy = await _pedagogy(session, version.id)
     prompt = dict(instance.prompt)
     exercise_type = instance.exercise_type
+    deep = release.version_number >= 4 and pedagogy is not None
 
     question_i18n = QUESTION_I18N.get(exercise_type)
     if question_i18n:
@@ -234,17 +257,45 @@ async def enrich_learning_instance(
         prompt["question"] = question_i18n["en"]
 
     prompt["instruction_locale_default"] = "en"
-    prompt["lesson"] = {
+    interview_example = next(
+        (row for row in examples if row.skill == "interview"),
+        example,
+    )
+    software_example = next(
+        (row for row in examples if row.skill == "software"),
+        None,
+    )
+    anchor = interview_example or example
+
+    explanation = EXPLANATION_I18N.get(exercise_type, {})
+    if deep and pedagogy and pedagogy.usage_notes is not None:
+        explanation = {
+            "en": pedagogy.usage_notes.en,
+            "fa": pedagogy.usage_notes.fa,
+        }
+    if deep and pedagogy and pedagogy.mistakes and exercise_type == "usage_error_spotting":
+        mistake = pedagogy.mistakes[0]
+        explanation = {
+            "en": mistake.why.en,
+            "fa": mistake.why.fa,
+        }
+
+    lesson = {
         "title_i18n": {
+            "en": "Learn it like a teacher would",
+            "fa": "مثل یک معلم واقعی یاد بگیر",
+        }
+        if deep
+        else {
             "en": "Learn it in context",
             "fa": "یادگیری در متن",
         },
         "goal_i18n": GOAL_I18N.get(exercise_type, {}),
-        "explanation_i18n": EXPLANATION_I18N.get(exercise_type, {}),
-        "example_de": example.text_de if example else None,
+        "explanation_i18n": explanation,
+        "example_de": anchor.text_de if anchor else None,
         "example_i18n": {
-            "en": example.text_en if example else None,
-            "fa": example.text_fa if example else None,
+            "en": anchor.text_en if anchor else None,
+            "fa": anchor.text_fa if anchor else None,
         },
         "meaning_i18n": {
             "en": translations.get("en"),
@@ -255,37 +306,228 @@ async def enrich_learning_instance(
         },
     }
 
-    if exercise_type in {"reverse_typing", "perfect_form_typing"}:
+    if verb is not None:
+        lesson["grammar"].update(
+            {
+                "perfect_auxiliary": verb.perfect_auxiliary,
+                "participle_ii": verb.participle_ii,
+                "separable": verb.separable,
+                "separable_prefix": verb.separable_prefix,
+                "regularity": verb.regularity,
+                "governed_case": verb.governed_case,
+                "governed_preposition": verb.governed_preposition,
+            }
+        )
+
+    if deep and pedagogy is not None:
+        lesson["pronunciation_hint"] = pedagogy.pronunciation_hint
+        lesson["usage_notes_i18n"] = (
+            pedagogy.usage_notes.model_dump() if pedagogy.usage_notes else None
+        )
+        lesson["praesens"] = (
+            pedagogy.praesens.model_dump() if pedagogy.praesens else None
+        )
+        lesson["structures"] = [
+            {
+                "pattern_de": item.pattern_de,
+                "note_i18n": item.note.model_dump(),
+            }
+            for item in pedagogy.structures
+        ]
+        lesson["mistakes"] = [
+            {
+                "wrong_de": item.wrong_de,
+                "correct_de": item.correct_de,
+                "why_i18n": item.why.model_dump(),
+            }
+            for item in pedagogy.mistakes
+        ]
+        lesson["contrasts"] = [
+            {
+                "lemma": item.lemma,
+                "difference_i18n": item.difference.model_dump(),
+            }
+            for item in pedagogy.contrasts
+        ]
+        lesson["collocations"] = list(pedagogy.collocations)
+        lesson["related"] = list(pedagogy.related)
+        lesson["interview_uses"] = [
+            {
+                "model_answer_de": item.model_answer_de,
+                "note_i18n": item.note.model_dump(),
+            }
+            for item in pedagogy.interview_uses
+        ]
+        lesson["grammar_tags"] = list(pedagogy.grammar_tags)
+        lesson["examples"] = [
+            {
+                "de": row.text_de,
+                "en": row.text_en,
+                "fa": row.text_fa,
+                "skill": row.skill,
+            }
+            for row in examples
+        ]
+        if software_example is not None:
+            lesson["software_example_de"] = software_example.text_de
+        if pedagogy.mistakes:
+            primary = pedagogy.mistakes[0]
+            lesson["teaching_feedback"] = {
+                "why_i18n": primary.why.model_dump(),
+                "rule_i18n": explanation,
+                "correct_example_de": primary.correct_de,
+            }
+
+    block = (
+        teaching_block_for_position(
+            day.day_number,
+            activity.position,
+            release.version_number,
+        )
+        if release.version_number >= 4
+        else None
+    )
+    if block is not None:
+        lesson["teaching_block"] = teaching_block_as_prompt(block)
+        lesson["title_i18n"] = block.title_i18n.model_dump()
+        lesson["goal_i18n"] = block.explanation_i18n.model_dump()
+        lesson["explanation_i18n"] = block.rule_i18n.model_dump()
+        lesson["example_de"] = block.example_de
+        lesson["example_i18n"] = (
+            block.example_i18n.model_dump() if block.example_i18n else lesson.get("example_i18n")
+        )
+        lesson["teaching_feedback"] = {
+            "why_i18n": block.explanation_i18n.model_dump(),
+            "rule_i18n": block.rule_i18n.model_dump(),
+            "correct_example_de": block.corrected_example_de or block.example_de,
+        }
+
+    prompt["lesson"] = lesson
+
+    # Course (and course-like) keys may pin a graded overlay. Silent remix keys
+    # must keep the exercise_type they were materialized for, or explore_mix
+    # never clears missing families.
+    apply_course_overlay = not instance.instance_key.startswith("silent:")
+    existing_contract = overlay_contract_from_instance(
+        instance.prompt if isinstance(instance.prompt, dict) else None
+    )
+    if apply_course_overlay and existing_contract is not None:
+        # Historical graded contract is frozen on the instance. Never silently
+        # re-bind to a newer teaching overlay for answer keys. Teaching metadata
+        # above may refresh; token order / answer_key must not.
+        prompt["overlay_contract"] = existing_contract
+        if existing_contract.get("graded_as") == "phrase_builder":
+            instance.exercise_type = "phrase_builder"
+        # Preserve the originally pinned answer_key verbatim.
+        if isinstance(instance.answer_key, dict):
+            key = dict(instance.answer_key)
+            key["overlay_contract"] = dict(existing_contract)
+            instance.answer_key = key
+    elif apply_course_overlay and release.version_number >= 4:
+        identity = overlay_identity_for_release(release.version_number)
+        override = prompt_override_for_position(
+            day.day_number,
+            activity.position,
+            release.version_number,
+        )
+        if identity is not None and override is not None:
+            prompt, answer_key = apply_prompt_override(
+                prompt,
+                dict(instance.answer_key or {}),
+                override,
+                overlay_identity=identity,
+            )
+            instance.answer_key = answer_key
+            instance.exercise_type = str(
+                answer_key.get("overlay_contract", {}).get("graded_as")
+                or "phrase_builder"
+            )
+
+    active_exercise_type = instance.exercise_type
+    if active_exercise_type in {"reverse_typing", "perfect_form_typing"}:
         prompt["clue_i18n"] = {
             "en": translations.get("en"),
             "fa": translations.get("fa"),
         }
         prompt["clue"] = translations.get("en") or prompt.get("clue")
 
-    if exercise_type == "meaning_multiple_choice":
+    if active_exercise_type == "meaning_multiple_choice":
         prompt["choices"] = await _localize_meaning_choices(
             session,
             release.id,
             list(prompt.get("choices", [])),
         )
 
-    if exercise_type == "meaning_matching":
+    if active_exercise_type == "meaning_matching":
         prompt["right_items"] = await _localize_matching_items(
             session,
             release.id,
             list(prompt.get("right_items", [])),
         )
 
-    prompt["placeholder_i18n"] = _placeholder_i18n(exercise_type)
-    prompt["tap_hint_i18n"] = _tap_hint_i18n(exercise_type)
+    prompt["placeholder_i18n"] = _placeholder_i18n(active_exercise_type)
+    prompt["tap_hint_i18n"] = _tap_hint_i18n(active_exercise_type)
 
     instance.prompt = prompt
-    instance.contract_version = PROMPT_CONTRACT_VERSION
+    instance.contract_version = (
+        PROMPT_CONTRACT_VERSION_V4 if deep else PROMPT_CONTRACT_VERSION
+    )
     instance.prompt_checksum = hashlib.sha256(
         json.dumps(prompt, ensure_ascii=False, sort_keys=True).encode("utf-8")
     ).hexdigest()
     await session.flush()
     return instance
+
+
+async def _pedagogy(session: AsyncSession, version_id: UUID) -> VerbPedagogyIn | None:
+    row = await session.scalar(
+        select(VersionLocalization).where(
+            VersionLocalization.version_id == version_id,
+            VersionLocalization.field == PEDAGOGY_FIELD,
+            VersionLocalization.locale == PEDAGOGY_LOCALE,
+            VersionLocalization.position == 0,
+        )
+    )
+    if row is None:
+        return None
+    return VerbPedagogyIn.model_validate_json(row.value)
+
+
+def teaching_feedback_from_prompt(prompt: dict, *, correct: bool) -> dict | None:
+    if correct:
+        return None
+    lesson = prompt.get("lesson") if isinstance(prompt, dict) else None
+    if not isinstance(lesson, dict):
+        return None
+    block = lesson.get("teaching_block")
+    if isinstance(block, dict):
+        return {
+            "why_i18n": block.get("explanation_i18n"),
+            "rule_i18n": block.get("rule_i18n"),
+            "correct_example_de": block.get("corrected_example_de")
+            or block.get("example_de"),
+        }
+    teaching = lesson.get("teaching_feedback")
+    if isinstance(teaching, dict):
+        return teaching
+    mistakes = lesson.get("mistakes")
+    if isinstance(mistakes, list) and mistakes:
+        first = mistakes[0]
+        if isinstance(first, dict):
+            return {
+                "why_i18n": first.get("why_i18n"),
+                "rule_i18n": lesson.get("explanation_i18n"),
+                "correct_example_de": first.get("correct_de"),
+            }
+    explanation = lesson.get("explanation_i18n")
+    example_de = lesson.get("example_de")
+    if explanation or example_de:
+        return {
+            "why_i18n": explanation if isinstance(explanation, dict) else None,
+            "rule_i18n": explanation if isinstance(explanation, dict) else None,
+            "correct_example_de": example_de if isinstance(example_de, str) else None,
+        }
+    return None
 
 
 async def _translations(session: AsyncSession, version_id: UUID) -> dict[str, str]:

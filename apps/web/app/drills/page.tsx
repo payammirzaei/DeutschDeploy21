@@ -116,27 +116,33 @@ export default function DrillsPage() {
   }, [activity]);
 
   async function submit(answer: ExerciseAnswer) {
-    if (!activity || submitting || queued) return;
+    if (!activity || submitting) return;
     setSubmitting(true);
+    setQueued(false);
     setError(null);
-    const durationMs = startedAt.current ? Math.max(0, Date.now() - startedAt.current) : null;
-    const submission = await submitLearningAttemptSafely<AttemptResult>(activity.id, {
-      ...answer,
-      duration_ms: durationMs,
-    });
-    if (submission.status === "queued") {
-      setQueued(true);
-      setSubmitting(false);
-      return;
-    }
-    if (submission.status === "error") {
+    try {
+      const durationMs = startedAt.current ? Math.max(0, Date.now() - startedAt.current) : null;
+      const submission = await submitLearningAttemptSafely<AttemptResult>(activity.id, {
+        ...answer,
+        duration_ms: durationMs,
+      });
+      if (submission.status === "queued") {
+        setQueued(true);
+        setError("Answer saved on this device. Tap Check again to retry sync.");
+        return;
+      }
+      if (submission.status === "error") {
+        setError("Your drill answer was not saved. Try again.");
+        return;
+      }
+      setResult(submission.data);
+      setQueued(false);
+      setSessionCount((count) => count + 1);
+    } catch {
       setError("Your drill answer was not saved. Try again.");
+    } finally {
       setSubmitting(false);
-      return;
     }
-    setResult(submission.data);
-    setSessionCount((count) => count + 1);
-    setSubmitting(false);
   }
 
   const meta = activity ? typeMeta[activity.exercise_type] : null;
@@ -219,8 +225,14 @@ export default function DrillsPage() {
                 key={activity.id}
                 exerciseType={activity.exercise_type}
                 prompt={activity.prompt}
-                submitting={submitting || queued}
-                submitLabel={timeExpired ? "Submit after time" : "Check answer"}
+                submitting={submitting}
+                submitLabel={
+                  queued
+                    ? "Retry sync"
+                    : timeExpired
+                      ? "Submit after time"
+                      : "Check answer"
+                }
                 onSubmit={submit}
               />
             </article>

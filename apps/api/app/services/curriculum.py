@@ -7,7 +7,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.content import ContentItem, ContentVersion
+from app.models.content import ContentDraft, ContentItem, ContentVersion
 from app.models.learning import Course, CourseDay, CourseRelease, ReleaseActivity
 from app.models.user import User
 from app.services.content import (
@@ -20,10 +20,11 @@ from app.services.exercise_registry import ALL_SILENT_EXERCISE_TYPES
 from app.services.interview_drills import INTERVIEW_DRILL_TYPES, load_interview_drills
 
 COURSE_SLUG = "software-interview-21d"
-LATEST_RELEASE_VERSION = 3
+LATEST_RELEASE_VERSION = 4
 CURRICULUM_ROOT = Path(__file__).resolve().parents[4] / "content" / "curriculum"
 V2_CURRICULUM_PATH = CURRICULUM_ROOT / "software-interview-21d.v2.json"
-CURRICULUM_PATH = CURRICULUM_ROOT / "software-interview-21d.v3.json"
+V3_CURRICULUM_PATH = CURRICULUM_ROOT / "software-interview-21d.v3.json"
+CURRICULUM_PATH = CURRICULUM_ROOT / "software-interview-21d.v4.json"
 
 LEGACY_STARTER_DAYS = [
     {
@@ -117,14 +118,16 @@ def _expand_manifest(raw: dict[str, Any]) -> dict[str, Any]:
                     "required": True,
                 }
             )
-        expanded_days.append(
-            {
-                "day": raw_day.get("day"),
-                "title": raw_day.get("title"),
-                "objective": raw_day.get("objective"),
-                "activities": activities,
-            }
-        )
+        expanded_day = {
+            "day": raw_day.get("day"),
+            "title": raw_day.get("title"),
+            "objective": raw_day.get("objective"),
+            "activities": activities,
+        }
+        for optional_key in ("focus_grammar", "focus_interview", "lesson_flow"):
+            if optional_key in raw_day and raw_day.get(optional_key) not in (None, [], ""):
+                expanded_day[optional_key] = raw_day.get(optional_key)
+        expanded_days.append(expanded_day)
     payload["days"] = expanded_days
     return payload
 
@@ -150,6 +153,7 @@ async def ensure_curriculum_releases(
     user: User,
 ) -> tuple[Course, CourseRelease, CourseRelease]:
     legacy_manifest = _load_curriculum_manifest(V2_CURRICULUM_PATH, 2)
+    v3_manifest = _load_curriculum_manifest(V3_CURRICULUM_PATH, 3)
     latest_manifest = load_curriculum_manifest()
     await _ensure_all_starter_content(session, user)
 
@@ -178,6 +182,7 @@ async def ensure_curriculum_releases(
         await _build_legacy_release(session, legacy)
 
     await _ensure_manifest_release(session, course.id, legacy_manifest)
+    await _ensure_manifest_release(session, course.id, v3_manifest)
     latest = await _ensure_manifest_release(session, course.id, latest_manifest)
     return course, legacy, latest
 
@@ -215,13 +220,13 @@ async def _ensure_all_starter_content(
     payloads = load_starter_verbs()
     report = await dry_run_verbs(session, payloads)
     actions = {row.external_id: row.action for row in report.rows}
-    missing = [
+    changed = [
         payload
         for payload in payloads
-        if actions.get(payload.external_id) == "create"
+        if actions.get(payload.external_id) in {"create", "update"}
     ]
-    if missing:
-        await apply_verb_import(session, user, missing)
+    if changed:
+        await apply_verb_import(session, user, changed)
 
     for payload in payloads:
         item = await session.scalar(
@@ -233,8 +238,12 @@ async def _ensure_all_starter_content(
             raise RuntimeError(
                 f"Required content item missing: {payload.external_id}"
             )
+        draft = await session.get(ContentDraft, item.id)
         latest = await _latest_content_version(session, item.id)
         if latest is None:
+            await publish_item(session, user, item.id)
+            continue
+        if draft is not None and draft.source_checksum != latest.checksum:
             await publish_item(session, user, item.id)
 
 

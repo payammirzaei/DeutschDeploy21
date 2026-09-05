@@ -6,7 +6,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.content import ContentVersion, VerbVersion
-from app.models.learning import ActivityInstance, CourseDay, Enrollment, ReleaseActivity
+from app.models.learning import (
+    ActivityInstance,
+    CourseDay,
+    CourseRelease,
+    Enrollment,
+    ReleaseActivity,
+)
 from app.services.advanced_exercises import (
     ADVANCED_EXERCISE_TYPES,
     ADVANCED_TARGETS,
@@ -30,7 +36,12 @@ from app.services.interview_drills import (
 )
 from app.services.learning_experience import (
     PROMPT_CONTRACT_VERSION,
+    PROMPT_CONTRACT_VERSION_V4,
     enrich_learning_instance,
+)
+from app.services.lesson_overlay import (
+    overlay_contract_from_instance,
+    prompt_override_for_position,
 )
 
 ALL_SILENT_EXERCISE_TYPES = (*SILENT_EXERCISE_TYPES, *ADVANCED_EXERCISE_TYPES)
@@ -42,7 +53,36 @@ async def _enrich_once(
     instance: ActivityInstance,
     activity: ReleaseActivity,
 ) -> ActivityInstance:
-    if instance.contract_version >= PROMPT_CONTRACT_VERSION:
+    day = await session.get(CourseDay, activity.day_id)
+    target = PROMPT_CONTRACT_VERSION
+    release = None
+    if day is not None:
+        release = await session.get(CourseRelease, day.release_id)
+        if release is not None and release.version_number >= 4:
+            target = PROMPT_CONTRACT_VERSION_V4
+
+    # Graded overlay contracts are immutable on the ActivityInstance. Never
+    # rewrite answer keys from the current/latest teaching overlay.
+    if overlay_contract_from_instance(
+        instance.prompt if isinstance(instance.prompt, dict) else None
+    ):
+        return instance
+
+    # Graded prompt overrides belong to the course day path. Silent remixes
+    # must keep the requested exercise_type or explore_mix never clears families.
+    needs_overlay_pin = (
+        not instance.instance_key.startswith("silent:")
+        and day is not None
+        and release is not None
+        and release.version_number >= 4
+        and prompt_override_for_position(
+            day.day_number,
+            activity.position,
+            release.version_number,
+        )
+        is not None
+    )
+    if instance.contract_version >= target and not needs_overlay_pin:
         return instance
     return await enrich_learning_instance(session, instance, activity)
 
