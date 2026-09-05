@@ -1,0 +1,442 @@
+{
+  "overlay_id": "software-interview-21d-v4-teaching",
+  "overlay_version": 2,
+  "schema_version": 1,
+  "course_slug": "software-interview-21d",
+  "release_version": 4,
+  "checksum": "495e9ab911660152c891856f5c8a4908e88afa10f5c1a279db601614e934f8da",
+  "days": {
+    "1": {
+      "context_de": "Ich stelle mich kurz vor. Ich arbeite als Backend-Entwickler. Zurzeit arbeite ich an einer internen API.",
+      "context_i18n": {
+        "en": "A compact professional opening: introduce yourself, name your role, then name current work with V2 word order.",
+        "fa": "یک شروع حرفه‌ای کوتاه: خودت را معرفی کن، نقشت را بگو، بعد با ترتیب V2 کار فعلی را نام ببر."
+      },
+      "activity_stages": ["learn", "learn", "recognize", "build", "recall", "challenge", "challenge"],
+      "teaching_blocks": [
+        {
+          "id": "d1.intro-structure",
+          "type": "interview_pattern",
+          "activity_position": 1,
+          "title_i18n": {"en": "A 20-second introduction", "fa": "معرفی بیست‌ثانیه‌ای"},
+          "explanation_i18n": {
+            "en": "Start with sich vorstellen, then name the role. Keep the prefix vor at the end in the present tense.",
+            "fa": "با sich vorstellen شروع کن، بعد نقش را بگو. در حال، پیشوند vor به پایان می‌رود."
+          },
+          "rule_i18n": {
+            "en": "Ich stelle mich vor. Ich arbeite als …",
+            "fa": "Ich stelle mich vor. Ich arbeite als …"
+          },
+          "example_de": "Ich stelle mich kurz vor: Ich arbeite als Backend-Entwickler.",
+          "example_i18n": {
+            "en": "Let me briefly introduce myself: I work as a backend developer.",
+            "fa": "اجازه بده کوتاه خودم را معرفی کنم: من به‌عنوان بک‌اند دولوپر کار می‌کنم."
+          },
+          "common_mistake_de": "Ich vorstelle mich als Backend-Entwickler.",
+          "corrected_example_de": "Ich stelle mich als Backend-Entwickler vor."
+        },
+        {
+          "id": "d1.arbeiten-als-an",
+          "type": "usage",
+          "activity_position": 2,
+          "title_i18n": {"en": "arbeiten als vs arbeiten an", "fa": "arbeiten als در برابر arbeiten an"},
+          "explanation_i18n": {
+            "en": "Use arbeiten als for the job title. Use arbeiten an plus dative for the current task or system.",
+            "fa": "برای عنوان شغلی arbeiten als و برای کار یا سیستم فعلی arbeiten an + داتیو."
+          },
+          "rule_i18n": {
+            "en": "als + role; an + dative: an einer API, an einem Dashboard, an der Migration.",
+            "fa": "als + نقش؛ an + داتیو: an einer API، an einem Dashboard، an der Migration."
+          },
+          "example_de": "Ich arbeite als Backend-Entwickler. Zurzeit arbeite ich an einer internen API.",
+          "example_i18n": {
+            "en": "I work as a backend developer. Right now I am working on an internal API.",
+            "fa": "من به‌عنوان بک‌اند دولوپر کار می‌کنم. فعلاً روی یک API داخلی کار می‌کنم."
+          },
+          "common_mistake_de": "Ich arbeite auf einer API.",
+          "corrected_example_de": "Ich arbeite an einer API."
+        },
+        {
+          "id": "d1.v2-word-order",
+          "type": "grammar",
+          "activity_position": 3,
+          "title_i18n": {"en": "The verb stays in position 2", "fa": "فعل در جایگاه دوم می‌ماند"},
+          "explanation_i18n": {
+            "en": "In a main clause the conjugated verb is the second idea, even if a time phrase comes first.",
+            "fa": "در جملهٔ اصلی، فعل صرف‌شده ایدهٔ دوم است؛ حتی اگر قید زمان اول بیاید."
+          },
+          "rule_i18n": {
+            "en": "Time or topic first, then the verb: Zurzeit arbeite ich … / Heute spreche ich …",
+            "fa": "زمان یا موضوع اول، بعد فعل: Zurzeit arbeite ich … / Heute spreche ich …"
+          },
+          "example_de": "Zurzeit arbeite ich an einer internen API.",
+          "example_i18n": {
+            "en": "Right now I am working on an internal API.",
+            "fa": "فعلاً روی یک API داخلی کار می‌کنم."
+          },
+          "common_mistake_de": "Zurzeit ich arbeite an einer API.",
+          "corrected_example_de": "Zurzeit arbeite ich an einer API."
+        },
+        {
+          "id": "d1.perfekt-recall",
+          "type": "grammar",
+          "activity_position": 5,
+          "title_i18n": {"en": "Perfekt before you transfer", "fa": "قبل از انتقال، Perfekt"},
+          "explanation_i18n": {
+            "en": "Before the final introduction challenge, lock Perfekt: haben + object/reflexive + Partizip II at the end.",
+            "fa": "قبل از چالش نهایی معرفی، Perfekt را تثبیت کن: haben + مفعول/رفلکسیو + Partizip II در پایان."
+          },
+          "rule_i18n": {
+            "en": "Ich habe mich kurz vorgestellt. Ich habe das Projekt beschrieben.",
+            "fa": "Ich habe mich kurz vorgestellt. Ich habe das Projekt beschrieben."
+          },
+          "example_de": "Im Gespräch habe ich mich kurz vorgestellt und mein aktuelles Projekt beschrieben.",
+          "example_i18n": {
+            "en": "In the interview I briefly introduced myself and described my current project.",
+            "fa": "در مصاحبه کوتاه خودم را معرفی کردم و پروژهٔ فعلی‌ام را توصیف کردم."
+          },
+          "common_mistake_de": "Ich habe vorgestellt mich kurz.",
+          "corrected_example_de": "Ich habe mich kurz vorgestellt."
+        },
+        {
+          "id": "d1.transfer-intro",
+          "type": "interview_pattern",
+          "activity_position": 6,
+          "title_i18n": {"en": "Build a reusable introduction", "fa": "یک معرفی قابل استفاده بساز"},
+          "explanation_i18n": {
+            "en": "Assemble role and current work with V2. Do not invent a personal biography.",
+            "fa": "نقش و کار فعلی را با V2 بساز. زندگی‌نامه شخصی نساز."
+          },
+          "rule_i18n": {
+            "en": "Ich stelle mich vor. Ich arbeite als …. Zurzeit arbeite ich an ….",
+            "fa": "Ich stelle mich vor. Ich arbeite als …. Zurzeit arbeite ich an …."
+          },
+          "example_de": "Ich stelle mich kurz vor. Ich arbeite als Backend-Entwickler. Zurzeit arbeite ich an einer internen API.",
+          "example_i18n": {
+            "en": "Let me briefly introduce myself. I work as a backend developer. Right now I am working on an internal API.",
+            "fa": "اجازه بده کوتاه خودم را معرفی کنم. به‌عنوان بک‌اند دولوپر کار می‌کنم. فعلاً روی یک API داخلی کار می‌کنم."
+          },
+          "common_mistake_de": "Ich vorstelle mich. Zurzeit ich arbeite auf eine API.",
+          "corrected_example_de": "Ich stelle mich kurz vor. Zurzeit arbeite ich an einer internen API."
+        },
+        {
+          "id": "d1.fragen-nachfragen",
+          "type": "contrast",
+          "activity_position": 7,
+          "title_i18n": {"en": "fragen vs nachfragen", "fa": "fragen در برابر nachfragen"},
+          "explanation_i18n": {
+            "en": "After your introduction, keep a clarification phrase ready. fragen asks; nachfragen checks back.",
+            "fa": "بعد از معرفی، یک عبارت روشن‌سازی آماده داشته باش. fragen می‌پرسد؛ nachfragen دوباره چک می‌کند."
+          },
+          "rule_i18n": {
+            "en": "Darf ich kurz nachfragen, ob …",
+            "fa": "Darf ich kurz nachfragen, ob …"
+          },
+          "example_de": "Darf ich kurz nachfragen, ob das Projekt intern oder kundenbezogen war?",
+          "example_i18n": {
+            "en": "May I quickly check whether the project was internal or customer-facing?",
+            "fa": "اجازه هست سریع بپرسم پروژه داخلی بود یا مشتری‌محور؟"
+          },
+          "common_mistake_de": "Darf ich kurz fragen nach, ob das intern war?",
+          "corrected_example_de": "Darf ich kurz nachfragen, ob das intern war?"
+        }
+      ],
+      "prompt_overrides": [
+        {
+          "activity_position": 6,
+          "question_i18n": {
+            "en": "Assemble a short professional introduction from the structures you learned today.",
+            "fa": "با ساختارهایی که امروز یاد گرفتی، یک معرفی حرفه‌ای کوتاه بساز."
+          },
+          "chunks": [
+            "Ich stelle mich kurz vor.",
+            "Ich arbeite als Backend-Entwickler.",
+            "Zurzeit arbeite ich an einer internen API."
+          ]
+        }
+      ],
+      "spiral": [
+        {
+          "external_id": "verb.arbeiten",
+          "lemma": "arbeiten",
+          "stage": "introduced",
+          "day": 1,
+          "focus": "arbeiten als + arbeiten an + Dativ"
+        },
+        {
+          "external_id": "verb.vorstellen",
+          "lemma": "vorstellen",
+          "stage": "introduced",
+          "day": 1,
+          "focus": "sich vorstellen in a self-introduction"
+        }
+      ]
+    },
+    "2": {
+      "context_de": "In meinem letzten Projekt habe ich eine interne Plattform entwickelt. Ich arbeite weiter an den APIs.",
+      "context_i18n": {
+        "en": "Day 2 reuses arbeiten from Day 1 inside a new sentence and introduces entwickeln with an accusative object.",
+        "fa": "روز ۲ فعل arbeiten از روز ۱ را در جمله‌ای تازه به‌کار می‌برد و entwickeln را با مفعول اکوزاتیو معرفی می‌کند."
+      },
+      "activity_stages": ["learn", "learn", "recognize", "build", "build", "recall", "challenge"],
+      "teaching_blocks": [
+        {
+          "id": "d2.accusative",
+          "type": "grammar",
+          "activity_position": 1,
+          "title_i18n": {"en": "Name the thing you build", "fa": "چیزی را که می‌سازی نام ببر"},
+          "explanation_i18n": {
+            "en": "Most software verbs take a direct accusative object: eine Plattform, eine API, ein Feature.",
+            "fa": "بیشتر فعل‌های نرم‌افزاری مفعول مستقیم اکوزاتیو می‌گیرند: eine Plattform، eine API، ein Feature."
+          },
+          "rule_i18n": {
+            "en": "etwas entwickeln / implementieren / bauen + accusative object.",
+            "fa": "etwas entwickeln / implementieren / bauen + مفعول اکوزاتیو."
+          },
+          "example_de": "Ich entwickle eine interne Plattform.",
+          "example_i18n": {
+            "en": "I develop an internal platform.",
+            "fa": "من یک پلتفرم داخلی توسعه می‌دهم."
+          },
+          "common_mistake_de": "Ich entwickle von einer Plattform.",
+          "corrected_example_de": "Ich entwickle eine Plattform."
+        },
+        {
+          "id": "d2.perfekt-haben",
+          "type": "grammar",
+          "activity_position": 4,
+          "title_i18n": {"en": "Perfekt: haben + object + Partizip II", "fa": "Perfekt: haben + مفعول + Partizip II"},
+          "explanation_i18n": {
+            "en": "For finished project work, keep the object before the participle at the end.",
+            "fa": "برای کار تمام‌شدهٔ پروژه، مفعول را قبل از Partizip در پایان بگذار."
+          },
+          "rule_i18n": {
+            "en": "Ich habe eine Plattform entwickelt. Not: Ich habe entwickelt eine Plattform.",
+            "fa": "Ich habe eine Plattform entwickelt. نه: Ich habe entwickelt eine Plattform."
+          },
+          "example_de": "In meinem letzten Projekt habe ich eine interne Plattform entwickelt.",
+          "example_i18n": {
+            "en": "In my last project I developed an internal platform.",
+            "fa": "در آخرین پروژه‌ام یک پلتفرم داخلی توسعه دادم."
+          },
+          "common_mistake_de": "Ich habe entwickelt eine Plattform.",
+          "corrected_example_de": "Ich habe eine Plattform entwickelt."
+        },
+        {
+          "id": "d2.verwenden-nutzen",
+          "type": "contrast",
+          "activity_position": 6,
+          "title_i18n": {"en": "verwenden vs nutzen", "fa": "verwenden در برابر nutzen"},
+          "explanation_i18n": {
+            "en": "verwenden names the tool. nutzen often adds the benefit. Avoid benutzen in formal interview German unless you mean a physical object.",
+            "fa": "verwenden ابزار را نام می‌برد. nutzen اغلب سود را هم می‌گوید. در مصاحبهٔ رسمی کمتر از benutzen استفاده کن مگر برای شیء فیزیکی."
+          },
+          "rule_i18n": {
+            "en": "Wir verwenden PostgreSQL. Wir nutzen Caching, um die Last zu senken.",
+            "fa": "Wir verwenden PostgreSQL. Wir nutzen Caching, um die Last zu senken."
+          },
+          "example_de": "Wir verwenden PostgreSQL und nutzen Redis, um die Datenbank zu entlasten.",
+          "example_i18n": {
+            "en": "We use PostgreSQL and we use Redis to take load off the database.",
+            "fa": "از PostgreSQL استفاده می‌کنیم و از Redis بهره می‌گیریم تا بار پایگاه داده کم شود."
+          },
+          "common_mistake_de": "Wir benutzen PostgreSQL für persistente Daten.",
+          "corrected_example_de": "Wir verwenden PostgreSQL für persistente Daten."
+        }
+      ],
+      "spiral": [
+        {
+          "external_id": "verb.arbeiten",
+          "lemma": "arbeiten",
+          "stage": "reinforced",
+          "day": 2,
+          "focus": "reused in Ich arbeite weiter an den APIs"
+        },
+        {
+          "external_id": "verb.entwickeln",
+          "lemma": "entwickeln",
+          "stage": "introduced",
+          "day": 2,
+          "focus": "Präsens + Perfekt with accusative object"
+        }
+      ]
+    },
+    "3": {
+      "context_de": "In dem Projekt, in dem ich die Plattform entwickelt habe, habe ich weiter an den APIs gearbeitet. Zuerst habe ich die Logs analysiert. Dann habe ich die Ursache gefunden und den Fehler behoben.",
+      "context_i18n": {
+        "en": "The Day 3 story reuses entwickeln and arbeiten, then sequences analysis, finding the cause, and fixing the defect.",
+        "fa": "روایت روز ۳ فعل‌های entwickeln و arbeiten را دوباره به‌کار می‌برد و بعد ترتیب تحلیل، پیدا کردن علت و رفع نقص را می‌سازد."
+      },
+      "activity_stages": ["learn", "learn", "recognize", "build", "build", "recall", "challenge"],
+      "teaching_blocks": [
+        {
+          "id": "d3.testen-pruefen",
+          "type": "contrast",
+          "activity_position": 1,
+          "title_i18n": {"en": "testen vs prüfen", "fa": "testen در برابر prüfen"},
+          "explanation_i18n": {
+            "en": "testen tries behavior. prüfen checks a condition or criterion.",
+            "fa": "testen رفتار را می‌آزماید. prüfen یک شرط یا معیار را کنترل می‌کند."
+          },
+          "rule_i18n": {
+            "en": "eine API testen; Logs prüfen; eine Berechtigung prüfen.",
+            "fa": "eine API testen؛ Logs prüfen؛ eine Berechtigung prüfen."
+          },
+          "example_de": "Die Pipeline testet jeden Pull Request. Der Health Check prüft, ob die Datenbank erreichbar ist.",
+          "example_i18n": {
+            "en": "The pipeline tests every pull request. The health check verifies whether the database is reachable.",
+            "fa": "پایپلاین هر پول‌ریکوئست را تست می‌کند. هلث‌چک کنترل می‌کند که پایگاه داده در دسترس باشد."
+          },
+          "common_mistake_de": "Wir prüfen die API, ob sie schnell ist.",
+          "corrected_example_de": "Wir testen die API, um zu sehen, ob sie schnell genug ist."
+        },
+        {
+          "id": "d3.problem-sequence",
+          "type": "interview_pattern",
+          "activity_position": 3,
+          "title_i18n": {"en": "Problem → analysis → solution", "fa": "مسئله → تحلیل → راه‌حل"},
+          "explanation_i18n": {
+            "en": "Interview answers become clearer with connectors: zuerst, dann, deshalb.",
+            "fa": "جواب مصاحبه با حروف ربط واضح‌تر می‌شود: zuerst، dann، deshalb."
+          },
+          "rule_i18n": {
+            "en": "Zuerst … Dann … Deshalb …",
+            "fa": "Zuerst … Dann … Deshalb …"
+          },
+          "example_de": "Zuerst habe ich die Logs analysiert. Dann habe ich den Fehler behoben.",
+          "example_i18n": {
+            "en": "First I analyzed the logs. Then I fixed the fault.",
+            "fa": "اول لاگ‌ها را تحلیل کردم. بعد خطا را برطرف کردم."
+          },
+          "common_mistake_de": "Ich habe behoben den Fehler, dann analysiert ich die Logs.",
+          "corrected_example_de": "Zuerst habe ich die Logs analysiert. Dann habe ich den Fehler behoben."
+        },
+        {
+          "id": "d3.loesen-beheben",
+          "type": "contrast",
+          "activity_position": 4,
+          "title_i18n": {"en": "lösen vs beheben", "fa": "lösen در برابر beheben"},
+          "explanation_i18n": {
+            "en": "lösen is the broader problem. beheben is the concrete defect.",
+            "fa": "lösen مسئلهٔ کلی است. beheben نقص مشخص است."
+          },
+          "rule_i18n": {
+            "en": "ein Problem lösen; einen Fehler beheben.",
+            "fa": "ein Problem lösen؛ einen Fehler beheben."
+          },
+          "example_de": "Wir haben das Performanceproblem gelöst, indem wir den Fehler in der Abfrage behoben haben.",
+          "example_i18n": {
+            "en": "We solved the performance problem by fixing the fault in the query.",
+            "fa": "مشکل عملکرد را با رفع خطا در کوئری حل کردیم."
+          },
+          "common_mistake_de": "Wir haben den Fehler gelöst.",
+          "corrected_example_de": "Wir haben den Fehler behoben."
+        },
+        {
+          "id": "d3.finden-herausfinden",
+          "type": "contrast",
+          "activity_position": 5,
+          "title_i18n": {"en": "finden vs herausfinden", "fa": "finden در برابر herausfinden"},
+          "explanation_i18n": {
+            "en": "finden is locating something. herausfinden is discovering information after investigation.",
+            "fa": "finden یعنی پیدا کردن چیزی. herausfinden یعنی پس از بررسی، اطلاعاتی را کشف کردن."
+          },
+          "rule_i18n": {
+            "en": "den Fehler finden; herausfinden, warum der Service langsam ist.",
+            "fa": "den Fehler finden؛ herausfinden, warum der Service langsam ist."
+          },
+          "example_de": "Ich habe den Fehler gefunden und herausgefunden, warum die Abfrage langsam war.",
+          "example_i18n": {
+            "en": "I found the bug and figured out why the query was slow.",
+            "fa": "خطا را پیدا کردم و فهمیدم چرا کوئری کند بود."
+          },
+          "common_mistake_de": "Ich habe herausgefunden den Fehler.",
+          "corrected_example_de": "Ich habe den Fehler gefunden."
+        },
+        {
+          "id": "d3.irregular-participles",
+          "type": "grammar",
+          "activity_position": 6,
+          "title_i18n": {"en": "Irregular participles", "fa": "Partizipهای بی‌قاعده"},
+          "explanation_i18n": {
+            "en": "finden → gefunden, beheben → behoben. Keep haben, the object, then the participle.",
+            "fa": "finden → gefunden، beheben → behoben. haben، مفعول و بعد Partizip را نگه دار."
+          },
+          "rule_i18n": {
+            "en": "Ich habe die Ursache gefunden. Ich habe den Fehler behoben.",
+            "fa": "Ich habe die Ursache gefunden. Ich habe den Fehler behoben."
+          },
+          "example_de": "Ich habe die Ursache gefunden und den Fehler behoben.",
+          "example_i18n": {
+            "en": "I found the cause and fixed the fault.",
+            "fa": "علت را پیدا کردم و خطا را برطرف کردم."
+          },
+          "common_mistake_de": "Ich habe den Fehler gefindet und behebt.",
+          "corrected_example_de": "Ich habe den Fehler gefunden und behoben."
+        },
+        {
+          "id": "d3.verbessern",
+          "type": "usage",
+          "activity_position": 7,
+          "title_i18n": {"en": "verbessern is not the same as lösen", "fa": "verbessern با lösen یکی نیست"},
+          "explanation_i18n": {
+            "en": "verbessern makes an existing thing better. lösen removes a problem. Do not use verbessern for a defect you actually fixed.",
+            "fa": "verbessern چیز موجود را بهتر می‌کند. lösen مسئله را برطرف می‌کند. برای نقصی که واقعاً رفع کرده‌ای verbessern نگو."
+          },
+          "rule_i18n": {
+            "en": "die Leistung verbessern; ein Problem lösen; einen Fehler beheben.",
+            "fa": "die Leistung verbessern؛ ein Problem lösen؛ einen Fehler beheben."
+          },
+          "example_de": "Der neue Index verbessert die Abfrageleistung deutlich.",
+          "example_i18n": {
+            "en": "The new index improves query performance significantly.",
+            "fa": "ایندکس جدید عملکرد کوئری را مشخصاً بهتر می‌کند."
+          },
+          "common_mistake_de": "Ich habe den Produktionsfehler verbessert.",
+          "corrected_example_de": "Ich habe den Produktionsfehler behoben."
+        }
+      ],
+      "spiral": [
+        {
+          "external_id": "verb.entwickeln",
+          "lemma": "entwickeln",
+          "stage": "reinforced",
+          "day": 3,
+          "focus": "reused in in dem ich die Plattform entwickelt habe"
+        },
+        {
+          "external_id": "verb.arbeiten",
+          "lemma": "arbeiten",
+          "stage": "recalled",
+          "day": 3,
+          "focus": "reused in habe ich weiter an den APIs gearbeitet"
+        },
+        {
+          "external_id": "verb.loesen",
+          "lemma": "lösen",
+          "stage": "introduced",
+          "day": 3,
+          "focus": "problem-solving phrase; planned STAR/problem explanation"
+        }
+      ],
+      "planned_future": [
+        {
+          "external_id": "verb.entwickeln",
+          "from_day": 2,
+          "planned_day": 8,
+          "stage": "applied",
+          "focus": "technical explanation in Perfekt",
+          "status": "planned"
+        },
+        {
+          "external_id": "verb.loesen",
+          "from_day": 3,
+          "planned_day": 13,
+          "stage": "applied",
+          "focus": "STAR problem explanation",
+          "status": "planned"
+        }
+      ]
+    }
+  }
+}

@@ -102,15 +102,65 @@ async function deleteQueuedAttempt(url: string): Promise<void> {
   emitOutboxChanged();
 }
 
+const ATTEMPT_TIMEOUT_MS = 15_000;
+
+/**
+ * Idempotency keys must work on plain HTTP LAN / Tailscale hosts.
+ * `crypto.randomUUID()` is secure-context-only in many browsers, so those
+ * origins throw before the attempt is ever sent.
+ */
+export function createIdempotencyKey(): string {
+  const webCrypto = typeof globalThis.crypto !== "undefined" ? globalThis.crypto : undefined;
+  if (webCrypto && typeof webCrypto.randomUUID === "function") {
+    try {
+      return webCrypto.randomUUID();
+    } catch {
+      // Non-secure contexts can expose the method but still reject.
+    }
+  }
+  if (webCrypto && typeof webCrypto.getRandomValues === "function") {
+    const bytes = new Uint8Array(16);
+    webCrypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
+  return `local-${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}`;
+}
+
+function abortSignalWithTimeout(ms: number): AbortSignal {
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+    try {
+      return AbortSignal.timeout(ms);
+    } catch {
+      // fall through
+    }
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  // Avoid keeping the timer alive if the request finishes early in Node tests.
+  const signal = controller.signal;
+  signal.addEventListener(
+    "abort",
+    () => {
+      clearTimeout(timer);
+    },
+    { once: true },
+  );
+  return signal;
+}
+
 async function sendAttempt<T>(attempt: QueuedAttempt): Promise<{ response: Response; data: T | null }> {
   const response = await fetch(attempt.url, {
     method: "POST",
-    credentials: "same-origin",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       "Idempotency-Key": attempt.idempotencyKey,
     },
     body: JSON.stringify(attempt.body),
+    signal: abortSignalWithTimeout(ATTEMPT_TIMEOUT_MS),
   });
   const contentType = response.headers.get("content-type") ?? "";
   const data = contentType.includes("application/json") ? ((await response.json()) as T) : null;
@@ -143,20 +193,53 @@ export async function submitLearningAttemptSafely<T>(
   instanceId: string,
   body: AttemptBody,
 ): Promise<SafeAttemptResult<T>> {
+  try {
+    return await submitLearningAttemptSafelyInner<T>(instanceId, body);
+  } catch {
+    // Never throw into the learning UI — surface a retryable error state.
+    return { status: "error", httpStatus: null };
+  }
+}
+
+async function submitLearningAttemptSafelyInner<T>(
+  instanceId: string,
+  body: AttemptBody,
+): Promise<SafeAttemptResult<T>> {
   const url = learningAttemptUrl(instanceId);
 
+  let existing: QueuedAttempt | null = null;
   try {
-    const existing = await getQueuedAttempt(url);
-    if (existing) return { status: "queued" };
+    existing = await getQueuedAttempt(url);
   } catch {
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       return { status: "error", httpStatus: null };
     }
   }
 
+  // A previously queued answer for this instance must be retried with the
+  // original idempotency key — never leave the UI stuck on "Saving…".
+  if (existing) {
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      return { status: "queued" };
+    }
+    try {
+      const { response, data } = await sendAttempt<T>(existing);
+      if (response.ok && data !== null) {
+        await deleteQueuedAttempt(url);
+        return { status: "submitted", data };
+      }
+      if (response.status === 401) {
+        return { status: "error", httpStatus: 401 };
+      }
+      return { status: "queued" };
+    } catch {
+      return { status: "queued" };
+    }
+  }
+
   const attempt: QueuedAttempt = {
     url,
-    idempotencyKey: crypto.randomUUID(),
+    idempotencyKey: createIdempotencyKey(),
     body,
     createdAt: Date.now(),
   };

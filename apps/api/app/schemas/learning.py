@@ -18,6 +18,13 @@ class ActivitySummary(BaseModel):
     submitted: bool
 
 
+class TeachingOverlayIdentity(BaseModel):
+    overlay_id: str
+    overlay_version: int
+    schema_version: int
+    checksum: str
+
+
 class DayView(BaseModel):
     day_number: int
     title: str
@@ -26,6 +33,12 @@ class DayView(BaseModel):
     submitted_count: int
     total_count: int
     activities: list[ActivitySummary]
+    context_de: str | None = None
+    context_i18n: dict[str, str] | None = None
+    activity_stages: list[str] = Field(default_factory=list)
+    teaching_blocks: list[dict] = Field(default_factory=list)
+    spiral: list[dict] = Field(default_factory=list)
+    planned_future: list[dict] = Field(default_factory=list)
 
 
 class LearningHome(BaseModel):
@@ -33,11 +46,12 @@ class LearningHome(BaseModel):
     enrollment_id: UUID | None = None
     course_title: str | None = None
     release_version: int | None = None
-    latest_release_version: int = 3
+    latest_release_version: int = 4
     upgrade_available: bool = False
     current_day: int = 1
     available_through_day: int = 21
     course_complete: bool = False
+    teaching_overlay: TeachingOverlayIdentity | None = None
     days: list[DayView] = Field(default_factory=list)
 
 
@@ -89,6 +103,14 @@ class AttemptIn(BaseModel):
         return self
 
 
+class TeachingFeedback(BaseModel):
+    why_i18n: dict[str, str] | None = None
+    rule_i18n: dict[str, str] | None = None
+    correct_example_de: str | None = None
+    submitted_answer: str | None = None
+    correct_answer: str | None = None
+
+
 class AttemptResult(BaseModel):
     attempt_id: UUID
     evaluation_id: UUID
@@ -97,6 +119,8 @@ class AttemptResult(BaseModel):
     feedback_code: str
     day_complete: bool
     next_day: int
+    teaching: TeachingFeedback | None = None
+    review_scheduled: bool = False
 
 
 class StartLearningResult(BaseModel):

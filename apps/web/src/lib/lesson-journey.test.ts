@@ -88,4 +88,33 @@ describe("daily lesson journey", () => {
       }),
     ).toBe("complete");
   });
+
+  it("prefers authored stages over position buckets", () => {
+    expect(lessonStageForPosition(1, 7, ["learn", "recognize"])).toBe("learn");
+    expect(lessonStageForPosition(2, 7, ["learn", "recognize"])).toBe("recognize");
+  });
+
+  it("marks authored learn activities done only after those positions are submitted", () => {
+    const authored = [
+      "learn",
+      "learn",
+      "recognize",
+      "build",
+      "build",
+      "recall",
+      "challenge",
+    ];
+    const activities = Array.from({ length: 7 }, (_, index) => ({
+      position: index + 1,
+      submitted: index < 2,
+    }));
+    expect(
+      lessonStageStatus({
+        stage: "learn",
+        activeStage: "recognize",
+        activities,
+        authoredStages: authored,
+      }),
+    ).toBe("done");
+  });
 });

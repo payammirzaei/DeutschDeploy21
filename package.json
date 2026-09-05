@@ -4,6 +4,10 @@
   "version": "0.1.0",
   "workspaces": ["apps/web"],
   "scripts": {
+    "lint": "npm run web:lint",
+    "typecheck": "npm run web:typecheck",
+    "test": "npm run web:test",
+    "build": "npm run web:build",
     "web:dev": "npm --workspace apps/web run dev",
     "web:build": "npm --workspace apps/web run build",
     "web:lint": "npm --workspace apps/web run lint",
@@ -11,5 +15,9 @@
     "web:test": "npm --workspace apps/web run test",
     "api:generate": "npm --workspace apps/web run api:generate"
   },
-  "engines": {"node": ">=22.0.0"}
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.9.0 <11"
+  },
+  "packageManager": "npm@10.9.3"
 }

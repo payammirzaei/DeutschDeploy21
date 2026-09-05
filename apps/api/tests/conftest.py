@@ -1,5 +1,12 @@
 import os
+import sys
 from pathlib import Path
+
+# Windows + psycopg need SelectorEventLoop; do not impose this on Linux CI.
+if sys.platform.startswith("win"):
+    import asyncio
+
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 os.environ.setdefault("APP_ENV", "test")
 os.environ.setdefault("APP_SECRET_KEY", "test-secret-key-that-is-longer-than-thirty-two-characters")

@@ -142,29 +142,37 @@ export default function PracticePage() {
   }, [activity, recordResult]);
 
   async function submit(answer: ExerciseAnswer) {
-    if (!activity || submitting || queued || result) return;
+    if (!activity || submitting || result) return;
     setLastAnswer(answer);
     setSubmitting(true);
+    setQueued(false);
     setError(null);
-    const durationMs = startedAt.current
-      ? Math.max(0, Date.now() - startedAt.current)
-      : null;
-    const submission = await submitLearningAttemptSafely<AttemptResult>(activity.id, {
-      ...answer,
-      duration_ms: durationMs,
-    });
-    if (submission.status === "queued") {
-      setQueued(true);
-      setSubmitting(false);
-      return;
-    }
-    if (submission.status === "error") {
+    try {
+      const durationMs = startedAt.current
+        ? Math.max(0, Date.now() - startedAt.current)
+        : null;
+      const submission = await submitLearningAttemptSafely<AttemptResult>(activity.id, {
+        ...answer,
+        duration_ms: durationMs,
+      });
+      if (submission.status === "queued") {
+        setQueued(true);
+        setError(
+          "Answer saved on this device. Tap Check again to retry sync.",
+        );
+        return;
+      }
+      if (submission.status === "error") {
+        setError("Your answer was not saved. Try once more.");
+        return;
+      }
+      recordResult(submission.data);
+      setQueued(false);
+    } catch {
       setError("Your answer was not saved. Try once more.");
+    } finally {
       setSubmitting(false);
-      return;
     }
-    recordResult(submission.data);
-    setSubmitting(false);
   }
 
   async function continuePractice() {
@@ -193,21 +201,23 @@ export default function PracticePage() {
     return selection.selection_reason || strategyCopy[selection.strategy] || null;
   }, [selection]);
 
+  const inSession = Boolean(activity || setComplete || (!loading && selection));
+
   return (
-    <main className={styles.shell}>
+    <main className={`${styles.shell} ${inSession ? styles.shellActive : ""}`}>
       <header className={styles.header}>
         <Link href="/dashboard" className="brand" aria-label="Back to dashboard">
           DD<span>21</span>
         </Link>
-        <nav>
+        <nav aria-label="Practice navigation">
           <Link href="/learn" className="text-link">Learn</Link>
           <Link href="/review" className="text-link">Review</Link>
         </nav>
       </header>
 
       <section className={styles.hero}>
-        <div>
-          <span className="eyebrow">🤫 ADAPTIVE SILENT PRACTICE · QUICK SET</span>
+        <div className={styles.heroCopy}>
+          <span className="eyebrow">ADAPTIVE SILENT PRACTICE · QUICK SET</span>
           <h1>Eight drills.<br />Zero awkwardness.</h1>
           <p>
             A short, bus-friendly mix of tap puzzles and recall. The first cycle explores every
@@ -337,8 +347,8 @@ export default function PracticePage() {
                 key={activity.id}
                 exerciseType={activity.exercise_type}
                 prompt={activity.prompt}
-                submitting={submitting || queued}
-                submitLabel={queued ? "Saved offline" : "Check"}
+                submitting={submitting}
+                submitLabel={queued ? "Retry sync" : "Check"}
                 onSubmit={submit}
               />
             </article>

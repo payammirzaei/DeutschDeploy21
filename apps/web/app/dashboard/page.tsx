@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { api } from "@/src/lib/api";
+import { createIdempotencyKey } from "@/src/lib/offline-attempts";
 
 type User = { id: string; email: string };
 type Job = {
@@ -125,7 +126,7 @@ export default function DashboardPage() {
 
   async function runWorkerCheck() {
     setRunning(true);
-    const key = crypto.randomUUID();
+    const key = createIdempotencyKey();
     const { data, response } = await api.POST("/api/v1/platform/jobs", {
       params: { header: { "Idempotency-Key": key } },
       body: { message: "Web → API → PostgreSQL → Redis → Worker → PostgreSQL" },

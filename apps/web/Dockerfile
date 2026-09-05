@@ -18,9 +18,9 @@ RUN uv run python -m app.scripts.export_openapi
 
 FROM node:22-alpine AS deps
 WORKDIR /app
-COPY package.json ./
+COPY package.json package-lock.json .npmrc ./
 COPY apps/web/package.json apps/web/package.json
-RUN npm install
+RUN npm ci
 
 FROM node:22-alpine AS builder
 WORKDIR /app

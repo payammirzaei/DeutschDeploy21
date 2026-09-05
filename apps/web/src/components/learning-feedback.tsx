@@ -38,12 +38,13 @@ const COPY = {
     incorrectLead:
       "This miss is useful evidence. Use the rule below, compare it with the anchor, and let review bring it back later.",
     yourAnswer: "Your answer",
-    rule: "Why / rule",
-    anchor: "German anchor",
+    whyWrong: "Why it was wrong",
+    rule: "Rule",
+    anchor: "German example",
     meaning: "Meaning",
-    reveal: "Correct target",
-    evidenceCorrect: "Stored as positive mastery evidence",
-    evidenceWrong: "Stored as focused review evidence",
+    reveal: "Correct answer",
+    evidenceCorrect: "Nice. That pattern is stored.",
+    evidenceWrong: "We’ll bring this back soon.",
     nextActivity: "Next activity",
     nextDay: "Continue to next day",
     finish: "Finish course",
@@ -60,12 +61,13 @@ const COPY = {
     incorrectLead:
       "این اشتباه برای یادگیری مفیده. قانون پایین را ببین، با جمله‌ی نمونه مقایسه کن و بگذار مرور دوباره برش گرداند.",
     yourAnswer: "جواب تو",
-    rule: "چرا / قانون",
-    anchor: "جمله‌ی مرجع آلمانی",
+    whyWrong: "چرا غلط بود",
+    rule: "قانون",
+    anchor: "مثال آلمانی",
     meaning: "معنی",
-    reveal: "هدف درست",
-    evidenceCorrect: "به‌عنوان شواهد مثبت یادگیری ذخیره شد",
-    evidenceWrong: "برای مرور هدفمند ذخیره شد",
+    reveal: "جواب درست",
+    evidenceCorrect: "خوبه. این الگو ذخیره شد.",
+    evidenceWrong: "به‌زودی دوباره برمی‌گردیم سر همین نکته.",
     nextActivity: "تمرین بعدی",
     nextDay: "رفتن به روز بعد",
     finish: "پایان دوره",
@@ -165,7 +167,6 @@ export function LearningFeedback({
   answer,
   correct,
   score,
-  feedbackCode,
   dayComplete,
   nextDay,
   availableThroughDay,
@@ -175,13 +176,25 @@ export function LearningFeedback({
   const [locale, setLocale] = useState<Locale>("en");
   const copy = COPY[locale];
   const lesson = prompt.lesson;
-  const rule = localize(lesson?.explanation_i18n, locale);
+  const block = lesson?.teaching_block;
+  const teachingWhy =
+    localize(block?.explanation_i18n, locale) ??
+    localize(lesson?.teaching_feedback?.why_i18n, locale);
+  const teachingRule =
+    localize(block?.rule_i18n, locale) ??
+    localize(lesson?.teaching_feedback?.rule_i18n, locale) ??
+    localize(lesson?.usage_notes_i18n, locale) ??
+    localize(lesson?.explanation_i18n, locale);
   const meaning = localize(lesson?.meaning_i18n, locale);
   const answerText = useMemo(
     () => submittedAnswer(answer, prompt, locale),
     [answer, locale, prompt],
   );
-  const reveal = correctReveal(exerciseType, prompt, fallbackLemma, locale);
+  const reveal =
+    (!correct &&
+      (block?.corrected_example_de ||
+        lesson?.teaching_feedback?.correct_example_de)) ||
+    correctReveal(exerciseType, prompt, fallbackLemma, locale);
   const customNextLabel = localize(continueLabelI18n, locale);
   const nextLabel = customNextLabel ?? (
     dayComplete
@@ -243,17 +256,33 @@ export function LearningFeedback({
           </div>
         ) : null}
 
-        {rule ? (
+        {correct && teachingRule ? (
           <div className={`${styles.teachingCard} ${styles.ruleCard}`}>
             <span>{copy.rule}</span>
-            <p>{rule}</p>
+            <p>{teachingRule}</p>
           </div>
         ) : null}
 
-        {lesson?.example_de ? (
+        {!correct && teachingWhy ? (
+          <div className={`${styles.teachingCard} ${styles.ruleCard}`}>
+            <span>{copy.whyWrong}</span>
+            <p>{teachingWhy}</p>
+          </div>
+        ) : null}
+
+        {!correct && teachingRule ? (
+          <div className={`${styles.teachingCard} ${styles.ruleCard}`}>
+            <span>{copy.rule}</span>
+            <p>{teachingRule}</p>
+          </div>
+        ) : null}
+
+        {(block?.example_de || lesson?.example_de) ? (
           <div className={`${styles.teachingCard} ${styles.anchorCard}`}>
             <span>{copy.anchor}</span>
-            <blockquote lang="de" dir="ltr">{lesson.example_de}</blockquote>
+            <blockquote lang="de" dir="ltr">
+              {block?.example_de || lesson?.example_de}
+            </blockquote>
           </div>
         ) : null}
 
@@ -269,7 +298,6 @@ export function LearningFeedback({
         <div className={styles.scoreBlock}>
           <strong>{score}</strong>
           <span>{copy.score}</span>
-          <code>{feedbackCode}</code>
         </div>
         <span className={styles.evidence}>
           {correct ? copy.evidenceCorrect : copy.evidenceWrong}

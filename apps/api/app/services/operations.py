@@ -50,11 +50,15 @@ async def get_operations_summary(session: AsyncSession) -> OperationsSummary:
     since = now - timedelta(hours=24)
 
     queued_jobs = int(
-        await session.scalar(select(func.count(PlatformJob.id)).where(PlatformJob.status == "queued"))
+        await session.scalar(
+            select(func.count(PlatformJob.id)).where(PlatformJob.status == "queued")
+        )
         or 0
     )
     running_jobs = int(
-        await session.scalar(select(func.count(PlatformJob.id)).where(PlatformJob.status == "running"))
+        await session.scalar(
+            select(func.count(PlatformJob.id)).where(PlatformJob.status == "running")
+        )
         or 0
     )
     failed_jobs_24h = int(

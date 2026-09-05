@@ -280,7 +280,8 @@ def _selection_reason(
     if mastery.state == "review" or mastery.lapses > 0:
         return (
             "recent_miss",
-            "Weak spot first: this pattern has a recent miss, so it gets another short retrieval attempt.",
+            "Weak spot first: this pattern has a recent miss, so it gets "
+            "another short retrieval attempt.",
         )
     if mastery.state == "learning":
         return (
@@ -312,7 +313,8 @@ def _response(
     if strategy == "explore_mix":
         reason_code = "fresh_family"
         reason = (
-            "Exploration round: try every silent mini-game once before the mix starts targeting weaknesses."
+            "Exploration round: try every silent mini-game once before the mix "
+            "starts targeting weaknesses."
         )
     else:
         reason_code, reason = _selection_reason(mastery)

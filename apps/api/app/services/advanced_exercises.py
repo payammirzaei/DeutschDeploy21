@@ -218,7 +218,7 @@ async def _example_cloze(
     version: ContentVersion,
     verb: VerbVersion,
 ) -> tuple[dict, dict]:
-    example = await _example(session, version.id)
+    example = await _example(session, version.id, require_token=verb.infinitive)
     cloze = _replace_exact_word(example.text_de, verb.infinitive, "____")
     if cloze is None:
         raise UnsupportedAdvancedExerciseError(
@@ -246,7 +246,7 @@ async def _usage_error_spotting(
     version: ContentVersion,
     verb: VerbVersion,
 ) -> tuple[dict, dict]:
-    example = await _example(session, version.id)
+    example = await _example(session, version.id, require_token=verb.infinitive)
     participle_sentence = _replace_exact_word(
         example.text_de,
         verb.infinitive,
@@ -343,16 +343,32 @@ async def _phrase_builder(
     )
 
 
-async def _example(session: AsyncSession, version_id: UUID) -> VersionExample:
-    example = await session.scalar(
-        select(VersionExample)
-        .where(VersionExample.version_id == version_id)
-        .order_by(VersionExample.sort_order, VersionExample.external_id)
-        .limit(1)
+async def _example(
+    session: AsyncSession,
+    version_id: UUID,
+    *,
+    require_token: str | None = None,
+) -> VersionExample:
+    rows = list(
+        (
+            await session.execute(
+                select(VersionExample)
+                .where(VersionExample.version_id == version_id)
+                .order_by(VersionExample.sort_order, VersionExample.external_id)
+            )
+        ).scalars()
     )
-    if example is None:
+    if not rows:
         raise UnsupportedAdvancedExerciseError("Pinned verb has no example sentence")
-    return example
+    if require_token:
+        pattern = re.compile(
+            rf"(?<!\w){re.escape(require_token)}(?!\w)",
+            flags=re.IGNORECASE,
+        )
+        for row in rows:
+            if pattern.search(row.text_de):
+                return row
+    return rows[0]
 
 
 async def _translation(session: AsyncSession, version_id: UUID, locale: str) -> str | None:

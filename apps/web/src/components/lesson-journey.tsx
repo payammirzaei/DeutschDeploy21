@@ -12,6 +12,7 @@ type Props = {
   activities: JourneyActivity[];
   activityPosition?: number | null;
   dayComplete: boolean;
+  authoredStages?: string[] | null;
 };
 
 const STAGE_COPY: Record<
@@ -48,11 +49,13 @@ export function LessonJourney({
   activities,
   activityPosition = null,
   dayComplete,
+  authoredStages = null,
 }: Props) {
   const activeStage = activeLessonStage({
     activities,
     activityPosition,
     dayComplete,
+    authoredStages,
   });
   const submitted = activities.filter((activity) => activity.submitted).length;
   const activeCopy = STAGE_COPY[activeStage];
@@ -76,6 +79,7 @@ export function LessonJourney({
             stage,
             activeStage,
             activities,
+            authoredStages,
           });
           const copy = STAGE_COPY[stage];
           return (

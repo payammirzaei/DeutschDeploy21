@@ -1,0 +1,2076 @@
+{
+  "verb.vorstellen": {
+    "pronunciation_hint": "FOR-shtel-len",
+    "usage_notes": {
+      "en": "Use sich vorstellen to introduce yourself and etwas vorstellen to present an idea, product, or colleague.",
+      "fa": "از sich vorstellen برای معرفی خود و از etwas vorstellen برای معرفی یک ایده، محصول یا همکار استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "stelle vor",
+      "du": "stellst vor",
+      "er_sie_es": "stellt vor",
+      "wir": "stellen vor",
+      "ihr": "stellt vor",
+      "sie_Sie": "stellen vor"
+    },
+    "structures": [
+      {
+        "pattern_de": "sich vorstellen / jemandem etwas vorstellen",
+        "note": {
+          "en": "The prefix vor separates in the present tense; the reflexive pronoun is accusative.",
+          "fa": "پیشوند vor در زمان حال جدا می‌شود؛ ضمیر بازتابی در حالت اکوزاتیو است."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich vorstelle mich kurz.",
+        "correct_de": "Ich stelle mich kurz vor.",
+        "why": {
+          "en": "Vorstellen is separable, so vor goes to the end in a main clause.",
+          "fa": "فعل vorstellen جداشدنی است؛ بنابراین vor در جملهٔ اصلی به انتهای جمله می‌رود."
+        }
+      },
+      {
+        "wrong_de": "Ich habe mich gestellt vor.",
+        "correct_de": "Ich habe mich vorgestellt.",
+        "why": {
+          "en": "In the perfect tense, the participle vorgestellt stays together and goes to the end.",
+          "fa": "در زمان Perfekt، شکل Partizip II یعنی vorgestellt یکپارچه می‌ماند و در پایان می‌آید."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "präsentieren",
+        "difference": {
+          "en": "vorstellen is common for introductions and proposals; präsentieren stresses a more formal presentation.",
+          "fa": "vorstellen برای معرفی و پیشنهاد رایج است؛ präsentieren بیشتر بر ارائهٔ رسمی تأکید دارد."
+        }
+      }
+    ],
+    "collocations": [
+      "sich kurz vorstellen",
+      "eine Lösung vorstellen",
+      "dem Team ein Konzept vorstellen"
+    ],
+    "related": [
+      "verb.beschreiben",
+      "verb.erklaeren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Gern stelle ich mich kurz vor: Ich arbeite als Backend-Entwickler und konzentriere mich auf Cloud-Systeme.",
+        "note": {
+          "en": "A natural opening for a concise professional introduction.",
+          "fa": "شروعی طبیعی برای یک معرفی حرفه‌ای و کوتاه است."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "separable",
+      "reflexive",
+      "perfekt",
+      "interview-opening"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.vorstellen.infinitive.1",
+        "de": "Ich kann mich und mein Projekt kurz vorstellen.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.vorstellen.natural.1",
+        "de": "Ich stelle dir meine Kollegin vor.",
+        "en": "I am introducing my colleague to you.",
+        "fa": "همکارم را به تو معرفی می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.vorstellen.software.1",
+        "de": "Wir stellen dem Team morgen die neue Architektur vor.",
+        "en": "We are presenting the new architecture to the team tomorrow.",
+        "fa": "فردا معماری جدید را به تیم معرفی می‌کنیم.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.vorstellen.interview.1",
+        "de": "Im Gespräch habe ich mich kurz vorgestellt und dann mein letztes Projekt beschrieben.",
+        "en": "In the interview, I briefly introduced myself and then described my last project.",
+        "fa": "در مصاحبه کوتاه خودم را معرفی کردم و سپس آخرین پروژه‌ام را توضیح دادم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.arbeiten": {
+    "pronunciation_hint": "AR-bai-ten",
+    "usage_notes": {
+      "en": "Used for employment, collaboration, and work on a task or system.",
+      "fa": "برای اشتغال، همکاری و کار روی یک وظیفه یا سیستم به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "arbeite",
+      "du": "arbeitest",
+      "er_sie_es": "arbeitet",
+      "wir": "arbeiten",
+      "ihr": "arbeitet",
+      "sie_Sie": "arbeiten"
+    },
+    "structures": [
+      {
+        "pattern_de": "arbeiten als + Profession / an etwas arbeiten",
+        "note": {
+          "en": "als names the role. an takes the dative for the current task: an einer API.",
+          "fa": "als نقش شغلی را می‌گوید. an برای کار فعلی داتیو می‌گیرد: an einer API."
+        }
+      },
+      {
+        "pattern_de": "an etwas arbeiten / mit jemandem arbeiten",
+        "note": {
+          "en": "Both an and mit take the dative here.",
+          "fa": "در این کاربرد، هر دو حرف اضافهٔ an و mit با داتیو می‌آیند."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich arbeite auf einer API.",
+        "correct_de": "Ich arbeite an einer API.",
+        "why": {
+          "en": "Use an plus dative for a task or product you are working on.",
+          "fa": "برای چیزی که روی آن کار می‌کنید از an به‌همراه داتیو استفاده کنید."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "funktionieren",
+        "difference": {
+          "en": "arbeiten describes people working; funktionieren usually says that a machine or system works.",
+          "fa": "arbeiten کار کردن افراد را بیان می‌کند؛ funktionieren معمولاً یعنی یک دستگاه یا سیستم درست کار می‌کند."
+        }
+      }
+    ],
+    "collocations": [
+      "im Backend arbeiten",
+      "an einer API arbeiten",
+      "eng mit dem Team arbeiten"
+    ],
+    "related": [
+      "verb.entwickeln",
+      "verb.bauen"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "In meinem letzten Team habe ich eng mit DevOps und QA zusammengearbeitet.",
+        "note": {
+          "en": "Use Perfekt to describe past collaboration.",
+          "fa": "برای توضیح همکاری در گذشته از Perfekt استفاده کنید."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "dative",
+      "preposition-an",
+      "perfekt",
+      "collaboration"
+    ],
+    "grammar_overrides": {
+      "governed_case": "dative",
+      "governed_preposition": "an",
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.arbeiten.natural.1",
+        "de": "Heute arbeite ich von zu Hause.",
+        "en": "Today I am working from home.",
+        "fa": "امروز از خانه کار می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.arbeiten.software.1",
+        "de": "Wir arbeiten gerade an einem Monitoring-Dashboard.",
+        "en": "We are currently working on a monitoring dashboard.",
+        "fa": "در حال حاضر روی یک داشبورد مانیتورینگ کار می‌کنیم.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.arbeiten.interview.1",
+        "de": "Ich habe zwei Jahre lang in einem agilen Produktteam gearbeitet.",
+        "en": "I worked in an agile product team for two years.",
+        "fa": "دو سال در یک تیم محصول چابک کار کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.lernen": {
+    "pronunciation_hint": "LER-nen",
+    "usage_notes": {
+      "en": "Used for learning a skill, technology, language, or lesson from experience.",
+      "fa": "برای یادگیری مهارت، فناوری، زبان یا درس گرفتن از تجربه استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "lerne",
+      "du": "lernst",
+      "er_sie_es": "lernt",
+      "wir": "lernen",
+      "ihr": "lernt",
+      "sie_Sie": "lernen"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas lernen / lernen, etwas zu tun",
+        "note": {
+          "en": "Use an accusative object for a topic; use zu plus infinitive for an action.",
+          "fa": "برای موضوع از مفعول اکوزاتیو و برای یک کار از zu به‌همراه مصدر استفاده کنید."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich lerne über Kubernetes.",
+        "correct_de": "Ich lerne Kubernetes.",
+        "why": {
+          "en": "With a subject or skill, lernen normally takes a direct accusative object.",
+          "fa": "برای موضوع یا مهارت، lernen معمولاً مفعول مستقیم اکوزاتیو می‌گیرد."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "studieren",
+        "difference": {
+          "en": "lernen means learn or study generally; studieren means attend university or study a field academically.",
+          "fa": "lernen یعنی به‌طور کلی یاد گرفتن؛ studieren یعنی در دانشگاه تحصیل کردن یا رشته‌ای را آکادمیک خواندن."
+        }
+      }
+    ],
+    "collocations": [
+      "eine neue Technologie lernen",
+      "aus Fehlern lernen",
+      "selbstständig lernen"
+    ],
+    "related": [
+      "verb.analysieren",
+      "verb.verbessern"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Bei der Migration habe ich viel über verteilte Systeme gelernt.",
+        "note": {
+          "en": "Über is natural when emphasizing what you learned about a broader topic.",
+          "fa": "وقتی بر آموخته‌ها دربارهٔ یک موضوع گسترده تأکید می‌کنید، über طبیعی است."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "zu-infinitive",
+      "perfekt",
+      "learning"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.lernen.infinitive.1",
+        "de": "Ich kann mich schnell in neue Technologien einarbeiten und lernen.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.lernen.natural.1",
+        "de": "Ich lerne jeden Morgen zwanzig Minuten Deutsch.",
+        "en": "I learn German for twenty minutes every morning.",
+        "fa": "هر صبح بیست دقیقه آلمانی یاد می‌گیرم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.lernen.software.1",
+        "de": "Unser Team lernt gerade, die neue Cloud-Plattform effizient zu nutzen.",
+        "en": "Our team is currently learning to use the new cloud platform efficiently.",
+        "fa": "تیم ما در حال یادگیری استفادهٔ مؤثر از پلتفرم ابری جدید است.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.lernen.interview.1",
+        "de": "Aus diesem Fehler habe ich gelernt, Risiken früher anzusprechen.",
+        "en": "From this mistake, I learned to raise risks earlier.",
+        "fa": "از این اشتباه یاد گرفتم که ریسک‌ها را زودتر مطرح کنم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.sprechen": {
+    "pronunciation_hint": "SHPRECH-en",
+    "usage_notes": {
+      "en": "Used for speaking a language and talking with someone about a topic.",
+      "fa": "برای صحبت کردن به یک زبان یا گفت‌وگو با کسی دربارهٔ موضوعی به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "spreche",
+      "du": "sprichst",
+      "er_sie_es": "spricht",
+      "wir": "sprechen",
+      "ihr": "sprecht",
+      "sie_Sie": "sprechen"
+    },
+    "structures": [
+      {
+        "pattern_de": "mit jemandem über etwas sprechen",
+        "note": {
+          "en": "Mit takes dative; über takes accusative.",
+          "fa": "mit با داتیو و über با اکوزاتیو می‌آید."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich habe mit dem Kunden gesprecht.",
+        "correct_de": "Ich habe mit dem Kunden gesprochen.",
+        "why": {
+          "en": "Sprechen is irregular; its past participle is gesprochen.",
+          "fa": "sprechen بی‌قاعده است و Partizip II آن gesprochen است."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "reden",
+        "difference": {
+          "en": "Both mean talk; sprechen is neutral and especially common for languages and professional discussions.",
+          "fa": "هر دو به معنی صحبت کردن‌اند؛ sprechen خنثی‌تر است و برای زبان‌ها و گفت‌وگوهای حرفه‌ای بسیار رایج است."
+        }
+      }
+    ],
+    "collocations": [
+      "Deutsch sprechen",
+      "mit dem Kunden sprechen",
+      "über Anforderungen sprechen"
+    ],
+    "related": [
+      "verb.fragen",
+      "verb.erklaeren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Bei technischen Entscheidungen spreche ich früh mit allen beteiligten Teams.",
+        "note": {
+          "en": "This presents communication as a regular professional habit.",
+          "fa": "این جمله ارتباط مؤثر را به‌عنوان یک عادت حرفه‌ای نشان می‌دهد."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "irregular-present",
+      "perfekt",
+      "dative",
+      "prepositions"
+    ],
+    "grammar_overrides": {
+      "governed_case": "dative",
+      "governed_preposition": "mit",
+      "regularity": "irregular"
+    },
+    "examples": [
+      {
+        "external_id": "example.sprechen.natural.1",
+        "de": "Können wir später darüber sprechen?",
+        "en": "Can we talk about that later?",
+        "fa": "می‌توانیم بعداً درباره‌اش صحبت کنیم؟",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.sprechen.software.1",
+        "de": "Ich spreche mit dem DevOps-Team über die Deployment-Strategie.",
+        "en": "I am talking with the DevOps team about the deployment strategy.",
+        "fa": "با تیم DevOps دربارهٔ راهبرد استقرار صحبت می‌کنم.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.sprechen.interview.1",
+        "de": "Im letzten Projekt habe ich regelmäßig mit Stakeholdern gesprochen.",
+        "en": "In my last project, I regularly spoke with stakeholders.",
+        "fa": "در پروژهٔ قبلی به‌طور منظم با ذی‌نفعان گفت‌وگو کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.erklaeren": {
+    "pronunciation_hint": "er-KLEH-ren",
+    "usage_notes": {
+      "en": "Used to explain a concept, decision, process, or problem clearly.",
+      "fa": "برای توضیح روشن یک مفهوم، تصمیم، فرایند یا مشکل استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "erkläre",
+      "du": "erklärst",
+      "er_sie_es": "erklärt",
+      "wir": "erklären",
+      "ihr": "erklärt",
+      "sie_Sie": "erklären"
+    },
+    "structures": [
+      {
+        "pattern_de": "jemandem etwas erklären",
+        "note": {
+          "en": "The person is dative and the thing explained is accusative.",
+          "fa": "شخص در حالت داتیو و چیزی که توضیح داده می‌شود در حالت اکوزاتیو است."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich erkläre ihn die Architektur.",
+        "correct_de": "Ich erkläre ihm die Architektur.",
+        "why": {
+          "en": "The recipient of the explanation takes the dative case: ihm.",
+          "fa": "گیرندهٔ توضیح در حالت داتیو می‌آید: ihm."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "beschreiben",
+        "difference": {
+          "en": "erklären makes reasons or workings clear; beschreiben states what something is like.",
+          "fa": "erklären دلیل یا نحوهٔ کار را روشن می‌کند؛ beschreiben ویژگی‌ها و وضعیت چیزی را بیان می‌کند."
+        }
+      }
+    ],
+    "collocations": [
+      "eine Entscheidung erklären",
+      "den Ablauf erklären",
+      "etwas verständlich erklären"
+    ],
+    "related": [
+      "verb.beschreiben",
+      "verb.sprechen"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Ich kann erklären, warum wir uns für eine ereignisgesteuerte Architektur entschieden haben.",
+        "note": {
+          "en": "Useful for justifying a technical decision.",
+          "fa": "برای بیان دلیل یک تصمیم فنی کاربردی است."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "dative-recipient",
+      "accusative-object",
+      "subordinate-clause",
+      "technical-communication"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.erklaeren.natural.1",
+        "de": "Kannst du mir den Weg kurz erklären?",
+        "en": "Can you briefly explain the way to me?",
+        "fa": "می‌توانی مسیر را کوتاه برایم توضیح بدهی؟",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.erklaeren.software.1",
+        "de": "Die Dokumentation erklärt den Authentifizierungsablauf Schritt für Schritt.",
+        "en": "The documentation explains the authentication flow step by step.",
+        "fa": "مستندات روند احراز هویت را مرحله‌به‌مرحله توضیح می‌دهد.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.erklaeren.interview.1",
+        "de": "Im Interview habe ich erklärt, wie unser Caching die Antwortzeit reduziert hat.",
+        "en": "In the interview, I explained how our caching reduced response time.",
+        "fa": "در مصاحبه توضیح دادم که کش‌کردن ما چگونه زمان پاسخ را کاهش داد.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.beschreiben": {
+    "pronunciation_hint": "be-SHRAI-ben",
+    "usage_notes": {
+      "en": "Used to describe responsibilities, systems, processes, and situations.",
+      "fa": "برای توصیف مسئولیت‌ها، سیستم‌ها، فرایندها و موقعیت‌ها به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "beschreibe",
+      "du": "beschreibst",
+      "er_sie_es": "beschreibt",
+      "wir": "beschreiben",
+      "ihr": "beschreibt",
+      "sie_Sie": "beschreiben"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas als etwas beschreiben",
+        "note": {
+          "en": "The thing being described is an accusative object; als introduces its characterization.",
+          "fa": "چیزی که توصیف می‌شود مفعول اکوزاتیو است و als ویژگی یا نقش آن را معرفی می‌کند."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich beschreibe über mein Projekt.",
+        "correct_de": "Ich beschreibe mein Projekt.",
+        "why": {
+          "en": "Beschreiben takes a direct accusative object, without über.",
+          "fa": "beschreiben مفعول مستقیم اکوزاتیو می‌گیرد و به über نیاز ندارد."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "erklären",
+        "difference": {
+          "en": "beschreiben gives characteristics or details; erklären clarifies causes or how something works.",
+          "fa": "beschreiben جزئیات و ویژگی‌ها را می‌گوید؛ erklären علت یا نحوهٔ کار را روشن می‌کند."
+        }
+      }
+    ],
+    "collocations": [
+      "eine Architektur beschreiben",
+      "den Ablauf beschreiben",
+      "eine Herausforderung beschreiben"
+    ],
+    "related": [
+      "verb.erklaeren",
+      "verb.analysieren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Ich beschreibe die Situation, meine Aufgabe, mein Vorgehen und das Ergebnis.",
+        "note": {
+          "en": "This maps naturally to a structured interview answer.",
+          "fa": "این ترتیب برای یک پاسخ ساختاریافته در مصاحبه مناسب است."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "als-complement",
+      "interview-structure"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "irregular"
+    },
+    "examples": [
+      {
+        "external_id": "example.beschreiben.infinitive.1",
+        "de": "Ich kann meine Aufgaben im Projekt beschreiben.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.beschreiben.natural.1",
+        "de": "Sie beschreibt das Problem sehr genau.",
+        "en": "She describes the problem very precisely.",
+        "fa": "او مشکل را بسیار دقیق توصیف می‌کند.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.beschreiben.software.1",
+        "de": "Das Diagramm beschreibt die Kommunikation zwischen den Services.",
+        "en": "The diagram describes the communication between the services.",
+        "fa": "نمودار ارتباط میان سرویس‌ها را توصیف می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.beschreiben.interview.1",
+        "de": "Ich habe beschrieben, wie wir den Engpass im Backend gefunden haben.",
+        "en": "I described how we found the bottleneck in the backend.",
+        "fa": "توضیح دادم که چگونه گلوگاه بک‌اند را پیدا کردیم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.fragen": {
+    "pronunciation_hint": "FRAA-gen",
+    "usage_notes": {
+      "en": "Used to ask a person a question or ask about information.",
+      "fa": "برای پرسیدن سؤال از یک شخص یا پرس‌وجو دربارهٔ اطلاعات استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "frage",
+      "du": "fragst",
+      "er_sie_es": "fragt",
+      "wir": "fragen",
+      "ihr": "fragt",
+      "sie_Sie": "fragen"
+    },
+    "structures": [
+      {
+        "pattern_de": "jemanden etwas fragen / nach etwas fragen",
+        "note": {
+          "en": "The person is accusative; nach takes dative.",
+          "fa": "شخص در حالت اکوزاتیو می‌آید و nach داتیو می‌گیرد."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich frage zu dem Deployment.",
+        "correct_de": "Ich frage nach dem Deployment.",
+        "why": {
+          "en": "Use nach plus dative when asking for or about specific information.",
+          "fa": "برای پرسیدن دربارهٔ اطلاعات مشخص از nach به‌همراه داتیو استفاده کنید."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "bitten",
+        "difference": {
+          "en": "fragen asks a question; bitten asks someone to do something or requests something.",
+          "fa": "fragen یعنی سؤال پرسیدن؛ bitten یعنی از کسی درخواست انجام کاری یا چیزی را داشتن."
+        }
+      }
+    ],
+    "collocations": [
+      "eine Frage stellen",
+      "jemanden direkt fragen",
+      "nach Details fragen"
+    ],
+    "related": [
+      "verb.sprechen",
+      "verb.pruefen"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Darf ich fragen, wie Ihr Team technische Entscheidungen dokumentiert?",
+        "note": {
+          "en": "A polite, relevant question to ask an interviewer.",
+          "fa": "پرسشی مؤدبانه و مرتبط برای مطرح کردن با مصاحبه‌کننده است."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative-person",
+      "preposition-nach",
+      "dative",
+      "interview-question"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.fragen.infinitive.1",
+        "de": "Ich kann nachfragen, wenn eine Anforderung unklar ist.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.fragen.natural.1",
+        "de": "Ich frage meine Kollegin, ob sie Zeit hat.",
+        "en": "I ask my colleague whether she has time.",
+        "fa": "از همکارم می‌پرسم آیا وقت دارد.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.fragen.software.1",
+        "de": "Der Entwickler fragt nach den genauen API-Anforderungen.",
+        "en": "The developer asks about the exact API requirements.",
+        "fa": "توسعه‌دهنده دربارهٔ نیازمندی‌های دقیق API می‌پرسد.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.fragen.interview.1",
+        "de": "Am Ende des Gesprächs habe ich nach dem Onboarding gefragt.",
+        "en": "At the end of the interview, I asked about onboarding.",
+        "fa": "در پایان مصاحبه دربارهٔ فرایند ورود به تیم پرسیدم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.entwickeln": {
+    "pronunciation_hint": "ent-VICK-eln",
+    "usage_notes": {
+      "en": "Used for developing software, products, features, or ideas.",
+      "fa": "برای توسعهٔ نرم‌افزار، محصول، قابلیت یا ایده به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "entwickle",
+      "du": "entwickelst",
+      "er_sie_es": "entwickelt",
+      "wir": "entwickeln",
+      "ihr": "entwickelt",
+      "sie_Sie": "entwickeln"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas entwickeln",
+        "note": {
+          "en": "The thing being developed is accusative.",
+          "fa": "چیزی که توسعه داده می‌شود در حالت اکوزاتیو است."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich habe entwickelt eine Plattform.",
+        "correct_de": "Ich habe eine Plattform entwickelt.",
+        "why": {
+          "en": "In Perfekt, the past participle goes to the end.",
+          "fa": "در Perfekt، شکل Partizip II به انتهای جمله می‌رود."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "sich entwickeln",
+        "difference": {
+          "en": "etwas entwickeln means develop something; sich entwickeln means evolve or progress.",
+          "fa": "etwas entwickeln یعنی چیزی را توسعه دادن؛ sich entwickeln یعنی رشد یا تحول یافتن."
+        }
+      }
+    ],
+    "collocations": [
+      "Software entwickeln",
+      "eine Plattform entwickeln",
+      "Features entwickeln"
+    ],
+    "related": [
+      "verb.programmieren",
+      "verb.implementieren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "In meinem letzten Projekt habe ich eine interne Plattform entwickelt.",
+        "note": {
+          "en": "Use Perfekt for a completed project contribution.",
+          "fa": "برای بیان سهم تکمیل‌شده در پروژه از Perfekt استفاده کنید."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "perfekt",
+      "accusative",
+      "interview-past"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.entwickeln.natural.1",
+        "de": "Die Idee entwickelt sich langsam weiter.",
+        "en": "The idea is slowly evolving.",
+        "fa": "این ایده به‌آرامی در حال تکامل است.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.entwickeln.software.1",
+        "de": "Wir entwickeln Webanwendungen mit React und FastAPI.",
+        "en": "We develop web applications with React and FastAPI.",
+        "fa": "ما با React و FastAPI وب‌اپلیکیشن توسعه می‌دهیم.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.entwickeln.interview.1",
+        "de": "Ich habe eine skalierbare API für mehrere Produktteams entwickelt.",
+        "en": "I developed a scalable API for several product teams.",
+        "fa": "یک API مقیاس‌پذیر برای چند تیم محصول توسعه دادم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.programmieren": {
+    "pronunciation_hint": "pro-gra-MEE-ren",
+    "usage_notes": {
+      "en": "Used for writing code or programming a concrete application or function.",
+      "fa": "برای کدنویسی یا برنامه‌نویسی یک برنامه یا تابع مشخص استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "programmiere",
+      "du": "programmierst",
+      "er_sie_es": "programmiert",
+      "wir": "programmieren",
+      "ihr": "programmiert",
+      "sie_Sie": "programmieren"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas in einer Sprache programmieren",
+        "note": {
+          "en": "The product is accusative; the language commonly follows in.",
+          "fa": "محصول مفعول اکوزاتیو است و زبان برنامه‌نویسی معمولاً پس از in می‌آید."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich programmiere mit Python eine Sprache.",
+        "correct_de": "Ich programmiere eine Anwendung in Python.",
+        "why": {
+          "en": "Program the application; use in to name its programming language.",
+          "fa": "برنامه را می‌نویسیم و برای نام زبان برنامه‌نویسی از in استفاده می‌کنیم."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "entwickeln",
+        "difference": {
+          "en": "programmieren focuses on writing code; entwickeln covers the broader development process.",
+          "fa": "programmieren بر نوشتن کد تمرکز دارد؛ entwickeln کل فرایند توسعه را دربر می‌گیرد."
+        }
+      }
+    ],
+    "collocations": [
+      "eine Schnittstelle programmieren",
+      "in Python programmieren",
+      "eine Funktion programmieren"
+    ],
+    "related": [
+      "verb.entwickeln",
+      "verb.implementieren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Ich programmiere hauptsächlich in TypeScript und Python.",
+        "note": {
+          "en": "A direct way to name your main programming languages.",
+          "fa": "روشی مستقیم برای نام بردن از زبان‌های اصلی برنامه‌نویسی است."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "preposition-in",
+      "technical-skill"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.programmieren.natural.1",
+        "de": "Am Wochenende programmiere ich manchmal ein kleines Tool.",
+        "en": "At weekends I sometimes program a small tool.",
+        "fa": "آخر هفته‌ها گاهی یک ابزار کوچک برنامه‌نویسی می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.programmieren.software.1",
+        "de": "Wir programmieren den Service in Go.",
+        "en": "We are programming the service in Go.",
+        "fa": "این سرویس را با زبان Go برنامه‌نویسی می‌کنیم.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.programmieren.interview.1",
+        "de": "Für den Prototyp habe ich eine kleine API in Python programmiert.",
+        "en": "For the prototype, I programmed a small API in Python.",
+        "fa": "برای نمونهٔ اولیه یک API کوچک با پایتون برنامه‌نویسی کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.implementieren": {
+    "pronunciation_hint": "im-ple-men-TEE-ren",
+    "usage_notes": {
+      "en": "Used when turning a requirement, design, or algorithm into working code.",
+      "fa": "برای تبدیل نیازمندی، طراحی یا الگوریتم به کد قابل اجرا به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "implementiere",
+      "du": "implementierst",
+      "er_sie_es": "implementiert",
+      "wir": "implementieren",
+      "ihr": "implementiert",
+      "sie_Sie": "implementieren"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas implementieren",
+        "note": {
+          "en": "Implementieren takes a direct accusative object.",
+          "fa": "implementieren مفعول مستقیم اکوزاتیو می‌گیرد."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir haben implementiert das Caching.",
+        "correct_de": "Wir haben das Caching implementiert.",
+        "why": {
+          "en": "The participle belongs at the end in a Perfekt main clause.",
+          "fa": "در جملهٔ اصلی Perfekt، Partizip II در انتها قرار می‌گیرد."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "einführen",
+        "difference": {
+          "en": "implementieren is technical realization; einführen is rolling out or introducing something in an organization.",
+          "fa": "implementieren یعنی پیاده‌سازی فنی؛ einführen یعنی راه‌اندازی یا معرفی چیزی در سازمان."
+        }
+      }
+    ],
+    "collocations": [
+      "eine Funktion implementieren",
+      "Caching implementieren",
+      "eine Schnittstelle implementieren"
+    ],
+    "related": [
+      "verb.entwickeln",
+      "verb.programmieren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Ich habe die Authentifizierung mit OAuth 2.0 implementiert.",
+        "note": {
+          "en": "Name both your contribution and the relevant technology.",
+          "fa": "هم سهم خود و هم فناوری مرتبط را مشخص می‌کند."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "perfekt",
+      "implementation"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.implementieren.natural.1",
+        "de": "Die Idee ist gut, aber wir müssen sie noch implementieren.",
+        "en": "The idea is good, but we still need to implement it.",
+        "fa": "ایده خوب است، اما هنوز باید آن را پیاده‌سازی کنیم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.implementieren.software.1",
+        "de": "Das Team implementiert gerade eine rollenbasierte Zugriffskontrolle.",
+        "en": "The team is currently implementing role-based access control.",
+        "fa": "تیم در حال پیاده‌سازی کنترل دسترسی مبتنی بر نقش است.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.implementieren.interview.1",
+        "de": "Ich habe einen Retry-Mechanismus für fehlgeschlagene Anfragen implementiert.",
+        "en": "I implemented a retry mechanism for failed requests.",
+        "fa": "یک سازوکار تلاش مجدد برای درخواست‌های ناموفق پیاده‌سازی کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.bauen": {
+    "pronunciation_hint": "BAU-en",
+    "usage_notes": {
+      "en": "In software, an informal and natural verb for building systems, services, and tools.",
+      "fa": "در حوزهٔ نرم‌افزار، فعلی طبیعی و نسبتاً غیررسمی برای ساخت سیستم، سرویس و ابزار است."
+    },
+    "praesens": {
+      "ich": "baue",
+      "du": "baust",
+      "er_sie_es": "baut",
+      "wir": "bauen",
+      "ihr": "baut",
+      "sie_Sie": "bauen"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas bauen / an etwas bauen",
+        "note": {
+          "en": "Use accusative for the result; an plus dative emphasizes ongoing work.",
+          "fa": "برای محصول نهایی از اکوزاتیو و برای تأکید بر کار در جریان از an با داتیو استفاده کنید."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir bauen an eine Plattform.",
+        "correct_de": "Wir bauen an einer Plattform.",
+        "why": {
+          "en": "An takes dative when it means working on something.",
+          "fa": "وقتی an به معنی کار روی چیزی است، داتیو می‌گیرد."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "erstellen",
+        "difference": {
+          "en": "bauen is broad and conversational; erstellen is more formal and suits documents or configured resources.",
+          "fa": "bauen عمومی‌تر و محاوره‌ای‌تر است؛ erstellen رسمی‌تر است و برای سند یا منبع پیکربندی‌شده مناسب است."
+        }
+      }
+    ],
+    "collocations": [
+      "eine Plattform bauen",
+      "einen Prototyp bauen",
+      "an einem Service bauen"
+    ],
+    "related": [
+      "verb.entwickeln",
+      "verb.erstellen"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Wir haben einen Prototyp gebaut, um die technische Machbarkeit zu prüfen.",
+        "note": {
+          "en": "Links an action to its purpose.",
+          "fa": "یک اقدام را به هدف آن پیوند می‌دهد."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "an-dative",
+      "perfekt"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.bauen.natural.1",
+        "de": "Die Kinder bauen einen Turm.",
+        "en": "The children are building a tower.",
+        "fa": "بچه‌ها یک برج می‌سازند.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.bauen.software.1",
+        "de": "Wir bauen einen Dienst für die Verarbeitung von Ereignissen.",
+        "en": "We are building a service for processing events.",
+        "fa": "یک سرویس برای پردازش رویدادها می‌سازیم.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.bauen.interview.1",
+        "de": "In meinem letzten Projekt habe ich eine CI/CD-Pipeline gebaut.",
+        "en": "In my last project, I built a CI/CD pipeline.",
+        "fa": "در پروژهٔ قبلی یک خط لولهٔ CI/CD ساختم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.erstellen": {
+    "pronunciation_hint": "er-SHTEL-len",
+    "usage_notes": {
+      "en": "Used for creating documents, configurations, reports, tickets, and technical resources.",
+      "fa": "برای ایجاد سند، پیکربندی، گزارش، تیکت و منابع فنی استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "erstelle",
+      "du": "erstellst",
+      "er_sie_es": "erstellt",
+      "wir": "erstellen",
+      "ihr": "erstellt",
+      "sie_Sie": "erstellen"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas erstellen",
+        "note": {
+          "en": "The created item is a direct accusative object.",
+          "fa": "چیزی که ایجاد می‌شود مفعول مستقیم اکوزاتیو است."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich habe eine Dokumentation geerstellt.",
+        "correct_de": "Ich habe eine Dokumentation erstellt.",
+        "why": {
+          "en": "Verbs with the inseparable prefix er- do not add ge- in the participle.",
+          "fa": "افعال دارای پیشوند جدانشدنی er- در Partizip II پیشوند ge- نمی‌گیرند."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "bauen",
+        "difference": {
+          "en": "erstellen is precise for producing an artifact; bauen is more natural for larger systems.",
+          "fa": "erstellen برای تولید یک خروجی مشخص دقیق‌تر است؛ bauen برای سیستم‌های بزرگ‌تر طبیعی‌تر است."
+        }
+      }
+    ],
+    "collocations": [
+      "eine Dokumentation erstellen",
+      "ein Ticket erstellen",
+      "einen Bericht erstellen"
+    ],
+    "related": [
+      "verb.bauen",
+      "verb.beschreiben"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Ich habe Runbooks für die wichtigsten Störfälle erstellt.",
+        "note": {
+          "en": "Highlights practical operational documentation.",
+          "fa": "بر مستندسازی عملیاتی کاربردی تأکید می‌کند."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "inseparable-prefix",
+      "accusative",
+      "perfekt"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.erstellen.infinitive.1",
+        "de": "Ich kann technische Dokumentation erstellen.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.erstellen.natural.1",
+        "de": "Ich erstelle eine Liste für morgen.",
+        "en": "I am making a list for tomorrow.",
+        "fa": "برای فردا یک فهرست تهیه می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.erstellen.software.1",
+        "de": "Das Skript erstellt automatisch einen täglichen Bericht.",
+        "en": "The script automatically creates a daily report.",
+        "fa": "اسکریپت به‌صورت خودکار یک گزارش روزانه ایجاد می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.erstellen.interview.1",
+        "de": "Für das Onboarding habe ich eine verständliche Entwicklerdokumentation erstellt.",
+        "en": "For onboarding, I created clear developer documentation.",
+        "fa": "برای ورود اعضای جدید، مستندات توسعه‌دهندگان را به‌شکلی روشن تهیه کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.verwenden": {
+    "pronunciation_hint": "fer-VEN-den",
+    "usage_notes": {
+      "en": "A neutral, slightly formal verb for using a tool, method, or technology.",
+      "fa": "فعلی خنثی و کمی رسمی برای استفاده از ابزار، روش یا فناوری است."
+    },
+    "praesens": {
+      "ich": "verwende",
+      "du": "verwendest",
+      "er_sie_es": "verwendet",
+      "wir": "verwenden",
+      "ihr": "verwendet",
+      "sie_Sie": "verwenden"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas für etwas verwenden",
+        "note": {
+          "en": "The tool is accusative; für also takes accusative.",
+          "fa": "ابزار در حالت اکوزاتیو است و für نیز اکوزاتیو می‌گیرد."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir verwenden von PostgreSQL.",
+        "correct_de": "Wir verwenden PostgreSQL.",
+        "why": {
+          "en": "Verwenden takes a direct object without von.",
+          "fa": "verwenden مفعول مستقیم می‌گیرد و به von نیاز ندارد."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "nutzen",
+        "difference": {
+          "en": "Both mean use; verwenden is neutral-formal, while nutzen often emphasizes practical use or benefit.",
+          "fa": "هر دو به معنی استفاده کردن‌اند؛ verwenden خنثی و رسمی‌تر است و nutzen اغلب بر کاربرد یا بهره تأکید دارد."
+        }
+      }
+    ],
+    "collocations": [
+      "PostgreSQL verwenden",
+      "ein Framework verwenden",
+      "für das Deployment verwenden"
+    ],
+    "related": [
+      "verb.nutzen",
+      "verb.implementieren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Wir haben Redis als Cache verwendet, um die Datenbank zu entlasten.",
+        "note": {
+          "en": "Names the technology and the reason for choosing it.",
+          "fa": "فناوری و دلیل انتخاب آن را بیان می‌کند."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "fuer-accusative",
+      "technology-choice"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.verwenden.infinitive.1",
+        "de": "Ich kann Docker für reproduzierbare Umgebungen verwenden.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.verwenden.natural.1",
+        "de": "Ich verwende diese App jeden Tag.",
+        "en": "I use this app every day.",
+        "fa": "هر روز از این اپ استفاده می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.verwenden.software.1",
+        "de": "Der Service verwendet PostgreSQL für persistente Daten.",
+        "en": "The service uses PostgreSQL for persistent data.",
+        "fa": "این سرویس برای داده‌های پایدار از PostgreSQL استفاده می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.verwenden.interview.1",
+        "de": "Für das Monitoring haben wir Prometheus und Grafana verwendet.",
+        "en": "We used Prometheus and Grafana for monitoring.",
+        "fa": "برای مانیتورینگ از Prometheus و Grafana استفاده کردیم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.nutzen": {
+    "pronunciation_hint": "NUTS-en",
+    "usage_notes": {
+      "en": "Used for making practical use of a tool, opportunity, resource, or advantage.",
+      "fa": "برای استفادهٔ عملی از ابزار، فرصت، منبع یا مزیت به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "nutze",
+      "du": "nutzt",
+      "er_sie_es": "nutzt",
+      "wir": "nutzen",
+      "ihr": "nutzt",
+      "sie_Sie": "nutzen"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas nutzen, um ... zu ...",
+        "note": {
+          "en": "Use um ... zu to state the purpose of using something.",
+          "fa": "برای بیان هدف استفاده از چیزی، از ساختار um ... zu استفاده کنید."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir nutzen von Containern.",
+        "correct_de": "Wir nutzen Container.",
+        "why": {
+          "en": "Nutzen takes a direct accusative object.",
+          "fa": "nutzen مفعول مستقیم اکوزاتیو می‌گیرد."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "verwenden",
+        "difference": {
+          "en": "nutzen often highlights usefulness or benefit; verwenden simply states what is used.",
+          "fa": "nutzen اغلب بر سودمندی تأکید دارد؛ verwenden فقط بیان می‌کند چه چیزی استفاده می‌شود."
+        }
+      }
+    ],
+    "collocations": [
+      "Cloud-Dienste nutzen",
+      "eine Chance nutzen",
+      "Ressourcen effizient nutzen"
+    ],
+    "related": [
+      "verb.verwenden",
+      "verb.verbessern"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Wir nutzen Infrastructure as Code, um Änderungen nachvollziehbar zu machen.",
+        "note": {
+          "en": "Connects a practice with its engineering benefit.",
+          "fa": "یک روش را به مزیت مهندسی آن پیوند می‌دهد."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "um-zu",
+      "purpose"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.nutzen.natural.1",
+        "de": "Ich nutze die Zugfahrt zum Lesen.",
+        "en": "I use the train journey for reading.",
+        "fa": "از زمان سفر با قطار برای مطالعه استفاده می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.nutzen.software.1",
+        "de": "Wir nutzen Kubernetes für die Orchestrierung unserer Container.",
+        "en": "We use Kubernetes to orchestrate our containers.",
+        "fa": "برای هماهنگ‌سازی کانتینرهایمان از Kubernetes استفاده می‌کنیم.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.nutzen.interview.1",
+        "de": "Ich habe Metriken genutzt, um den Engpass objektiv zu bewerten.",
+        "en": "I used metrics to assess the bottleneck objectively.",
+        "fa": "از معیارها استفاده کردم تا گلوگاه را به‌صورت عینی ارزیابی کنم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.testen": {
+    "pronunciation_hint": "TES-ten",
+    "usage_notes": {
+      "en": "Used for testing software, assumptions, behavior, or a technical setup.",
+      "fa": "برای تست نرم‌افزار، فرضیه، رفتار یا پیکربندی فنی به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "teste",
+      "du": "testest",
+      "er_sie_es": "testet",
+      "wir": "testen",
+      "ihr": "testet",
+      "sie_Sie": "testen"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas auf etwas testen",
+        "note": {
+          "en": "The object and the criterion after auf are accusative.",
+          "fa": "مفعول و معیار پس از auf هر دو اکوزاتیو هستند."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir testen ob die API stabil ist.",
+        "correct_de": "Wir testen, ob die API stabil ist.",
+        "why": {
+          "en": "An ob subordinate clause is separated by a comma.",
+          "fa": "جملهٔ وابسته با ob با ویرگول جدا می‌شود."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "prüfen",
+        "difference": {
+          "en": "testen emphasizes practical trials; prüfen emphasizes systematic checking against criteria.",
+          "fa": "testen بر آزمون عملی تأکید دارد؛ prüfen بر بررسی منظم طبق معیارها."
+        }
+      }
+    ],
+    "collocations": [
+      "eine API testen",
+      "automatisch testen",
+      "auf Fehler testen"
+    ],
+    "related": [
+      "verb.pruefen",
+      "verb.beheben"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Wir haben kritische Abläufe mit Integrations- und End-to-End-Tests getestet.",
+        "note": {
+          "en": "Names both test scope and method.",
+          "fa": "هم دامنه و هم روش تست را بیان می‌کند."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "ob-clause",
+      "testing"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.testen.infinitive.1",
+        "de": "Ich kann APIs automatisiert testen.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.testen.natural.1",
+        "de": "Ich teste das neue Gerät heute Abend.",
+        "en": "I will test the new device this evening.",
+        "fa": "امشب دستگاه جدید را امتحان می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.testen.software.1",
+        "de": "Die Pipeline testet jeden Pull Request automatisch.",
+        "en": "The pipeline tests every pull request automatically.",
+        "fa": "خط لوله هر pull request را خودکار تست می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.testen.interview.1",
+        "de": "Vor dem Release habe ich die wichtigsten Nutzerflüsse getestet.",
+        "en": "Before the release, I tested the most important user flows.",
+        "fa": "پیش از انتشار، مهم‌ترین جریان‌های کاربر را تست کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.pruefen": {
+    "pronunciation_hint": "PRUE-fen",
+    "usage_notes": {
+      "en": "Used for checking correctness, compliance, availability, or a condition.",
+      "fa": "برای بررسی صحت، انطباق، در دسترس بودن یا یک شرط استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "prüfe",
+      "du": "prüfst",
+      "er_sie_es": "prüft",
+      "wir": "prüfen",
+      "ihr": "prüft",
+      "sie_Sie": "prüfen"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas prüfen / etwas auf Fehler prüfen",
+        "note": {
+          "en": "The checked item and the criterion after auf are accusative.",
+          "fa": "مورد بررسی و معیار پس از auf در حالت اکوزاتیو هستند."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich prüfe, ist der Service erreichbar.",
+        "correct_de": "Ich prüfe, ob der Service erreichbar ist.",
+        "why": {
+          "en": "Use ob and final verb position for an indirect yes-no question.",
+          "fa": "برای پرسش غیرمستقیم بله/خیر از ob و فعل در انتهای جمله استفاده کنید."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "testen",
+        "difference": {
+          "en": "prüfen is checking against a condition; testen is trying behavior under test conditions.",
+          "fa": "prüfen بررسی بر اساس یک شرط است؛ testen آزمودن رفتار در شرایط تست است."
+        }
+      }
+    ],
+    "collocations": [
+      "den Status prüfen",
+      "auf Fehler prüfen",
+      "eine Berechtigung prüfen"
+    ],
+    "related": [
+      "verb.testen",
+      "verb.analysieren"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Zuerst habe ich die Logs und die letzten Deployments geprüft.",
+        "note": {
+          "en": "A clear first step in incident diagnosis.",
+          "fa": "یک گام نخست روشن برای عیب‌یابی رخداد است."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "auf-accusative",
+      "ob-clause"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.pruefen.infinitive.1",
+        "de": "Ich kann Eingabedaten vor der Verarbeitung prüfen.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.pruefen.natural.1",
+        "de": "Ich prüfe noch einmal die Adresse.",
+        "en": "I am checking the address once more.",
+        "fa": "نشانی را یک بار دیگر بررسی می‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.pruefen.software.1",
+        "de": "Der Health Check prüft, ob die Datenbank erreichbar ist.",
+        "en": "The health check verifies whether the database is reachable.",
+        "fa": "بررسی سلامت کنترل می‌کند که پایگاه داده در دسترس باشد.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.pruefen.interview.1",
+        "de": "Ich habe die Konfiguration auf Sicherheitsfehler geprüft.",
+        "en": "I checked the configuration for security flaws.",
+        "fa": "پیکربندی را از نظر نقص‌های امنیتی بررسی کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.analysieren": {
+    "pronunciation_hint": "ana-lue-ZEE-ren",
+    "usage_notes": {
+      "en": "Used for systematically analyzing data, logs, requirements, causes, or behavior.",
+      "fa": "برای تحلیل نظام‌مند داده، لاگ، نیازمندی، علت یا رفتار به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "analysiere",
+      "du": "analysierst",
+      "er_sie_es": "analysiert",
+      "wir": "analysieren",
+      "ihr": "analysiert",
+      "sie_Sie": "analysieren"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas analysieren",
+        "note": {
+          "en": "Analysieren takes a direct accusative object.",
+          "fa": "analysieren مفعول مستقیم اکوزاتیو می‌گیرد."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir haben die Logs geanalysiert.",
+        "correct_de": "Wir haben die Logs analysiert.",
+        "why": {
+          "en": "Verbs ending in -ieren form the participle without ge-.",
+          "fa": "افعال پایان‌یافته به -ieren در Partizip II پیشوند ge- نمی‌گیرند."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "prüfen",
+        "difference": {
+          "en": "analysieren investigates patterns and causes; prüfen checks a known condition.",
+          "fa": "analysieren الگوها و علت‌ها را بررسی می‌کند؛ prüfen یک شرط مشخص را کنترل می‌کند."
+        }
+      }
+    ],
+    "collocations": [
+      "Logs analysieren",
+      "eine Ursache analysieren",
+      "Nutzungsdaten analysieren"
+    ],
+    "related": [
+      "verb.pruefen",
+      "verb.finden"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Ich habe die Traces analysiert und die langsamste Datenbankabfrage identifiziert.",
+        "note": {
+          "en": "Shows an evidence-based diagnostic process.",
+          "fa": "یک فرایند عیب‌یابی مبتنی بر شواهد را نشان می‌دهد."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "ieren-participle",
+      "diagnosis"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.analysieren.natural.1",
+        "de": "Wir analysieren die Ergebnisse gemeinsam.",
+        "en": "We analyze the results together.",
+        "fa": "نتایج را با هم تحلیل می‌کنیم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.analysieren.software.1",
+        "de": "Das Team analysiert Metriken und verteilte Traces.",
+        "en": "The team analyzes metrics and distributed traces.",
+        "fa": "تیم معیارها و ردگیری‌های توزیع‌شده را تحلیل می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.analysieren.interview.1",
+        "de": "Bei der Störung habe ich zuerst die Fehlerrate analysiert.",
+        "en": "During the incident, I first analyzed the error rate.",
+        "fa": "هنگام اختلال ابتدا نرخ خطا را تحلیل کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.loesen": {
+    "pronunciation_hint": "LOE-zen",
+    "usage_notes": {
+      "en": "Used for solving a problem, task, conflict, or technical challenge.",
+      "fa": "برای حل مشکل، وظیفه، تعارض یا چالش فنی استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "löse",
+      "du": "löst",
+      "er_sie_es": "löst",
+      "wir": "lösen",
+      "ihr": "löst",
+      "sie_Sie": "lösen"
+    },
+    "structures": [
+      {
+        "pattern_de": "ein Problem lösen / etwas durch etwas lösen",
+        "note": {
+          "en": "The problem is accusative; durch names the means.",
+          "fa": "مشکل مفعول اکوزاتیو است و durch راه‌حل یا وسیله را بیان می‌کند."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir lösen für das Problem.",
+        "correct_de": "Wir lösen das Problem.",
+        "why": {
+          "en": "Lösen takes a direct accusative object, without für.",
+          "fa": "lösen مفعول مستقیم اکوزاتیو می‌گیرد و für لازم نیست."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "beheben",
+        "difference": {
+          "en": "lösen is broad problem-solving; beheben means removing a specific fault or defect.",
+          "fa": "lösen حل مسئله به‌طور کلی است؛ beheben یعنی رفع یک خطا یا نقص مشخص."
+        }
+      }
+    ],
+    "collocations": [
+      "ein Problem lösen",
+      "einen Konflikt lösen",
+      "eine Aufgabe lösen"
+    ],
+    "related": [
+      "verb.beheben",
+      "verb.finden"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Wir haben das Skalierungsproblem durch horizontale Partitionierung gelöst.",
+        "note": {
+          "en": "States the problem and the concrete solution.",
+          "fa": "مشکل و راه‌حل مشخص آن را بیان می‌کند."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "durch-accusative",
+      "problem-solving"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.loesen.natural.1",
+        "de": "Wir lösen das Problem morgen in Ruhe.",
+        "en": "We will solve the problem calmly tomorrow.",
+        "fa": "فردا با آرامش مشکل را حل می‌کنیم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.loesen.software.1",
+        "de": "Ein Index löst das Problem nur teilweise.",
+        "en": "An index solves the problem only partially.",
+        "fa": "یک ایندکس مشکل را فقط تا حدی حل می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.loesen.interview.1",
+        "de": "Ich habe das Performanceproblem zusammen mit dem Datenbankteam gelöst.",
+        "en": "I solved the performance problem with the database team.",
+        "fa": "مشکل عملکرد را همراه تیم پایگاه داده حل کردم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.finden": {
+    "pronunciation_hint": "FIN-den",
+    "usage_notes": {
+      "en": "Used for finding something and for expressing an opinion.",
+      "fa": "برای پیدا کردن چیزی و نیز بیان نظر استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "finde",
+      "du": "findest",
+      "er_sie_es": "findet",
+      "wir": "finden",
+      "ihr": "findet",
+      "sie_Sie": "finden"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas finden / etwas gut finden",
+        "note": {
+          "en": "The found or evaluated thing is accusative.",
+          "fa": "چیزی که پیدا یا ارزیابی می‌شود در حالت اکوزاتیو است."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Ich habe den Fehler gefindet.",
+        "correct_de": "Ich habe den Fehler gefunden.",
+        "why": {
+          "en": "Finden is irregular; its past participle is gefunden.",
+          "fa": "finden بی‌قاعده است و Partizip II آن gefunden است."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "herausfinden",
+        "difference": {
+          "en": "finden locates something; herausfinden discovers information after investigation.",
+          "fa": "finden چیزی را پیدا می‌کند؛ herausfinden پس از بررسی، اطلاعات را کشف می‌کند."
+        }
+      }
+    ],
+    "collocations": [
+      "einen Fehler finden",
+      "eine Lösung finden",
+      "etwas sinnvoll finden"
+    ],
+    "related": [
+      "verb.analysieren",
+      "verb.loesen"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Durch verteiltes Tracing habe ich die Ursache gefunden.",
+        "note": {
+          "en": "Use gefunden to report a successful investigation.",
+          "fa": "برای گزارش نتیجهٔ موفق بررسی از gefunden استفاده کنید."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "irregular",
+      "perfekt",
+      "accusative"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "irregular"
+    },
+    "examples": [
+      {
+        "external_id": "example.finden.infinitive.1",
+        "de": "Ich kann die Ursache eines Fehlers finden.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.finden.natural.1",
+        "de": "Ich finde meinen Schlüssel nicht.",
+        "en": "I cannot find my key.",
+        "fa": "کلیدم را پیدا نمی‌کنم.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.finden.software.1",
+        "de": "Der Scanner findet veraltete Abhängigkeiten.",
+        "en": "The scanner finds outdated dependencies.",
+        "fa": "اسکنر وابستگی‌های قدیمی را پیدا می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.finden.interview.1",
+        "de": "Wir haben den Fehler schließlich in der Serialisierung gefunden.",
+        "en": "We eventually found the bug in serialization.",
+        "fa": "در نهایت خطا را در بخش سریال‌سازی پیدا کردیم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.beheben": {
+    "pronunciation_hint": "be-HAY-ben",
+    "usage_notes": {
+      "en": "Used for fixing a fault, vulnerability, outage, or concrete defect.",
+      "fa": "برای رفع خطا، آسیب‌پذیری، اختلال یا نقص مشخص به‌کار می‌رود."
+    },
+    "praesens": {
+      "ich": "behebe",
+      "du": "behebst",
+      "er_sie_es": "behebt",
+      "wir": "beheben",
+      "ihr": "behebt",
+      "sie_Sie": "beheben"
+    },
+    "structures": [
+      {
+        "pattern_de": "einen Fehler beheben",
+        "note": {
+          "en": "The fault being fixed is accusative.",
+          "fa": "خطایی که رفع می‌شود در حالت اکوزاتیو است."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir haben den Fehler behebt.",
+        "correct_de": "Wir haben den Fehler behoben.",
+        "why": {
+          "en": "Beheben is irregular; its past participle is behoben.",
+          "fa": "beheben بی‌قاعده است و Partizip II آن behoben است."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "lösen",
+        "difference": {
+          "en": "beheben removes a specific defect; lösen handles a broader problem or task.",
+          "fa": "beheben یک نقص مشخص را رفع می‌کند؛ lösen یک مسئله یا وظیفهٔ گسترده‌تر را حل می‌کند."
+        }
+      }
+    ],
+    "collocations": [
+      "einen Fehler beheben",
+      "eine Schwachstelle beheben",
+      "eine Störung beheben"
+    ],
+    "related": [
+      "verb.loesen",
+      "verb.testen"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Ich habe die Ursache eingegrenzt und den Fehler ohne Ausfallzeit behoben.",
+        "note": {
+          "en": "Shows diagnosis, action, and operational impact.",
+          "fa": "تشخیص، اقدام و اثر عملیاتی را نشان می‌دهد."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "irregular",
+      "perfekt",
+      "accusative",
+      "incident"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "irregular"
+    },
+    "examples": [
+      {
+        "external_id": "example.beheben.infinitive.1",
+        "de": "Ich kann Produktionsfehler sicher beheben.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.beheben.natural.1",
+        "de": "Der Techniker behebt die Störung noch heute.",
+        "en": "The technician will fix the fault today.",
+        "fa": "تکنسین همین امروز اختلال را رفع می‌کند.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.beheben.software.1",
+        "de": "Das Update behebt eine kritische Sicherheitslücke.",
+        "en": "The update fixes a critical security vulnerability.",
+        "fa": "این به‌روزرسانی یک آسیب‌پذیری امنیتی جدی را رفع می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.beheben.interview.1",
+        "de": "Unter Zeitdruck habe ich den Produktionsfehler behoben und das Team informiert.",
+        "en": "Under time pressure, I fixed the production bug and informed the team.",
+        "fa": "تحت فشار زمانی خطای محیط عملیاتی را رفع کردم و تیم را در جریان گذاشتم.",
+        "skill": "interview"
+      }
+    ]
+  },
+  "verb.verbessern": {
+    "pronunciation_hint": "fer-BES-sern",
+    "usage_notes": {
+      "en": "Used for improving quality, performance, reliability, a process, or a skill.",
+      "fa": "برای بهبود کیفیت، عملکرد، پایداری، فرایند یا مهارت استفاده می‌شود."
+    },
+    "praesens": {
+      "ich": "verbessere",
+      "du": "verbesserst",
+      "er_sie_es": "verbessert",
+      "wir": "verbessern",
+      "ihr": "verbessert",
+      "sie_Sie": "verbessern"
+    },
+    "structures": [
+      {
+        "pattern_de": "etwas verbessern / sich verbessern",
+        "note": {
+          "en": "Use an accusative object, or the reflexive form for something that improves.",
+          "fa": "از مفعول اکوزاتیو استفاده کنید؛ برای بهتر شدن خودِ چیزی، شکل بازتابی می‌آید."
+        }
+      }
+    ],
+    "mistakes": [
+      {
+        "wrong_de": "Wir haben die Leistung geverbessert.",
+        "correct_de": "Wir haben die Leistung verbessert.",
+        "why": {
+          "en": "The inseparable prefix ver- prevents ge- in the participle.",
+          "fa": "پیشوند جدانشدنی ver- مانع افزودن ge- در Partizip II می‌شود."
+        }
+      }
+    ],
+    "contrasts": [
+      {
+        "lemma": "optimieren",
+        "difference": {
+          "en": "verbessern means make better generally; optimieren suggests systematic improvement toward an optimum.",
+          "fa": "verbessern یعنی به‌طور کلی بهتر کردن؛ optimieren به بهینه‌سازی نظام‌مند اشاره دارد."
+        }
+      }
+    ],
+    "collocations": [
+      "die Performance verbessern",
+      "einen Prozess verbessern",
+      "die Zuverlässigkeit verbessern"
+    ],
+    "related": [
+      "verb.analysieren",
+      "verb.nutzen"
+    ],
+    "interview_uses": [
+      {
+        "model_answer_de": "Durch Caching haben wir die mittlere Antwortzeit deutlich verbessert.",
+        "note": {
+          "en": "State the intervention and measurable outcome.",
+          "fa": "اقدام و نتیجهٔ قابل اندازه‌گیری را بیان می‌کند."
+        }
+      }
+    ],
+    "grammar_tags": [
+      "accusative",
+      "reflexive",
+      "inseparable-prefix",
+      "impact"
+    ],
+    "grammar_overrides": {
+      "governed_case": "accusative",
+      "governed_preposition": null,
+      "regularity": "regular"
+    },
+    "examples": [
+      {
+        "external_id": "example.verbessern.infinitive.1",
+        "de": "Ich kann bestehende Lösungen schrittweise verbessern.",
+        "en": null,
+        "fa": null,
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.verbessern.natural.1",
+        "de": "Mit Übung verbessert sich meine Aussprache.",
+        "en": "My pronunciation improves with practice.",
+        "fa": "با تمرین تلفظم بهتر می‌شود.",
+        "skill": "natural"
+      },
+      {
+        "external_id": "example.verbessern.software.1",
+        "de": "Der neue Index verbessert die Abfrageleistung deutlich.",
+        "en": "The new index significantly improves query performance.",
+        "fa": "ایندکس جدید عملکرد پرس‌وجو را به‌طور محسوسی بهتر می‌کند.",
+        "skill": "software"
+      },
+      {
+        "external_id": "example.verbessern.interview.1",
+        "de": "Ich habe den Deployment-Prozess automatisiert und dadurch die Zuverlässigkeit verbessert.",
+        "en": "I automated the deployment process and thereby improved reliability.",
+        "fa": "فرایند استقرار را خودکار کردم و در نتیجه پایداری را بهبود دادم.",
+        "skill": "interview"
+      }
+    ]
+  }
+}

@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     openai_api_key: SecretStr | None = None
     openai_transcription_model: str = "gpt-4o-transcribe"
 
+    @property
+    def web_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.web_origin.split(",") if origin.strip()]
+
     @model_validator(mode="after")
     def validate_production_secrets(self) -> "Settings":
         if self.app_env in {"staging", "production"}:

@@ -569,20 +569,44 @@
 
 @media (max-width: 680px) {
   .shell {
-    padding: 18px 14px 42px;
+    padding:
+      max(14px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      calc(36px + env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(12px);
   }
 
   .header nav {
     gap: 10px;
-    font-size: 11px;
+    font-size: 12px;
+  }
+
+  .header nav :global(.text-link) {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
   }
 
   .hero {
-    margin-top: 26px;
+    margin-top: 20px;
+    gap: 16px;
   }
 
   .hero h1 {
-    font-size: clamp(42px, 14vw, 64px);
+    font-size: clamp(34px, 11vw, 52px);
+    line-height: 1.02;
+  }
+
+  .hero p {
+    font-size: 14px;
   }
 
   .sessionBar {
@@ -595,8 +619,8 @@
   }
 
   .workspace {
-    margin-left: -14px;
-    margin-right: -14px;
+    margin-left: -12px;
+    margin-right: -12px;
     border-left: 0;
     border-right: 0;
     border-radius: 0;
@@ -604,7 +628,7 @@
   }
 
   .reviewStage {
-    padding: 20px 14px 28px;
+    padding: 16px 12px 24px;
   }
 
   .sectionTitle {
@@ -642,12 +666,13 @@
   }
 
   .exercise {
-    padding: 16px;
+    padding: 14px;
     border-radius: 16px;
+    min-width: 0;
   }
 
   .masteryPanel {
-    padding: 20px 14px;
+    padding: 18px 12px;
   }
 
   .masteryList {
@@ -655,7 +680,7 @@
   }
 
   .sessionSummary {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

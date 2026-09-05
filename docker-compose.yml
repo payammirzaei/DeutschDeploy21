@@ -33,6 +33,8 @@ services:
       REDIS_URL: redis://redis:6379/0
       MEDIA_STORAGE_BACKEND: filesystem
       MEDIA_ROOT: /data/media
+      # Keep in sync with phone/LAN testing hosts (comma-separated).
+      WEB_ORIGIN: http://localhost:3000,http://10.112.59.108:3000,http://100.85.161.102:3000
     command: ["sh", "-c", "uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port 8000"]
     ports: ["8000:8000"]
     volumes: ["speech_media:/data/media"]

@@ -32,6 +32,56 @@ class VerbExampleIn(BaseModel):
     skill: str | None = Field(default=None, max_length=120)
 
 
+class LocalizedNote(BaseModel):
+    en: str = Field(min_length=1, max_length=1200)
+    fa: str = Field(min_length=1, max_length=1200)
+
+
+class VerbStructureIn(BaseModel):
+    pattern_de: str = Field(min_length=2, max_length=240)
+    note: LocalizedNote
+
+
+class VerbMistakeIn(BaseModel):
+    wrong_de: str = Field(min_length=2, max_length=600)
+    correct_de: str = Field(min_length=2, max_length=600)
+    why: LocalizedNote
+
+
+class VerbContrastIn(BaseModel):
+    lemma: str = Field(min_length=2, max_length=120)
+    difference: LocalizedNote
+
+
+class VerbInterviewUseIn(BaseModel):
+    model_answer_de: str = Field(min_length=4, max_length=900)
+    note: LocalizedNote
+
+
+class VerbPraesensIn(BaseModel):
+    ich: str = Field(min_length=1, max_length=80)
+    du: str = Field(min_length=1, max_length=80)
+    er_sie_es: str = Field(min_length=1, max_length=80)
+    wir: str = Field(min_length=1, max_length=80)
+    ihr: str = Field(min_length=1, max_length=80)
+    sie_Sie: str = Field(min_length=1, max_length=80)
+
+
+class VerbPedagogyIn(BaseModel):
+    """Optional deep-teaching metadata layered onto a verb version."""
+
+    pronunciation_hint: str | None = Field(default=None, max_length=120)
+    usage_notes: LocalizedNote | None = None
+    praesens: VerbPraesensIn | None = None
+    structures: list[VerbStructureIn] = Field(default_factory=list, max_length=8)
+    mistakes: list[VerbMistakeIn] = Field(default_factory=list, max_length=6)
+    contrasts: list[VerbContrastIn] = Field(default_factory=list, max_length=6)
+    collocations: list[str] = Field(default_factory=list, max_length=12)
+    related: list[str] = Field(default_factory=list, max_length=12)
+    interview_uses: list[VerbInterviewUseIn] = Field(default_factory=list, max_length=6)
+    grammar_tags: list[str] = Field(default_factory=list, max_length=16)
+
+
 class VerbImportIn(BaseModel):
     external_id: str = Field(pattern=r"^verb\.[a-z0-9._-]+$", max_length=180)
     type: Literal["verb"] = "verb"
@@ -42,6 +92,7 @@ class VerbImportIn(BaseModel):
     grammar: VerbGrammarIn
     classification: VerbClassificationIn
     examples: list[VerbExampleIn] = Field(min_length=1, max_length=12)
+    pedagogy: VerbPedagogyIn | None = None
 
     @model_validator(mode="after")
     def validate_learning_contract(self) -> "VerbImportIn":
@@ -112,6 +163,7 @@ class VerbView(BaseModel):
     register: str
     translations: dict[str, list[str]]
     examples: list[ExampleView]
+    pedagogy: VerbPedagogyIn | None = None
 
 
 class DraftVerbView(BaseModel):

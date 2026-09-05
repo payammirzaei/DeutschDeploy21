@@ -28,8 +28,15 @@ from app.schemas.content import (
     PublishResult,
     VerbImportIn,
     VerbImportReport,
+    VerbPedagogyIn,
     VerbView,
     VersionSummary,
+)
+
+PEDAGOGY_FIELD = "pedagogy"
+PEDAGOGY_LOCALE = "x-json"
+DAYS_1_3_PEDAGOGY_PATH = (
+    Path(__file__).resolve().parents[4] / "content" / "verbs" / "pedagogy-days-1-3.v4.json"
 )
 
 
@@ -119,6 +126,7 @@ async def apply_verb_import(
             item.canonical_language = payload.canonical_language
 
         checksum = payload_checksum(payload)
+        schema_version = 2 if payload.pedagogy is not None else 1
         draft = await session.get(ContentDraft, item.id)
         if draft is None:
             draft = ContentDraft(
@@ -127,7 +135,7 @@ async def apply_verb_import(
                 definition=_primary_translation(payload, "en"),
                 cefr=payload.classification.cefr,
                 register=payload.classification.register,
-                schema_version=1,
+                schema_version=schema_version,
                 source_checksum=checksum,
                 updated_by_user_id=actor.id,
             )
@@ -137,7 +145,7 @@ async def apply_verb_import(
             draft.definition = _primary_translation(payload, "en")
             draft.cefr = payload.classification.cefr
             draft.register = payload.classification.register
-            draft.schema_version = 1
+            draft.schema_version = schema_version
             draft.source_checksum = checksum
             draft.updated_by_user_id = actor.id
 
@@ -164,6 +172,22 @@ async def apply_verb_import(
                         value=value.strip(),
                     )
                 )
+
+        if payload.pedagogy is not None:
+            session.add(
+                DraftLocalization(
+                    item_id=item.id,
+                    locale=PEDAGOGY_LOCALE,
+                    field=PEDAGOGY_FIELD,
+                    position=0,
+                    value=json.dumps(
+                        payload.pedagogy.model_dump(mode="json"),
+                        ensure_ascii=False,
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ),
+                )
+            )
 
         for position, example in enumerate(payload.examples):
             session.add(
@@ -344,6 +368,7 @@ async def list_published_verbs(session: AsyncSession) -> list[VerbView]:
             continue
         translations = await _version_translations(session, latest.id)
         examples = await _version_examples(session, latest.id)
+        pedagogy = await _version_pedagogy(session, latest.id)
         result.append(
             VerbView(
                 item_id=item.id,
@@ -363,6 +388,7 @@ async def list_published_verbs(session: AsyncSession) -> list[VerbView]:
                 register=latest.register,
                 translations=translations,
                 examples=examples,
+                pedagogy=pedagogy,
             )
         )
     result.sort(key=lambda row: row.lemma)
@@ -388,12 +414,58 @@ async def list_versions(session: AsyncSession, item_id: UUID) -> list[VersionSum
     ]
 
 
+def load_days_1_3_pedagogy() -> dict[str, dict]:
+    if not DAYS_1_3_PEDAGOGY_PATH.exists():
+        return {}
+    raw = json.loads(DAYS_1_3_PEDAGOGY_PATH.read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        raise RuntimeError("Days 1-3 pedagogy file must be a JSON object")
+    return raw
+
+
 def load_starter_verbs() -> list[VerbImportIn]:
     path = Path(__file__).resolve().parents[4] / "content" / "starter-verbs.csv"
+    pedagogy_by_id = load_days_1_3_pedagogy()
     records: list[dict] = []
     with path.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle):
             slug = row["external_id"].removeprefix("verb.")
+            deep = pedagogy_by_id.get(row["external_id"], {})
+            grammar_overrides = deep.get("grammar_overrides") or {}
+            regularity = grammar_overrides.get("regularity") or (
+                "regular" if row["participle_ii"].endswith("t") else "irregular"
+            )
+            examples = deep.get("examples")
+            if not examples:
+                examples = [
+                    {
+                        "external_id": f"example.{slug}.interview.1",
+                        "de": row["example_de"],
+                        "fa": None,
+                        "en": None,
+                        "skill": "technical-speaking",
+                    }
+                ]
+            else:
+                lemma = row["lemma"]
+                if not any(lemma in str(example.get("de", "")) for example in examples):
+                    examples = [
+                        {
+                            "external_id": f"example.{slug}.infinitive.1",
+                            "de": row["example_de"],
+                            "en": None,
+                            "fa": None,
+                            "skill": "natural",
+                        },
+                        *examples,
+                    ]
+            pedagogy = None
+            if deep:
+                pedagogy = {
+                    key: value
+                    for key, value in deep.items()
+                    if key not in {"examples", "grammar_overrides"}
+                }
             records.append(
                 {
                     "external_id": row["external_id"],
@@ -412,28 +484,19 @@ def load_starter_verbs() -> list[VerbImportIn]:
                         "separable": row["separable"].lower() == "true",
                         "separable_prefix": row["separable_prefix"] or None,
                         "reflexive": False,
-                        "regularity": (
-                            "regular"
-                            if row["participle_ii"].endswith("t")
-                            else "irregular"
+                        "regularity": regularity,
+                        "governed_case": grammar_overrides.get("governed_case"),
+                        "governed_preposition": grammar_overrides.get(
+                            "governed_preposition"
                         ),
-                        "governed_case": None,
-                        "governed_preposition": None,
                     },
                     "classification": {
                         "cefr": row["cefr"],
                         "domains": ["software-development", "interview"],
                         "register": "neutral",
                     },
-                    "examples": [
-                        {
-                            "external_id": f"example.{slug}.interview.1",
-                            "de": row["example_de"],
-                            "fa": None,
-                            "en": None,
-                            "skill": "technical-speaking",
-                        }
-                    ],
+                    "examples": examples,
+                    "pedagogy": pedagogy,
                 }
             )
     return TypeAdapter(list[VerbImportIn]).validate_python(records)
@@ -477,6 +540,30 @@ async def _version_examples(session: AsyncSession, version_id: UUID) -> list[Exa
         )
         for row in rows
     ]
+
+
+async def _version_pedagogy(
+    session: AsyncSession,
+    version_id: UUID,
+) -> VerbPedagogyIn | None:
+    row = await session.scalar(
+        select(VersionLocalization).where(
+            VersionLocalization.version_id == version_id,
+            VersionLocalization.field == PEDAGOGY_FIELD,
+            VersionLocalization.locale == PEDAGOGY_LOCALE,
+            VersionLocalization.position == 0,
+        )
+    )
+    if row is None:
+        return None
+    return VerbPedagogyIn.model_validate_json(row.value)
+
+
+async def load_version_pedagogy(
+    session: AsyncSession,
+    version_id: UUID,
+) -> VerbPedagogyIn | None:
+    return await _version_pedagogy(session, version_id)
 
 
 def _ensure_unique_external_ids(payloads: list[VerbImportIn]) -> None:
