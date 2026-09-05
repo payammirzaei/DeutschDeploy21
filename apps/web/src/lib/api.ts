@@ -14,11 +14,8 @@ type ApiCall = (url: string, init?: object) => Promise<ApiResult>;
 
 // Default missing init so local typecheck works before CI regenerates types.
 // credentials: include keeps the HttpOnly session cookie on LAN / IP hosts.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const client = createClient<paths>({
-  baseUrl: "",
-  credentials: "include",
-}) as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- openapi-fetch client until schema is typed
+const client = createClient<paths>({ baseUrl: "", credentials: "include" }) as any;
 
 export const api = {
   GET: ((url: string, init?: object) => client.GET(url, init ?? {})) as ApiCall,

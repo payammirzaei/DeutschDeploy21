@@ -126,7 +126,6 @@
   border-radius: 1rem;
   background: var(--surface-strong, #171717);
   padding: 0.8rem;
-  color: var(--text-strong, #fff);
 }
 
 .factRow strong {
@@ -158,8 +157,6 @@
   border-radius: 0.9rem;
   background: var(--surface-strong, #171717);
   font-weight: 900;
-  color: var(--text-strong, #fff);
-  
 }
 
 .exerciseMeta > div {
@@ -187,7 +184,6 @@
 
 .timeNote {
   background: var(--surface-strong, #171717);
-  color: var(--text-strong, #fff);
 }
 
 .error {
