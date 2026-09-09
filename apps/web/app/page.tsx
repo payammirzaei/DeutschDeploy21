@@ -13,9 +13,14 @@ export default function Home() {
         <Link href="/" className="brand" aria-label="DeutschDeploy21 home">
           DD<span>21</span>
         </Link>
-        <Link className="text-link" href="/login">
-          Sign in
-        </Link>
+        <div className="topbar-actions">
+          <Link className="text-link" href="/login">
+            Sign in
+          </Link>
+          <Link className="button button-primary compact" href="/register">
+            Create account
+          </Link>
+        </div>
       </nav>
 
       <section className="hero">
@@ -32,10 +37,12 @@ export default function Home() {
           the German that makes technical interviews work.
         </p>
         <div className="hero-actions">
-          <Link className="button button-primary" href="/login">
-            Enter your workspace <span aria-hidden="true">→</span>
+          <Link className="button button-primary" href="/register">
+            Start learning <span aria-hidden="true">→</span>
           </Link>
-          <span className="quiet">Private alpha · Phase 1</span>
+          <Link className="text-link" href="/login">
+            I already have an account
+          </Link>
         </div>
       </section>
 
