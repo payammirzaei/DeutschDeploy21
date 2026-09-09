@@ -6,6 +6,7 @@ import {
   ExerciseAnswer,
   ExercisePrompt,
 } from "@/src/components/exercise-player";
+import { GermanSpeakButton } from "@/src/components/german-speak-button";
 
 import styles from "./learning-feedback.module.css";
 
@@ -253,7 +254,10 @@ export function LearningFeedback({
         {lesson?.example_de ? (
           <div className={`${styles.teachingCard} ${styles.anchorCard}`}>
             <span>{copy.anchor}</span>
-            <blockquote lang="de" dir="ltr">{lesson.example_de}</blockquote>
+            <div className={styles.anchorRow} dir="ltr">
+              <blockquote lang="de">{lesson.example_de}</blockquote>
+              <GermanSpeakButton text={lesson.example_de} />
+            </div>
           </div>
         ) : null}
 
