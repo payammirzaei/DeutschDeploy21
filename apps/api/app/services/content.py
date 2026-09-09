@@ -429,8 +429,8 @@ def load_starter_verbs() -> list[VerbImportIn]:
                         {
                             "external_id": f"example.{slug}.interview.1",
                             "de": row["example_de"],
-                            "fa": None,
-                            "en": None,
+                            "fa": row.get("example_fa") or None,
+                            "en": row.get("example_en") or None,
                             "skill": "technical-speaking",
                         }
                     ],
