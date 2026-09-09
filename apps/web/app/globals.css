@@ -26,6 +26,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 
 .landing, .dashboard-shell { min-height: 100dvh; padding: 28px clamp(20px, 4vw, 64px) 48px; }
 .topbar, .dashboard-header { display: flex; align-items: center; justify-content: space-between; max-width: 1440px; margin: 0 auto; }
+.topbar-actions { display: flex; align-items: center; gap: 16px; }
 .brand { font-size: 21px; font-weight: 900; letter-spacing: -0.06em; }
 .brand span { color: var(--accent); }
 .text-link, .text-button { font-size: 14px; border: 0; background: transparent; padding: 10px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
@@ -41,6 +42,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .button:disabled { opacity: .55; cursor: wait; }
 .button-primary { background: var(--ink); color: var(--paper); }
 .button-accent { background: var(--accent); border-color: var(--accent); color: white; }
+.button.compact { min-height: 38px; padding: 10px 14px; font-size: 13px; }
 .full { width: 100%; }
 .quiet { color: var(--muted); font-size: 13px; }
 .metrics { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
@@ -58,6 +60,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .auth-form input { width: 100%; min-height: 44px; background: transparent; border: 1px solid var(--line); padding: 14px; border-radius: 8px; outline: none; }
 .auth-form input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,92,204,.1); }
 .form-error { color: var(--danger); font-size: 13px; }
+.auth-switch { margin: 22px 0 0; text-align: center; color: var(--muted); font-size: 14px; }
+.auth-switch a { color: var(--ink); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
 
 .dashboard-header { border-bottom: 1px solid var(--line); padding-bottom: 18px; }
 .header-right { display: flex; align-items: center; gap: 18px; }
@@ -116,6 +120,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   .hero { margin-top: 80px; }
   .hero h1 { font-size: clamp(50px, 16vw, 72px); }
   .auth-card { box-shadow: 0 12px 34px rgba(20, 32, 51, .12); }
+  .topbar-actions .button { display: none; }
   .dashboard-header { align-items: flex-start; }
   .dashboard-main h1 { font-size: clamp(48px, 15vw, 70px); }
   .dashboard-lead { font-size: 17px; }
