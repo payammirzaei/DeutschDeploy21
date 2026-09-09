@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.content import ContentVersion, VersionExample, VersionLocalization
 from app.models.learning import ActivityInstance, CourseDay, CourseRelease, ReleaseActivity
 
-PROMPT_CONTRACT_VERSION = 2
+PROMPT_CONTRACT_VERSION = 3
 
 QUESTION_I18N: dict[str, dict[str, str]] = {
     "meaning_multiple_choice": {
