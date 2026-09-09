@@ -1,7 +1,9 @@
 .player {
   display: grid;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
@@ -87,8 +89,11 @@
 }
 
 .lessonGoal {
+  min-width: 0;
+  max-width: 100%;
   font-size: clamp(1rem, 2.5vw, 1.12rem);
   line-height: 1.42;
+  overflow-wrap: anywhere;
 }
 
 .exampleRow {
@@ -99,8 +104,10 @@
 }
 
 .exampleRow blockquote {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .lessonCard blockquote {
@@ -188,13 +195,17 @@
 
 .heading {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   gap: 0.45rem;
   padding-top: 0.2rem;
 }
 
 .heading h2 {
   margin: 0;
-  max-width: 28ch;
+  min-width: 0;
+  max-width: min(28ch, 100%);
+  overflow-wrap: anywhere;
   font-size: clamp(1.42rem, 4vw, 2.05rem);
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -306,6 +317,9 @@
 
 .sentenceBoard {
   display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: 7.5rem;
   flex-wrap: wrap;
   align-content: flex-start;
@@ -323,7 +337,10 @@
 
 .orderedToken,
 .tokenBank button {
+  max-width: 100%;
   min-height: 2.85rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
   border: 1px solid var(--line, rgba(20, 32, 51, 0.14));
   border-bottom-width: 3px;
   border-radius: 0.82rem;
@@ -343,6 +360,9 @@
 
 .tokenBank {
   display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   flex-wrap: wrap;
   gap: 0.55rem;
 }
@@ -481,9 +501,11 @@
   }
 
   .exampleRow {
+    display: grid;
     width: 100%;
     min-width: 0;
-    align-items: flex-start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
   }
 
   .exampleTranslations {
