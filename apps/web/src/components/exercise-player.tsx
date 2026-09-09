@@ -2,6 +2,8 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
+import { GermanSpeakButton } from "@/src/components/german-speak-button";
+
 import styles from "./exercise-player.module.css";
 
 export type ExerciseLocale = "en" | "fa";
@@ -443,7 +445,10 @@ function LearningContext({
       </div>
       {goal ? <strong className={styles.lessonGoal}>{goal}</strong> : null}
       {lesson.example_de ? (
-        <blockquote lang="de" dir="ltr">{lesson.example_de}</blockquote>
+        <div className={styles.exampleRow} dir="ltr">
+          <blockquote lang="de">{lesson.example_de}</blockquote>
+          <GermanSpeakButton text={lesson.example_de} />
+        </div>
       ) : null}
       {exampleTranslation ? <p className={styles.exampleTranslation}>{exampleTranslation}</p> : null}
       {explanation ? <p>{explanation}</p> : null}
