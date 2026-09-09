@@ -1,5 +1,8 @@
+import csv
 import hashlib
 import json
+from functools import lru_cache
+from pathlib import Path
 from uuid import UUID
 
 from sqlalchemy import select
@@ -225,6 +228,11 @@ async def enrich_learning_instance(
         .limit(1)
     )
     translations = await _translations(session, version.id)
+    starter_example = (
+        _starter_example_translations().get(example.text_de, {})
+        if example is not None
+        else {}
+    )
     prompt = dict(instance.prompt)
     exercise_type = instance.exercise_type
 
@@ -243,8 +251,16 @@ async def enrich_learning_instance(
         "explanation_i18n": EXPLANATION_I18N.get(exercise_type, {}),
         "example_de": example.text_de if example else None,
         "example_i18n": {
-            "en": example.text_en if example else None,
-            "fa": example.text_fa if example else None,
+            "en": (
+                example.text_en
+                if example and example.text_en
+                else starter_example.get("en")
+            ),
+            "fa": (
+                example.text_fa
+                if example and example.text_fa
+                else starter_example.get("fa")
+            ),
         },
         "meaning_i18n": {
             "en": translations.get("en"),
@@ -286,6 +302,25 @@ async def enrich_learning_instance(
     ).hexdigest()
     await session.flush()
     return instance
+
+
+@lru_cache(maxsize=1)
+def _starter_example_translations() -> dict[str, dict[str, str]]:
+    path = Path(__file__).resolve().parents[4] / "content" / "starter-verbs.csv"
+    if not path.exists():
+        return {}
+
+    translations: dict[str, dict[str, str]] = {}
+    with path.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            german = (row.get("example_de") or "").strip()
+            if not german:
+                continue
+            translations[german] = {
+                "en": (row.get("example_en") or "").strip(),
+                "fa": (row.get("example_fa") or "").strip(),
+            }
+    return translations
 
 
 async def _translations(session: AsyncSession, version_id: UUID) -> dict[str, str]:
