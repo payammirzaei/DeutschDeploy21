@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+
 import { api } from "@/src/lib/api";
 
 export default function LoginPage() {
@@ -35,9 +36,9 @@ export default function LoginPage() {
         DD<span>21</span>
       </Link>
       <section className="auth-card">
-        <div className="eyebrow">PRIVATE WORKSPACE</div>
+        <div className="eyebrow">YOUR WORKSPACE</div>
         <h1>Welcome back.</h1>
-        <p>Sign in with the bootstrap account configured for your environment.</p>
+        <p>Sign in with your DeutschDeploy21 account.</p>
 
         <form onSubmit={submit} className="auth-form">
           <label>
@@ -69,6 +70,10 @@ export default function LoginPage() {
             {pending ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        <p className="auth-switch">
+          New here? <Link href="/register">Create an account</Link>
+        </p>
       </section>
     </main>
   );
