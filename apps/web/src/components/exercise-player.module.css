@@ -1,5 +1,7 @@
 .player {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   gap: 1rem;
 }
 
@@ -40,6 +42,9 @@
 .lessonCard {
   position: relative;
   display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   gap: 0.75rem;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--accent, #3b5ccc) 20%, var(--line, #ddd));
@@ -115,6 +120,9 @@
 
 .exampleTranslations {
   display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   gap: 0.42rem;
   border-inline-start: 3px solid color-mix(in srgb, var(--accent, #3b5ccc) 34%, transparent);
   padding-inline-start: 0.9rem;
@@ -122,6 +130,9 @@
 
 .translationRow {
   display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   grid-template-columns: 2rem minmax(0, 1fr);
   align-items: start;
   gap: 0.55rem;
@@ -150,9 +161,13 @@
 }
 
 .lessonCard .translationRow > p {
+  min-width: 0;
+  max-width: 100%;
   color: var(--ink, #142033);
   font-size: 0.9rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .meaningLine {
@@ -466,7 +481,27 @@
   }
 
   .exampleRow {
+    width: 100%;
+    min-width: 0;
     align-items: flex-start;
+  }
+
+  .exampleTranslations {
+    padding-inline-start: 0.65rem;
+  }
+
+  .translationRow {
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: 0.4rem;
+  }
+
+  .translationRow[dir="rtl"] {
+    grid-template-columns: minmax(0, 1fr) 1.75rem;
+  }
+
+  .lessonCard .translationRow > p {
+    font-size: 0.86rem;
+    line-height: 1.55;
   }
 
   .lessonCard blockquote {
