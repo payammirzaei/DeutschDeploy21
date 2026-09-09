@@ -433,7 +433,8 @@ function LearningContext({
   const title = localize(lesson.title_i18n, locale) ?? COPY[locale].context;
   const goal = localize(lesson.goal_i18n, locale);
   const explanation = localize(lesson.explanation_i18n, locale);
-  const exampleTranslation = localize(lesson.example_i18n, locale);
+  const exampleEnglish = lesson.example_i18n?.en ?? null;
+  const examplePersian = lesson.example_i18n?.fa ?? null;
   const meaning = localize(lesson.meaning_i18n, locale);
   const canShowMeaning = !new Set(["meaning_multiple_choice", "meaning_matching"]).has(exerciseType);
 
@@ -450,7 +451,22 @@ function LearningContext({
           <GermanSpeakButton text={lesson.example_de} />
         </div>
       ) : null}
-      {exampleTranslation ? <p className={styles.exampleTranslation}>{exampleTranslation}</p> : null}
+      {exampleEnglish || examplePersian ? (
+        <div className={styles.exampleTranslations}>
+          {exampleEnglish ? (
+            <div className={styles.translationRow} dir="ltr">
+              <span>EN</span>
+              <p lang="en">{exampleEnglish}</p>
+            </div>
+          ) : null}
+          {examplePersian ? (
+            <div className={styles.translationRow} dir="rtl">
+              <span>FA</span>
+              <p lang="fa">{examplePersian}</p>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       {explanation ? <p>{explanation}</p> : null}
       {canShowMeaning && meaning ? (
         <div className={styles.meaningLine}>
