@@ -113,8 +113,46 @@
   line-height: 1.52;
 }
 
-.exampleTranslation {
+.exampleTranslations {
+  display: grid;
+  gap: 0.42rem;
+  border-inline-start: 3px solid color-mix(in srgb, var(--accent, #3b5ccc) 34%, transparent);
+  padding-inline-start: 0.9rem;
+}
+
+.translationRow {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.55rem;
+}
+
+.translationRow[dir="rtl"] {
+  grid-template-columns: minmax(0, 1fr) 2rem;
+}
+
+.translationRow[dir="rtl"] > span {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.translationRow[dir="rtl"] > p {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.translationRow > span {
+  padding-top: 0.08rem;
+  color: var(--accent, #3b5ccc);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.lessonCard .translationRow > p {
+  color: var(--ink, #142033);
   font-size: 0.9rem;
+  line-height: 1.45;
 }
 
 .meaningLine {
