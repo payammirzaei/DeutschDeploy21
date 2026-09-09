@@ -157,6 +157,8 @@
 }
 
 .workspace {
+  width: 100%;
+  min-width: 0;
   max-width: 1320px;
   margin: 22px auto 0;
   display: grid;
@@ -277,9 +279,12 @@
 }
 
 .stage {
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
   padding: clamp(28px, 4.5vw, 62px);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   background:
     radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent-soft) 55%, transparent), transparent 34%),
@@ -289,7 +294,9 @@
 .dayIntro,
 .exercise,
 .feedback {
-  width: min(100%, 820px);
+  width: 100%;
+  min-width: 0;
+  max-width: 820px;
   margin-inline: auto;
 }
 
@@ -604,9 +611,9 @@
   .stage {
     width: 100%;
     min-width: 0;
-    max-width: 100vw;
+    max-width: 100%;
     padding: 24px 14px 32px;
-    overflow-x: clip;
+    overflow-x: hidden;
   }
 
   .exercise {
