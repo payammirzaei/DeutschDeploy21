@@ -20,7 +20,12 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json ./
 COPY apps/web/package.json apps/web/package.json
-RUN npm install
+
+# The npm version bundled with the current Node 22 image can hit an Arborist
+# workspace-resolution crash ("Cannot read properties of null (reading 'edgesOut')").
+# Pin a newer npm release before resolving the monorepo workspace dependencies.
+RUN npm install -g npm@12.0.2 \
+    && npm install
 
 FROM node:22-alpine AS builder
 WORKDIR /app
