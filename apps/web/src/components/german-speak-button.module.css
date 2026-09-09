@@ -1,0 +1,64 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.45rem;
+  border: 1px solid color-mix(in srgb, var(--accent, #3b5ccc) 28%, var(--line, #ddd));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface, #fff) 86%, transparent);
+  padding: 0.45rem 0.72rem;
+  color: var(--accent, #3b5ccc);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  border-color: var(--accent, #3b5ccc);
+  background: color-mix(in srgb, var(--accent-soft, #e8edff) 72%, white);
+  transform: translateY(-1px);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent, #3b5ccc);
+  outline-offset: 2px;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.speaking {
+  background: var(--accent, #3b5ccc);
+  color: white;
+}
+
+@media (max-width: 560px) {
+  .button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .button {
+    width: 2.65rem;
+    min-width: 2.65rem;
+    padding-inline: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
