@@ -457,7 +457,7 @@
   }
 
   .workspace {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     min-height: 0;
     overflow: visible;
   }
@@ -602,7 +602,18 @@
   }
 
   .stage {
+    width: 100%;
+    min-width: 0;
+    max-width: 100vw;
     padding: 24px 14px 32px;
+    overflow-x: clip;
+  }
+
+  .exercise {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .dayIntro h2,
